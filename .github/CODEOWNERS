@@ -1,0 +1,23 @@
+# WikiHop — Code Owners
+# Format : pattern  @owner
+# Ces règles déclenchent une revue obligatoire selon la zone modifiée.
+#
+# En pratique dans ce projet, l'orchestrateur (toi) est le seul reviewer GitHub,
+# mais ce fichier documente quelle zone correspond à quel agent.
+
+# Règle par défaut — Tech Lead valide tout
+*                           @vermich
+
+# Architecture et CI/CD
+.github/                    @vermich
+CLAUDE.md                   @vermich
+docs/                       @vermich
+
+# Backend (Julien)
+apps/backend/               @vermich
+
+# Mobile (Laurent)
+apps/mobile/                @vermich
+
+# Packages partagés (Maxime)
+packages/                   @vermich

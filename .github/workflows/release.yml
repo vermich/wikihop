@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/mobile/**'
+      - 'apps/backend/**'
+      - 'packages/**'
+
+jobs:
+  # ─────────────────────────────────────────────
+  # Build Expo EAS (preview interne)
+  # ─────────────────────────────────────────────
+  build-mobile:
+    name: Build mobile (EAS)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/mobile/package-lock.json
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        working-directory: apps/mobile
+        run: npm ci
+
+      - name: Build preview (iOS + Android)
+        working-directory: apps/mobile
+        run: eas build --platform all --profile preview --non-interactive
+
+  # ─────────────────────────────────────────────
+  # Deploy Backend
+  # ─────────────────────────────────────────────
+  deploy-backend:
+    name: Deploy backend
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: apps/backend
+        run: npm ci --production
+
+      # À adapter selon l'hébergeur choisi (Railway, Render, Fly.io...)
+      # - name: Deploy to Railway
+      #   run: railway up
+      #   env:
+      #     RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Deploy placeholder
+        run: echo "🚀 Backend deployment step — configure with your hosting provider"

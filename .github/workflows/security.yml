@@ -1,0 +1,51 @@
+name: Security audit
+
+on:
+  push:
+    branches: [main, develop]
+  schedule:
+    # Tous les lundis à 8h00 UTC
+    - cron: '0 8 * * 1'
+
+jobs:
+  audit-backend:
+    name: npm audit — Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Audit backend dependencies
+        working-directory: apps/backend
+        run: |
+          if [ -f package.json ]; then
+            npm audit --audit-level=high
+          else
+            echo "No package.json yet — skipping"
+          fi
+
+  audit-mobile:
+    name: npm audit — Mobile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Audit mobile dependencies
+        working-directory: apps/mobile
+        run: |
+          if [ -f package.json ]; then
+            npm audit --audit-level=high
+          else
+            echo "No package.json yet — skipping"
+          fi
