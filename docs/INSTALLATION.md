@@ -68,23 +68,20 @@ Installez-la maintenant, vous en aurez besoin à l'étape 7.
 
 ---
 
-## 2. 📥 Cloner le projet
+## 2. 📥 Récupérer le projet
 
-"Cloner" signifie télécharger le code source du projet sur votre ordinateur.
+> **Si vous travaillez dans Cursor (ou tout autre éditeur avec le projet déjà ouvert) — passez directement à l'étape 3.** Le projet est déjà sur votre machine.
 
-Ouvrez le **Terminal** et tapez la commande suivante (remplacez l'URL si nécessaire) :
+Si vous partez de zéro sur un nouvel ordinateur, ouvrez le **Terminal** et tapez :
 
 ```bash
 git clone https://github.com/vermich/wikihop.git
-```
-
-Puis entrez dans le dossier du projet :
-
-```bash
 cd wikihop
 ```
 
-> 💡 Toutes les commandes qui suivent doivent être exécutées depuis ce dossier `wikihop`.
+**Dans Cursor**, utilisez le Terminal intégré (`Ctrl + \`` ou menu *Terminal > New Terminal*) — il s'ouvre automatiquement à la racine du projet, vous n'avez rien d'autre à faire.
+
+> 💡 Toutes les commandes qui suivent doivent être exécutées depuis le dossier racine `wikihop` (celui qui contient `package.json`).
 
 ---
 
