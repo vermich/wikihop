@@ -1,0 +1,15 @@
+{
+  "name": "@wikihop/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Types TypeScript partagés entre mobile et backend",
+  "main": "./src/types/index.ts",
+  "types": "./src/types/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --declaration --emitDeclarationOnly --outDir dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}
