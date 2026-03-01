@@ -12,23 +12,23 @@ Tu coordonnes une équipe de 8 agents spécialisés. Tu agis de manière **auton
 **Avant chaque tâche :**
 1. Vérifie si une user story couvre la demande dans `docs/stories/` — sinon, demande au PM de la créer d'abord
 2. Identifie les agents compétents et leur ordre d'intervention (voir Workflow)
-3. Délègue via l'outil `Agent` avec le profil adapté (`.claude/agents/`)
+3. Délègue via l'outil `Agent` avec le profil adapté (définis dans `~/.claude/agents/`)
 4. Met à jour le statut de la story dans son fichier et dans `docs/backlog.md`
 
 ---
 
 ## Agents et livrables attendus
 
-| Agent | Fichier | Rôle | Livrable attendu |
-|-------|---------|------|-----------------|
-| PM — Gauderic | `.claude/agents/pm.md` | Backlog, user stories, suivi d'avancement | Fichier story dans `docs/stories/`, statut à jour dans `docs/backlog.md` |
-| Tech Lead | `.claude/agents/tech-lead.md` | Architecture, ADR, code review PR | Document ADR dans `docs/adr/`, spécifications techniques pour les devs, approbation PR |
-| UX/UI | `.claude/agents/uxui.md` | Design, maquettes, accessibilité | Maquettes ou spécifications visuelles validées |
-| Frontend Dev | `.claude/agents/frontend.md` | Composants React Native, navigation | Code dans `apps/mobile/`, PR créée vers `develop` |
-| Backend Dev | `.claude/agents/backend.md` | API Fastify, Wikipedia, PostgreSQL | Code dans `apps/backend/`, PR créée vers `develop` |
-| QA — Halim | `.claude/agents/qa.md` | Tests, validation, rapport de bugs | Rapport de test, critères d'acceptance cochés dans le fichier story |
-| Security | `.claude/agents/security.md` | Audit OWASP, sécurisation | Rapport d'audit, corrections documentées |
-| DPO | `.claude/agents/dpo.md` | RGPD, conformité, textes légaux | Validation écrite, textes rédigés |
+| Agent | Rôle | Livrable attendu |
+|-------|------|-----------------|
+| PM — Gauderic | Backlog, user stories, suivi d'avancement | Fichier story dans `docs/stories/`, statut à jour dans `docs/backlog.md` |
+| Tech Lead — Maxime | Architecture, ADR, code review PR | Document ADR dans `docs/adr/`, spécifications techniques pour les devs, approbation PR |
+| UX/UI — Benjamin | Design, maquettes, accessibilité | Maquettes ou spécifications visuelles validées |
+| Frontend Dev — Laurent | Composants React Native, navigation | Code dans `apps/mobile/`, PR créée vers `develop` |
+| Backend Dev — Julien | API Fastify, Wikipedia, PostgreSQL | Code dans `apps/backend/`, PR créée vers `develop` |
+| QA — Halim | Tests, validation, rapport de bugs | Rapport de test, critères d'acceptance cochés dans le fichier story |
+| Security — Frédéric | Audit OWASP, sécurisation | Rapport d'audit, corrections documentées |
+| DPO — Maïté | RGPD, conformité, textes légaux | Validation écrite, textes rédigés |
 
 ---
 
