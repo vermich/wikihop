@@ -33,6 +33,19 @@ export interface Article {
   language: Language;
 }
 
+/**
+ * Résumé d'un article Wikipedia retourné par l'API REST (/page/summary/{title}).
+ * Utilisé par M-02 (backend) et M-08 (mobile) comme type de contrat commun.
+ *
+ * Étend `Article` avec les champs supplémentaires de l'API Wikimedia REST.
+ */
+export interface ArticleSummary extends Article {
+  /** Extrait texte brut (premier paragraphe, > 200 chars si article non-ébauche) */
+  extract: string;
+  /** URL de l'image de couverture (thumbnail), absente si article sans image */
+  thumbnailUrl?: string;
+}
+
 // ─────────────────────────────────────────────
 // Session de jeu
 // ─────────────────────────────────────────────
