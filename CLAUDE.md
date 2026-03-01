@@ -155,6 +155,8 @@ Un agent **ne valide jamais son propre travail** :
 - `main` = production stable — merge uniquement depuis `develop` après validation complète
 - Le Tech Lead approuve toutes les PR avant merge
 
+**L'orchestrateur gère Git de manière autonome** : commits, push, merge de branches de correction vers `develop` — sans demander de validation au Client. Seul le merge de `develop` vers `main` (mise en production) requiert une confirmation explicite.
+
 ---
 
 ## Règles générales
