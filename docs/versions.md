@@ -67,6 +67,17 @@ Mis à jour manuellement à chaque changement de version significatif.
 
 ---
 
+## Vulnérabilités connues — à traiter en Phase 4
+
+| Dépendance | CVE | Sévérité | Fix | Impact réel | Planifié |
+|------------|-----|:--------:|-----|-------------|---------|
+| `node-pg-migrate` 7.9.1 | GHSA-5j98-mcp5-4vw2 (glob CLI) | High | Upgrade → v8.x | Nul — outil CLI interne uniquement | Phase 4 |
+| `expo` SDK 52 / `tar` | GHSA-r6q2-hw4h-w, GHSA-34x7… | High | Upgrade → Expo SDK 55 | Nul — extraction d'archives signées Expo uniquement | Phase 4 |
+
+> Ces alertes apparaissent à chaque `npm install`. Elles concernent des outils de développement, pas le code de l'application finale. Elles seront auditées et corrigées par Security — Frédéric avant la mise en production.
+
+---
+
 ## Notes de compatibilité
 
 - **Zod v3 + `zod/v4`** : `fastify-type-provider-zod` v6 utilise l'API interne Zod v4. Les imports doivent utiliser `'zod/v4'` (disponible depuis Zod 3.25.0).
