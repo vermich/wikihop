@@ -50,9 +50,9 @@ Mis à jour manuellement à chaque changement de version significatif.
 
 | Composant | Version installée | Rôle |
 |-----------|:-----------------:|------|
-| React Native | 0.76.9 | Framework mobile |
-| React | 18.3.1 | Bibliothèque UI |
-| Expo SDK | 52.0.49 | Plateforme managed workflow |
+| React Native | 0.81.5 | Framework mobile |
+| React | 19.1.0 | Bibliothèque UI |
+| Expo SDK | 54.0.33 | Plateforme managed workflow |
 | @react-navigation/native | 7.1.31 | Navigation — core |
 | @react-navigation/native-stack | 7.14.2 | Navigation — stack natif |
 | Zustand | 4.5.7 | State management global |
@@ -72,7 +72,7 @@ Mis à jour manuellement à chaque changement de version significatif.
 | Dépendance | CVE | Sévérité | Fix | Impact réel | Planifié |
 |------------|-----|:--------:|-----|-------------|---------|
 | `node-pg-migrate` 7.9.1 | GHSA-5j98-mcp5-4vw2 (glob CLI) | High | Upgrade → v8.x | Nul — outil CLI interne uniquement | Phase 4 |
-| `expo` SDK 52 / `tar` | GHSA-r6q2-hw4h-w, GHSA-34x7… | High | Upgrade → Expo SDK 55 | Nul — extraction d'archives signées Expo uniquement | Phase 4 |
+| `expo` SDK 54 / `tar` | GHSA-r6q2-hw4h-w, GHSA-34x7… | High | Upgrade → Expo SDK 55 | Nul — extraction d'archives signées Expo uniquement | Phase 4 |
 
 > Ces alertes apparaissent à chaque `npm install`. Elles concernent des outils de développement, pas le code de l'application finale. Elles seront auditées et corrigées par Security — Frédéric avant la mise en production.
 

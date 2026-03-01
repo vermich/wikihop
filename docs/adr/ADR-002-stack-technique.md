@@ -18,14 +18,17 @@ Les contraintes structurantes sont :
 ### Mobile — `apps/mobile`
 | Couche | Technologie | Version | Justification |
 |--------|-------------|---------|---------------|
-| Framework | Expo SDK (managed workflow) | 52+ | Builds cloud EAS, pas d'environnement natif local requis |
-| Runtime | React Native | 0.76+ | Inclus avec Expo 52 |
+| Framework | Expo SDK (managed workflow) | 54+ | Builds cloud EAS, pas d'environnement natif local requis |
+| Runtime | React Native | 0.81+ | Inclus avec Expo 54 — New Architecture activée par défaut |
+| Runtime React | React | 19+ | Requis par Expo SDK 54 / React Native 0.81 |
 | Langage | TypeScript | 5.3+ | Strict mode activé |
 | Navigation | @react-navigation/native-stack | v7 | Intégration native (UINavigationController / Fragment), performances supérieures à JS stack |
 | State management | Zustand | 4+ | API minimaliste, pas de boilerplate Redux, DevTools disponibles |
-| Persistance locale | @react-native-async-storage/async-storage | 1.23+ | Standard Expo/RN pour la persistance clé-valeur |
+| Persistance locale | @react-native-async-storage/async-storage | 2.x+ | Standard Expo/RN pour la persistance clé-valeur |
 | Tests | Jest + @testing-library/react-native | latest | Standard communauté React Native |
 | Build cloud | Expo EAS Build | latest | Génère les .ipa/.apk sans Xcode/Android Studio local |
+
+> **Migration SDK 54 (2026-03-01)** : migration Expo 52 → 54 effectuée dans `feat/frontend-expo-sdk-54`. `@types/react-native` supprimé — types inclus dans `react-native` depuis 0.71. `.npmrc` racine avec `legacy-peer-deps=true` ajouté pour contourner le conflit transitif optionnel `jest-expo 54.x` / `react-server-dom-webpack` en npm strict mode.
 
 Note sur la navigation : React Navigation v7 est retenu face à Expo Router. Expo Router impose une organisation de fichiers basée sur le filesystem (file-based routing) qui convient aux apps "classiques" mais contraint la structure de navigation d'un jeu où les transitions sont imprévisibles. React Navigation v7 avec `native-stack` offre plus de flexibilité pour les transitions custom de GameScreen.
 
