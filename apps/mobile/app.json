@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "WikiHop",
+    "slug": "wikihop",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.wikihop.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.wikihop.app"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "REMPLACER_PAR_EAS_PROJECT_ID"
+      }
+    }
+  }
+}

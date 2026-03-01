@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-native",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
+    "paths": {
+      "@wikihop/shared": ["../../packages/shared/src/types/index.ts"]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "App.tsx",
+    "index.ts",
+    "__tests__/**/*.ts",
+    "__tests__/**/*.tsx"
+  ],
+  "exclude": ["node_modules", ".expo", "dist"]
+}
