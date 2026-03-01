@@ -17,9 +17,11 @@ En tant que joueur, je veux être notifié immédiatement quand j'atteins la des
 ## Critères d'acceptance
 - [ ] Quand le joueur navigue vers l'article destination, la victoire est détectée automatiquement
 - [ ] L'écran de victoire affiche : nombre de sauts, temps total, article de départ, article destination
-- [ ] Le chemin complet parcouru est affiché (liste des articles visités)
-- [ ] Un bouton "Rejouer" lance une nouvelle partie avec une nouvelle paire aléatoire
-- [ ] Un bouton "Menu" retourne à l'écran d'accueil
+- [ ] Le chemin complet parcouru est affiché sous forme de liste ordonnée d'articles cliquables (chaque article ouvre la page Wikipedia dans une WebView externe)
+- [ ] Un bouton "Lire [titre de l'article cible]" ouvre l'article destination complet dans une WebView
+- [ ] Un bouton "Rejouer" lance une nouvelle partie avec la même paire d'articles (timer et compteur remis à zéro), sans retourner à l'accueil
+- [ ] Un bouton "Nouvelle partie" tire une nouvelle paire aléatoire et retourne à l'accueil
+- [ ] Un bouton "Retour" retourne à l'écran d'accueil sans démarrer de partie
 - [ ] L'animation de victoire est satisfaisante sans être excessive
 
 ## Notes de réalisation

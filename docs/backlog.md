@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-02-28 | **Version** : 2.0
+**PM** : Gauderic | **Mis à jour** : 2026-03-01 | **Version** : 2.2
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -30,18 +30,18 @@
 
 | ID | Titre | Priorité | Agent(s) | Statut |
 |----|-------|----------|----------|--------|
-| [F-01](stories/F-01-monorepo-init.md) | Initialisation du monorepo | Must | Tech Lead | ⬜ pending |
-| [F-02](stories/F-02-typescript-strict.md) | Configuration TypeScript strict | Must | Tech Lead | ⬜ pending |
-| [F-03](stories/F-03-eslint-prettier.md) | Configuration ESLint + Prettier | Must | Tech Lead | ⬜ pending |
-| [F-04](stories/F-04-expo-app-init.md) | Initialisation de l'application Expo | Must | Tech Lead, Frontend Dev | ⬜ pending |
-| [F-05](stories/F-05-fastify-backend-init.md) | Initialisation du backend Fastify | Must | Tech Lead, Backend Dev | ⬜ pending |
-| [F-06](stories/F-06-postgresql-setup.md) | Configuration de la base de données PostgreSQL | Must | Tech Lead, Backend Dev | ⬜ pending |
-| [F-07](stories/F-07-github-actions-ci.md) | Pipeline CI/CD GitHub Actions (lint + tests) | Must | Tech Lead | ⬜ pending |
-| [F-08](stories/F-08-jest-config.md) | Configuration Jest (mobile + backend) | Must | Tech Lead, QA | ⬜ pending |
-| [F-09](stories/F-09-adr-architecture.md) | ADR — Décisions d'architecture initiales | Must | Tech Lead | ⬜ pending |
-| [F-10](stories/F-10-git-conventions.md) | Stratégie de branches et conventions de commits | Must | Tech Lead, Orchestrateur | ⬜ pending |
-| [F-11](stories/F-11-docker-compose.md) | Docker Compose pour l'environnement local | Should | Tech Lead, Backend Dev | ⬜ pending |
-| [F-12](stories/F-12-expo-eas-config.md) | Configuration Expo EAS (build cloud) | Should | Tech Lead, Frontend Dev | ⬜ pending |
+| [F-01](stories/F-01-monorepo-init.md) | Initialisation du monorepo | Must | Tech Lead | 🔄 in-progress |
+| [F-02](stories/F-02-typescript-strict.md) | Configuration TypeScript strict | Must | Tech Lead | 🔄 in-progress |
+| [F-03](stories/F-03-eslint-prettier.md) | Configuration ESLint + Prettier | Must | Tech Lead | 🔄 in-progress |
+| [F-04](stories/F-04-expo-app-init.md) | Initialisation de l'application Expo | Must | Tech Lead, Frontend Dev | 🔄 in-progress |
+| [F-05](stories/F-05-fastify-backend-init.md) | Initialisation du backend Fastify | Must | Tech Lead, Backend Dev | 🔄 in-progress |
+| [F-06](stories/F-06-postgresql-setup.md) | Configuration de la base de données PostgreSQL | Must | Tech Lead, Backend Dev | 🔄 in-progress |
+| [F-07](stories/F-07-github-actions-ci.md) | Pipeline CI/CD GitHub Actions (lint + tests) | Must | Tech Lead | 🔄 in-progress |
+| [F-08](stories/F-08-jest-config.md) | Configuration Jest (mobile + backend) | Must | Tech Lead, QA | 🔄 in-progress |
+| [F-09](stories/F-09-adr-architecture.md) | ADR — Décisions d'architecture initiales | Must | Tech Lead | 🔄 in-progress |
+| [F-10](stories/F-10-git-conventions.md) | Stratégie de branches et conventions de commits | Must | Tech Lead, Orchestrateur | 🔄 in-progress |
+| [F-11](stories/F-11-docker-compose.md) | Docker Compose pour l'environnement local | Should | Tech Lead, Backend Dev | 🔄 in-progress |
+| [F-12](stories/F-12-expo-eas-config.md) | Configuration Expo EAS (build cloud) | Should | Tech Lead, Frontend Dev | 🔄 in-progress |
 
 ---
 
@@ -65,6 +65,9 @@
 | [M-12](stories/M-12-language-support.md) | Support de la langue (français par défaut, configurable) | Should | Frontend Dev, Backend Dev | ⬜ pending |
 | [M-13](stories/M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | ⬜ pending |
 | [M-14](stories/M-14-article-thumbnail.md) | Affichage de l'image de résumé de l'article | Could | Frontend Dev | ⬜ pending |
+| [M-15](stories/M-15-webview-css-injection.md) | WebView Wikipedia avec injection CSS mobile | Must | Frontend Dev | ⬜ pending |
+| [M-16](stories/M-16-popular-pages-strategy.md) | Pages populaires — stratégie hybride API + cache + fallback JSON | Must | Frontend Dev, Backend Dev | ⬜ pending |
+| [M-17](stories/M-17-change-objective.md) | Bouton "Changer l'objectif" pendant le jeu | Should | Frontend Dev, UX/UI | ⬜ pending |
 
 ---
 
@@ -83,6 +86,12 @@
 | [F3-07](stories/F3-07-integration-tests.md) | Tests d'intégration — parcours de jeu complet | Should | QA | ⬜ pending |
 | [F3-08](stories/F3-08-personal-stats.md) | Statistiques personnelles | Could | Frontend Dev, UX/UI | ⬜ pending |
 | [F3-09](stories/F3-09-animations-haptics.md) | Animations et feedback haptique | Could | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-10](stories/F3-10-history-sort.md) | Tri multi-critères dans l'historique des parties | Should | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-11](stories/F3-11-game-detail-screen.md) | Vue détail d'une partie — parcours, suppression et rejouer | Should | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-12](stories/F3-12-local-multiplayer.md) | Multijoueur local hot-seat (passage du téléphone) | Should | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-13](stories/F3-13-dev-mode.md) | Mode développeur — toggle affichage de l'article cible | Could | Frontend Dev | ⬜ pending |
+| [F3-14](stories/F3-14-contact-feedback.md) | Formulaire de feedback in-app (ContactScreen) | Could | Frontend Dev, UX/UI, DPO, Backend Dev | ⬜ pending |
+| [F3-15](stories/F3-15-firebase-analytics.md) | Firebase Analytics — intégration skeleton (événements de base) | Could | Frontend Dev, DPO | ⬜ pending |
 
 ---
 
@@ -128,11 +137,11 @@
 | Phase | Must | Should | Could | Total |
 |-------|------|--------|-------|-------|
 | 1-Fondations | 10 | 2 | 0 | 12 |
-| 2-MVP | 9 | 4 | 1 | 14 |
-| 3-Features | 4 | 3 | 2 | 9 |
+| 2-MVP | 11 | 5 | 1 | 17 |
+| 3-Features | 4 | 6 | 5 | 15 |
 | 4-Production | 9 | 4 | 2 | 15 |
 | Won't | — | — | — | 4 |
-| **Total** | **32** | **13** | **5** | **54** |
+| **Total** | **34** | **17** | **8** | **63** |
 
 ---
 
@@ -141,14 +150,15 @@
 | Agent | Stories |
 |-------|---------|
 | Tech Lead | F-01, F-02, F-03, F-04, F-05, F-06, F-07, F-08, F-09, F-10, F-12, P-06, P-12 |
-| Frontend Dev | F-04, M-01, M-03, M-04, M-05, M-06, M-07, M-08, M-10, M-11, M-12, M-13, M-14, F3-02, F3-03, F3-04, F3-05, F3-06, F3-08, F3-09, P-07, P-08, P-12, P-13, P-14 |
-| Backend Dev | F-05, F-06, F-11, M-02, M-08, M-12, F3-01, F3-05, P-03, P-05, P-06, P-09 |
-| UX/UI | M-01, M-06, M-13, M-14, F3-01, F3-02, F3-04, F3-05, F3-06, F3-08, F3-09 |
+| Frontend Dev | F-04, M-01, M-03, M-04, M-05, M-06, M-07, M-08, M-10, M-11, M-12, M-13, M-14, M-15, M-16, M-17, F3-02, F3-03, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-13, F3-14, F3-15, P-07, P-08, P-12, P-13, P-14 |
+| Backend Dev | F-05, F-06, F-11, M-02, M-08, M-12, M-16, F3-01, F3-05, F3-14, P-03, P-05, P-06, P-09 |
+| UX/UI | M-01, M-06, M-13, M-14, M-17, F3-01, F3-02, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-14 |
 | QA | F-08, M-09, F3-07, P-05, P-11 |
 | Security | P-02, P-03, P-04, P-15 |
-| DPO | F3-04, F3-06, P-01, P-10, P-13, P-14 |
+| DPO | F3-04, F3-06, F3-14, F3-15, P-01, P-10, P-13, P-14 |
 
 ---
 
-*Backlog géré par Gauderic, PM WikiHop — 2026-02-28*
+*Backlog géré par Gauderic, PM WikiHop — 2026-03-01*
+*v2.1 : +9 stories créées (M-15 à M-17, F3-10 à F3-15) suite à l'analyse des fonctionnalités V1*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
