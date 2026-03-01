@@ -52,17 +52,17 @@
 | ID | Titre | Priorité | Agent(s) | Statut |
 |----|-------|----------|----------|--------|
 | [M-01](stories/M-01-home-screen.md) | Écran d'accueil — affichage départ et destination | Must | Frontend Dev, UX/UI, Backend Dev | ⬜ pending |
-| [M-02](stories/M-02-random-pair-api.md) | Génération d'une paire d'articles aléatoires (backend) | Must | Backend Dev | ⬜ pending |
+| [M-02](stories/M-02-random-pair-api.md) | Génération d'une paire d'articles aléatoires (backend) | Must | Backend Dev | 🔄 in-progress |
 | [M-03](stories/M-03-article-content-display.md) | Récupération et affichage du contenu d'un article Wikipedia | Must | Frontend Dev, Backend Dev | ⬜ pending |
 | [M-04](stories/M-04-article-navigation.md) | Navigation entre articles (tap sur un lien) | Must | Frontend Dev | ⬜ pending |
 | [M-05](stories/M-05-jumps-timer.md) | Compteur de sauts et timer en temps réel | Must | Frontend Dev | ⬜ pending |
 | [M-06](stories/M-06-victory-screen.md) | Détection de victoire et écran de résultat | Must | Frontend Dev, UX/UI | ⬜ pending |
 | [M-07](stories/M-07-game-session-model.md) | Modèle de données GameSession (local) | Must | Frontend Dev, Tech Lead | ✅ done |
-| [M-08](stories/M-08-wikipedia-service.md) | Service Wikipedia API (client mobile) | Must | Frontend Dev, Backend Dev | ⬜ pending |
+| [M-08](stories/M-08-wikipedia-service.md) | Service Wikipedia API (client mobile) | Must | Frontend Dev, Backend Dev | 🔄 in-progress |
 | [M-09](stories/M-09-unit-tests-game-logic.md) | Tests unitaires — logique de jeu | Must | QA, Frontend Dev, Backend Dev | ⬜ pending |
 | [M-10](stories/M-10-abandon-game.md) | Abandon de partie | Should | Frontend Dev, UX/UI | ⬜ pending |
 | [M-11](stories/M-11-offline-mode.md) | Gestion du mode hors-ligne | Should | Frontend Dev | ⬜ pending |
-| [M-12](stories/M-12-language-support.md) | Support de la langue (français par défaut, configurable) | Should | Frontend Dev, Backend Dev | ⬜ pending |
+| [M-12](stories/M-12-language-support.md) | Support de la langue (français par défaut, configurable) | Should | Frontend Dev, Backend Dev | 🔄 in-progress |
 | [M-13](stories/M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | ⬜ pending |
 | [M-14](stories/M-14-article-thumbnail.md) | Affichage de l'image de résumé de l'article | Could | Frontend Dev | ⬜ pending |
 | [M-15](stories/M-15-webview-css-injection.md) | WebView Wikipedia avec injection CSS mobile | Must | Frontend Dev | ⬜ pending |
