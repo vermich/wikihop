@@ -4,9 +4,9 @@ title: Configuration de la base de données PostgreSQL
 phase: 1-Fondations
 priority: Must
 agents: [Tech Lead, Backend Dev]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-01
 ---
 
 # F-06 — Configuration de la base de données PostgreSQL
@@ -18,7 +18,7 @@ En tant que développeur backend, je veux une base de données PostgreSQL connec
 - [x] PostgreSQL accessible localement (Docker Compose recommandé)
 - [x] Client de base de données configuré (pg ou Prisma — décision ADR)
 - [x] Système de migrations en place (schéma versionné)
-- [ ] Connexion testée et validée au démarrage du serveur
+- [x] Connexion testée et validée au démarrage du serveur
 - [x] Variables d'environnement `DATABASE_URL` documentées dans `.env.example`
 
 ## Notes de réalisation

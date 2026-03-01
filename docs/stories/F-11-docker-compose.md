@@ -4,9 +4,9 @@ title: Docker Compose pour l'environnement de développement local
 phase: 1-Fondations
 priority: Should
 agents: [Tech Lead, Backend Dev]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-01
 ---
 
 # F-11 — Docker Compose pour l'environnement de développement local
@@ -16,9 +16,9 @@ En tant que développeur, je veux démarrer l'environnement complet en une seule
 
 ## Critères d'acceptance
 - [x] `docker-compose.yml` à la racine démarre PostgreSQL
-- [ ] `npm run dev` (ou équivalent) démarre le backend et la base de données
+- [x] `npm run dev` (ou équivalent) démarre le backend et la base de données
 - [x] Un fichier `docker-compose.override.yml` permet les personnalisations locales sans modifier le fichier principal
-- [ ] Le README explique comment utiliser Docker Compose
+- [x] Le README explique comment utiliser Docker Compose
 
 ## Notes de réalisation
 <!-- Rempli par l'agent lors de l'implémentation -->

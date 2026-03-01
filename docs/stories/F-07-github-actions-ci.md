@@ -4,9 +4,9 @@ title: Pipeline CI/CD GitHub Actions (lint + tests)
 phase: 1-Fondations
 priority: Must
 agents: [Tech Lead]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-01
 ---
 
 # F-07 — Pipeline CI/CD GitHub Actions (lint + tests)
@@ -20,7 +20,7 @@ En tant qu'équipe, nous voulons un pipeline CI qui valide chaque Pull Request, 
 - [x] Le pipeline échoue si ESLint remonte des erreurs
 - [x] Le pipeline échoue si un test Jest échoue
 - [x] Durée d'exécution inférieure à 5 minutes sur un projet vide
-- [ ] Badge de statut CI affiché dans le README
+- [x] Badge de statut CI affiché dans le README
 
 ## Notes de réalisation
 <!-- Rempli par l'agent lors de l'implémentation -->

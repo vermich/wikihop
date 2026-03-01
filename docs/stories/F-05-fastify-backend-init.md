@@ -4,9 +4,9 @@ title: Initialisation du backend Fastify (Node.js + TypeScript)
 phase: 1-Fondations
 priority: Must
 agents: [Tech Lead, Backend Dev]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-01
 ---
 
 # F-05 — Initialisation du backend Fastify (Node.js + TypeScript)
@@ -19,7 +19,7 @@ En tant que développeur backend, je veux un serveur Fastify fonctionnel et typ�
 - [x] Route de santé `GET /health` retourne `{ status: "ok" }` avec code 200
 - [x] Variables d'environnement gérées via un fichier `.env` (exemple `.env.example` commité)
 - [x] Structure `routes/`, `services/`, `plugins/`, `db/` créée
-- [ ] Le serveur démarre localement sans erreur avec `npm run dev`
+- [x] Le serveur démarre localement sans erreur avec `npm run dev`
 
 ## Notes de réalisation
 <!-- Rempli par l'agent lors de l'implémentation -->

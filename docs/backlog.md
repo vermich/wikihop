@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-01 | **Version** : 2.2
+**PM** : Gauderic | **Mis à jour** : 2026-03-01 | **Version** : 2.3
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -30,18 +30,18 @@
 
 | ID | Titre | Priorité | Agent(s) | Statut |
 |----|-------|----------|----------|--------|
-| [F-01](stories/F-01-monorepo-init.md) | Initialisation du monorepo | Must | Tech Lead | 🔄 in-progress |
-| [F-02](stories/F-02-typescript-strict.md) | Configuration TypeScript strict | Must | Tech Lead | 🔄 in-progress |
-| [F-03](stories/F-03-eslint-prettier.md) | Configuration ESLint + Prettier | Must | Tech Lead | 🔄 in-progress |
-| [F-04](stories/F-04-expo-app-init.md) | Initialisation de l'application Expo | Must | Tech Lead, Frontend Dev | 🔄 in-progress |
-| [F-05](stories/F-05-fastify-backend-init.md) | Initialisation du backend Fastify | Must | Tech Lead, Backend Dev | 🔄 in-progress |
-| [F-06](stories/F-06-postgresql-setup.md) | Configuration de la base de données PostgreSQL | Must | Tech Lead, Backend Dev | 🔄 in-progress |
-| [F-07](stories/F-07-github-actions-ci.md) | Pipeline CI/CD GitHub Actions (lint + tests) | Must | Tech Lead | 🔄 in-progress |
-| [F-08](stories/F-08-jest-config.md) | Configuration Jest (mobile + backend) | Must | Tech Lead, QA | 🔄 in-progress |
-| [F-09](stories/F-09-adr-architecture.md) | ADR — Décisions d'architecture initiales | Must | Tech Lead | 🔄 in-progress |
-| [F-10](stories/F-10-git-conventions.md) | Stratégie de branches et conventions de commits | Must | Tech Lead, Orchestrateur | 🔄 in-progress |
-| [F-11](stories/F-11-docker-compose.md) | Docker Compose pour l'environnement local | Should | Tech Lead, Backend Dev | 🔄 in-progress |
-| [F-12](stories/F-12-expo-eas-config.md) | Configuration Expo EAS (build cloud) | Should | Tech Lead, Frontend Dev | 🔄 in-progress |
+| [F-01](stories/F-01-monorepo-init.md) | Initialisation du monorepo | Must | Tech Lead | ✅ done |
+| [F-02](stories/F-02-typescript-strict.md) | Configuration TypeScript strict | Must | Tech Lead | ✅ done |
+| [F-03](stories/F-03-eslint-prettier.md) | Configuration ESLint + Prettier | Must | Tech Lead | ✅ done |
+| [F-04](stories/F-04-expo-app-init.md) | Initialisation de l'application Expo | Must | Tech Lead, Frontend Dev | ✅ done |
+| [F-05](stories/F-05-fastify-backend-init.md) | Initialisation du backend Fastify | Must | Tech Lead, Backend Dev | ✅ done |
+| [F-06](stories/F-06-postgresql-setup.md) | Configuration de la base de données PostgreSQL | Must | Tech Lead, Backend Dev | ✅ done |
+| [F-07](stories/F-07-github-actions-ci.md) | Pipeline CI/CD GitHub Actions (lint + tests) | Must | Tech Lead | ✅ done |
+| [F-08](stories/F-08-jest-config.md) | Configuration Jest (mobile + backend) | Must | Tech Lead, QA | ✅ done |
+| [F-09](stories/F-09-adr-architecture.md) | ADR — Décisions d'architecture initiales | Must | Tech Lead | ✅ done |
+| [F-10](stories/F-10-git-conventions.md) | Stratégie de branches et conventions de commits | Must | Tech Lead, Orchestrateur | ✅ done |
+| [F-11](stories/F-11-docker-compose.md) | Docker Compose pour l'environnement local | Should | Tech Lead, Backend Dev | ✅ done |
+| [F-12](stories/F-12-expo-eas-config.md) | Configuration Expo EAS (build cloud) | Should | Tech Lead, Frontend Dev | ✅ done |
 
 ---
 
@@ -161,4 +161,5 @@
 
 *Backlog géré par Gauderic, PM WikiHop — 2026-03-01*
 *v2.1 : +9 stories créées (M-15 à M-17, F3-10 à F3-15) suite à l'analyse des fonctionnalités V1*
+*v2.3 : Phase 1 — Fondations clôturée (F-01 à F-12 passées en done, validées par QA — Halim et approuvées par Tech Lead — Maxime)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*

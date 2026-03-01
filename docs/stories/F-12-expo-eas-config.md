@@ -4,9 +4,9 @@ title: Configuration Expo EAS (build cloud)
 phase: 1-Fondations
 priority: Should
 agents: [Tech Lead, Frontend Dev]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-01
 ---
 
 # F-12 — Configuration Expo EAS (build cloud)
@@ -18,7 +18,7 @@ En tant que développeur, je veux Expo EAS configuré, afin de pouvoir générer
 - [x] `eas.json` configuré avec les profils `development`, `preview` et `production`
 - [x] Le profil `preview` génère un build installable sur device physique
 - [x] Les secrets EAS (tokens, credentials) sont documentés (pas commités)
-- [ ] La commande `eas build --profile preview` s'exécute sans erreur sur la CI
+- [x] La commande `eas build --profile preview` s'exécute sans erreur sur la CI
 
 ## Notes de réalisation
 <!-- Rempli par l'agent lors de l'implémentation -->

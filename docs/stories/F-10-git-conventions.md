@@ -4,9 +4,9 @@ title: Stratégie de branches et conventions de commits
 phase: 1-Fondations
 priority: Must
 agents: [Tech Lead, Orchestrateur]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-01
 ---
 
 # F-10 — Stratégie de branches et conventions de commits
@@ -15,7 +15,7 @@ completed:
 En tant qu'équipe, nous voulons des conventions de travail Git établies, afin de coordonner le travail entre agents sans conflits.
 
 ## Critères d'acceptance
-- [ ] Branches `main` et `develop` créées et protégées (pas de push direct sur `main`)
+- [x] Branches `main` et `develop` créées et protégées (pas de push direct sur `main`)
 - [x] Convention de nommage documentée : `feat/[agent]-[feature]`, `fix/[description]`
 - [x] Conventional Commits configuré (optionnel : commitlint + husky)
 - [x] Template de Pull Request créé dans `.github/`

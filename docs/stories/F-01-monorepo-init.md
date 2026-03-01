@@ -4,9 +4,9 @@ title: Initialisation du monorepo
 phase: 1-Fondations
 priority: Must
 agents: [Tech Lead]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-01
 ---
 
 # F-01 — Initialisation du monorepo

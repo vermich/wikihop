@@ -4,9 +4,9 @@ title: Configuration Jest (mobile + backend)
 phase: 1-Fondations
 priority: Must
 agents: [Tech Lead, QA]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-01
 ---
 
 # F-08 — Configuration Jest (mobile + backend)
@@ -18,7 +18,7 @@ En tant que développeur, je veux Jest configuré avec React Native Testing Libr
 - [x] Jest configuré dans `apps/mobile` avec `@testing-library/react-native`
 - [x] Jest configuré dans `apps/backend` pour tester les routes Fastify
 - [x] Script `test` disponible dans chaque workspace et à la racine
-- [ ] Un test factice ("smoke test") passe dans chaque workspace pour valider la configuration
+- [x] Un test factice ("smoke test") passe dans chaque workspace pour valider la configuration
 - [x] Coverage activé avec seuil minimum défini (ex : 70% lignes)
 
 ## Notes de réalisation

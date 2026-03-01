@@ -4,9 +4,9 @@ title: Configuration TypeScript strict (partagé, mobile, backend)
 phase: 1-Fondations
 priority: Must
 agents: [Tech Lead]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-01
 ---
 
 # F-02 — Configuration TypeScript strict (partagé, mobile, backend)
@@ -18,7 +18,7 @@ En tant que développeur, je veux TypeScript en mode strict activé partout, afi
 - [x] `tsconfig.json` racine avec `strict: true`, `noImplicitAny: true`, `exactOptionalPropertyTypes: true`
 - [x] `tsconfig` spécifique dans `apps/mobile`, `apps/backend` et `packages/shared` qui étend la config racine
 - [x] Les types partagés (`GameSession`, `Article`) sont définis dans `packages/shared` et compilent sans erreur
-- [ ] La commande `tsc --noEmit` passe sans erreur sur tout le monorepo
+- [x] La commande `tsc --noEmit` passe sans erreur sur tout le monorepo
 
 ## Notes de réalisation
 <!-- Rempli par l'agent lors de l'implémentation -->

@@ -4,9 +4,9 @@ title: Configuration ESLint + Prettier
 phase: 1-Fondations
 priority: Must
 agents: [Tech Lead]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-01
 ---
 
 # F-03 — Configuration ESLint + Prettier
@@ -19,7 +19,7 @@ En tant que développeur, je veux un linter et un formateur configurés de mani�
 - [x] Prettier configuré (single quotes, trailing comma, 2 espaces)
 - [x] `.eslintrc` et `.prettierrc` à la racine, hérités dans les sous-projets
 - [x] Script `lint` disponible à la racine et dans chaque workspace
-- [ ] Aucun fichier du projet ne produit d'erreur ou d'avertissement ESLint à l'initialisation
+- [x] Aucun fichier du projet ne produit d'erreur ou d'avertissement ESLint à l'initialisation
 
 ## Notes de réalisation
 <!-- Rempli par l'agent lors de l'implémentation -->

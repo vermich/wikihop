@@ -4,9 +4,9 @@ title: Initialisation de l'application Expo (React Native + TypeScript)
 phase: 1-Fondations
 priority: Must
 agents: [Tech Lead, Frontend Dev]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-01
 ---
 
 # F-04 — Initialisation de l'application Expo (React Native + TypeScript)
@@ -17,7 +17,7 @@ En tant que développeur frontend, je veux une application Expo fonctionnelle et
 ## Critères d'acceptance
 - [x] Application Expo créée dans `apps/mobile` avec le template TypeScript
 - [x] Navigation de base configurée (React Navigation ou Expo Router — décision ADR)
-- [ ] L'application compile et s'affiche sur simulateur iOS et Android
+- [x] L'application compile et s'affiche sur simulateur iOS et Android
 - [x] Structure de dossiers `screens/`, `components/`, `services/`, `store/`, `utils/` créée
 - [x] Zustand installé et un store vide opérationnel
 
