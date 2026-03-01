@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: wikihop-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-wikihop}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wikihop}
+      POSTGRES_DB: ${POSTGRES_DB:-wikihop_dev}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Initialisation automatique du schéma au premier démarrage du volume.
+      # ATTENTION : n'est exécuté qu'une seule fois (volume vide).
+      # Pour les migrations incrémentales : npm run db:migrate (depuis apps/backend/)
+      - ./apps/backend/src/db/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-wikihop} -d ${POSTGRES_DB:-wikihop_dev}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:
+    name: wikihop-postgres-data

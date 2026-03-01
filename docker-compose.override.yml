@@ -1,0 +1,26 @@
+# docker-compose.override.yml — Personnalisations locales
+#
+# Ce fichier est commité avec des valeurs raisonnables par défaut.
+# Chaque développeur peut le modifier localement.
+# Pour une surcharge personnelle sans conflit git : créer docker-compose.override.local.yml
+# (ajouté dans .gitignore).
+#
+# Fusionné automatiquement avec docker-compose.yml par `docker compose up`.
+
+services:
+  postgres:
+    environment:
+      POSTGRES_USER: wikihop
+      POSTGRES_PASSWORD: wikihop_local
+      POSTGRES_DB: wikihop_dev
+
+  # Décommenter pour accéder à PostgreSQL via Adminer (interface web)
+  # http://localhost:8080 → Système: PostgreSQL, Serveur: postgres, Login: wikihop
+  # adminer:
+  #   image: adminer:latest
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
