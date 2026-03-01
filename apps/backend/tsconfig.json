@@ -5,10 +5,11 @@
     "moduleResolution": "node",
     "target": "ES2022",
     "outDir": "./dist",
+    "resolveJsonModule": true,
     "paths": {
       "@wikihop/shared": ["../../packages/shared/src/types/index.ts"]
     }
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.json"],
   "exclude": ["node_modules", "dist"]
 }
