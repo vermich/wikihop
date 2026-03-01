@@ -30,18 +30,18 @@
 
 | ID | Titre | Priorité | Agent(s) | Statut |
 |----|-------|----------|----------|--------|
-| [F-01](stories/F-01-monorepo-init.md) | Initialisation du monorepo | Must | Tech Lead | ✅ done |
-| [F-02](stories/F-02-typescript-strict.md) | Configuration TypeScript strict | Must | Tech Lead | ✅ done |
-| [F-03](stories/F-03-eslint-prettier.md) | Configuration ESLint + Prettier | Must | Tech Lead | ✅ done |
-| [F-04](stories/F-04-expo-app-init.md) | Initialisation de l'application Expo | Must | Tech Lead, Frontend Dev | ✅ done |
-| [F-05](stories/F-05-fastify-backend-init.md) | Initialisation du backend Fastify | Must | Tech Lead, Backend Dev | ✅ done |
-| [F-06](stories/F-06-postgresql-setup.md) | Configuration de la base de données PostgreSQL | Must | Tech Lead, Backend Dev | ✅ done |
-| [F-07](stories/F-07-github-actions-ci.md) | Pipeline CI/CD GitHub Actions (lint + tests) | Must | Tech Lead | ✅ done |
-| [F-08](stories/F-08-jest-config.md) | Configuration Jest (mobile + backend) | Must | Tech Lead, QA | ✅ done |
-| [F-09](stories/F-09-adr-architecture.md) | ADR — Décisions d'architecture initiales | Must | Tech Lead | ✅ done |
-| [F-10](stories/F-10-git-conventions.md) | Stratégie de branches et conventions de commits | Must | Tech Lead, Orchestrateur | ✅ done |
-| [F-11](stories/F-11-docker-compose.md) | Docker Compose pour l'environnement local | Should | Tech Lead, Backend Dev | ✅ done |
-| [F-12](stories/F-12-expo-eas-config.md) | Configuration Expo EAS (build cloud) | Should | Tech Lead, Frontend Dev | ✅ done |
+| [F-01](stories/phase-1/F-01-monorepo-init.md) | Initialisation du monorepo | Must | Tech Lead | ✅ done |
+| [F-02](stories/phase-1/F-02-typescript-strict.md) | Configuration TypeScript strict | Must | Tech Lead | ✅ done |
+| [F-03](stories/phase-1/F-03-eslint-prettier.md) | Configuration ESLint + Prettier | Must | Tech Lead | ✅ done |
+| [F-04](stories/phase-1/F-04-expo-app-init.md) | Initialisation de l'application Expo | Must | Tech Lead, Frontend Dev | ✅ done |
+| [F-05](stories/phase-1/F-05-fastify-backend-init.md) | Initialisation du backend Fastify | Must | Tech Lead, Backend Dev | ✅ done |
+| [F-06](stories/phase-1/F-06-postgresql-setup.md) | Configuration de la base de données PostgreSQL | Must | Tech Lead, Backend Dev | ✅ done |
+| [F-07](stories/phase-1/F-07-github-actions-ci.md) | Pipeline CI/CD GitHub Actions (lint + tests) | Must | Tech Lead | ✅ done |
+| [F-08](stories/phase-1/F-08-jest-config.md) | Configuration Jest (mobile + backend) | Must | Tech Lead, QA | ✅ done |
+| [F-09](stories/phase-1/F-09-adr-architecture.md) | ADR — Décisions d'architecture initiales | Must | Tech Lead | ✅ done |
+| [F-10](stories/phase-1/F-10-git-conventions.md) | Stratégie de branches et conventions de commits | Must | Tech Lead, Orchestrateur | ✅ done |
+| [F-11](stories/phase-1/F-11-docker-compose.md) | Docker Compose pour l'environnement local | Should | Tech Lead, Backend Dev | ✅ done |
+| [F-12](stories/phase-1/F-12-expo-eas-config.md) | Configuration Expo EAS (build cloud) | Should | Tech Lead, Frontend Dev | ✅ done |
 
 ---
 
