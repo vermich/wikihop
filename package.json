@@ -1,0 +1,38 @@
+{
+  "name": "wikihop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "WikiHop — Wikirace mobile game (monorepo root)",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "scripts": {
+    "lint": "npm run lint -w apps/mobile -w apps/backend -w packages/shared --if-present",
+    "lint:fix": "npm run lint:fix -w apps/mobile -w apps/backend -w packages/shared --if-present",
+    "typecheck": "npm run typecheck -w apps/mobile -w apps/backend -w packages/shared --if-present",
+    "test": "npm run test -w apps/mobile -w apps/backend --if-present",
+    "build": "npm run build -w packages/shared -w apps/backend --if-present",
+    "dev": "npm run db:up && npm run dev:backend",
+    "dev:backend": "npm run dev -w apps/backend",
+    "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf {} + && find . -name 'dist' -type d -prune -exec rm -rf {} +",
+    "db:up": "docker compose up postgres -d",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down -v && docker compose up postgres -d",
+    "db:logs": "docker compose logs postgres -f"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-import-resolver-typescript": "^3.6.0",
+    "eslint-plugin-import": "^2.29.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.5.0"
+  }
+}

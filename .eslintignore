@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+coverage/
+.expo/
+*.config.js
+*.config.ts
+jest.config.*
+babel.config.*
+metro.config.*
+V1/
