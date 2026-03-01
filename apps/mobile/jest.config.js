@@ -2,7 +2,7 @@
  * Jest Configuration — WikiHop Mobile
  *
  * Étend la config de base du monorepo.
- * Utilise jest-expo comme preset pour la compatibilité Expo SDK 52.
+ * Utilise jest-expo comme preset pour la compatibilité Expo SDK 54.
  *
  * Note : setupFilesAfterFramework dans la spec est une typo —
  * le nom correct Jest est setupFilesAfterEnv.
