@@ -4,9 +4,9 @@ title: Pages populaires — stratégie hybride API + cache + fallback JSON
 phase: 2-MVP
 priority: Must
 agents: [Frontend Dev, Backend Dev]
-status: in-progress
+status: done
 created: 2026-03-01
-completed:
+completed: 2026-03-02
 ---
 
 # M-16 — Pages populaires — stratégie hybride API + cache + fallback JSON
@@ -15,14 +15,14 @@ completed:
 En tant que joueur, je veux que la paire d'articles proposée soit issue de pages Wikipedia connues et intéressantes, même sans connexion internet, afin de toujours pouvoir jouer.
 
 ## Critères d'acceptance
-- [ ] Le service `popular-pages` interroge l'API Wikimedia (`/api/rest_v1/metrics/pageviews/top/...`) pour récupérer les pages les plus consultées du mois en cours
-- [ ] Les pages populaires récupérées depuis l'API sont stockées en cache AsyncStorage avec un TTL de 24 heures
-- [ ] Si l'API Wikimedia est inaccessible (pas de réseau ou erreur), le service utilise un fichier JSON statique embarqué dans l'app (`assets/popular-pages.json`) comme fallback
-- [ ] Le fichier JSON statique contient au minimum 200 articles par langue (FR et EN) pour assurer une bonne variété
+- [x] Le service `popular-pages` interroge l'API Wikimedia (`/api/rest_v1/metrics/pageviews/top/...`) pour récupérer les pages les plus consultées du mois en cours
+- [x] Les pages populaires récupérées depuis l'API sont stockées en cache AsyncStorage avec un TTL de 24 heures
+- [x] Si l'API Wikimedia est inaccessible (pas de réseau ou erreur), le service utilise un fichier JSON statique embarqué dans l'app (`assets/popular-pages.json`) comme fallback
+- [x] Le fichier JSON statique contient au minimum 200 articles par langue (FR et EN) pour assurer une bonne variété
 - [ ] Un bouton "Recharger" en HomeScreen déclenche un rechargement manuel des pages populaires depuis l'API (avec animation de chargement)
 - [ ] La date de dernière mise à jour des pages populaires est affichée dans la HomeScreen (ex : "Mis à jour il y a 2 heures")
-- [ ] Les pages dont le titre contient des termes à exclure (pages de désambiguïsation, listes, portails) sont filtrées
-- [ ] La langue du service s'adapte à la langue sélectionnée dans l'app (FR ou EN)
+- [x] Les pages dont le titre contient des termes à exclure (pages de désambiguïsation, listes, portails) sont filtrées
+- [x] La langue du service s'adapte à la langue sélectionnée dans l'app (FR ou EN)
 
 ## Notes de réalisation
 
@@ -607,7 +607,33 @@ describe('popularPages store slice')
 - [ ] PR mobile vers `develop`, branche `feat/laurent-popular-pages`
 
 ## Validation QA — Halim
-<!-- Rempli par QA après les tests -->
+
+**Date** : 2026-03-02 | **Testeur** : Halim | **Statut** : Validé avec réserves
+
+### Critères d'acceptance — Partie backend (périmètre de cette PR)
+- [x] Service `popular-pages` interroge l'API Wikimedia Pageviews — `fetchPopularPagesFromWikimedia` implémenté avec AbortController timeout 3s
+- [x] Cache AsyncStorage TTL 24h — implémenté dans `popularPagesService.ts` mobile (clé `@wikihop/popular_pages`)
+- [x] Fallback JSON statique si API inaccessible — stratégie hybride `getPopularPages()` confirmée
+- [x] Fichier JSON statique >= 200 titres par langue — FR: 259 titres, EN: 268 titres (vérifié)
+- [ ] Bouton "Recharger" HomeScreen — **hors scope M-16** (délégué à M-01 selon notes Tech Lead)
+- [ ] Date de mise à jour HomeScreen — **hors scope M-16** (délégué à M-01 selon notes Tech Lead)
+- [x] Filtre d'exclusion (portails, catégories, listes, Accueil/Main Page) — implémenté côté backend et mobile
+- [x] Langue FR/EN adaptative — paramètre `language: 'fr' | 'en'` respecté dans toutes les fonctions
+
+### Tests automatisés
+- Jest backend (popular-pages.service.test.ts) : 31/31 tests passants, 0 échec
+- tsc --noEmit backend : sans erreur
+- tsc --noEmit mobile : sans erreur
+- npm run lint backend : 0 erreur, 0 warning
+- npm run lint mobile : 0 erreur (3 warnings `no-console` non liés à M-16)
+
+### Réserves
+**Critères 5 et 6 non testables dans cette PR** : le bouton "Recharger" et l'affichage de la date de mise à jour sont explicitement marqués hors scope par le Tech Lead (notes de réalisation) et délégués à M-01. Ces critères PM sont corrects fonctionnellement mais ont été découpés différemment lors de la spécification technique. Ils devront être cochés lors de la validation de M-01.
+
+### Observations
+- `buildWikimediaUrl()` cible le mois précédent (pas le mois en cours) car l'API Wikimedia n'a pas encore de données complètes pour le mois courant — décision cohérente et documentée.
+- `isWikimediaResponse()` guard de type défensif présent — conforme à `noUncheckedIndexedAccess`.
+- Le service ne logue pas avec `console.log` — utilise `void error` pour absorber silencieusement, le caller étant responsable du logging contextuel (conforme spec).
 
 ## Statut
 pending → in-progress → done

@@ -57,7 +57,7 @@
 | [M-04](stories/M-04-article-navigation.md) | Navigation entre articles (tap sur un lien) | Must | Frontend Dev | ⬜ pending |
 | [M-05](stories/M-05-jumps-timer.md) | Compteur de sauts et timer en temps réel | Must | Frontend Dev | ⬜ pending |
 | [M-06](stories/M-06-victory-screen.md) | Détection de victoire et écran de résultat | Must | Frontend Dev, UX/UI | ⬜ pending |
-| [M-07](stories/M-07-game-session-model.md) | Modèle de données GameSession (local) | Must | Frontend Dev, Tech Lead | ⬜ pending |
+| [M-07](stories/M-07-game-session-model.md) | Modèle de données GameSession (local) | Must | Frontend Dev, Tech Lead | ✅ done |
 | [M-08](stories/M-08-wikipedia-service.md) | Service Wikipedia API (client mobile) | Must | Frontend Dev, Backend Dev | ⬜ pending |
 | [M-09](stories/M-09-unit-tests-game-logic.md) | Tests unitaires — logique de jeu | Must | QA, Frontend Dev, Backend Dev | ⬜ pending |
 | [M-10](stories/M-10-abandon-game.md) | Abandon de partie | Should | Frontend Dev, UX/UI | ⬜ pending |
@@ -66,7 +66,7 @@
 | [M-13](stories/M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | ⬜ pending |
 | [M-14](stories/M-14-article-thumbnail.md) | Affichage de l'image de résumé de l'article | Could | Frontend Dev | ⬜ pending |
 | [M-15](stories/M-15-webview-css-injection.md) | WebView Wikipedia avec injection CSS mobile | Must | Frontend Dev | ⬜ pending |
-| [M-16](stories/M-16-popular-pages-strategy.md) | Pages populaires — stratégie hybride API + cache + fallback JSON | Must | Frontend Dev, Backend Dev | ⬜ pending |
+| [M-16](stories/M-16-popular-pages-strategy.md) | Pages populaires — stratégie hybride API + cache + fallback JSON | Must | Frontend Dev, Backend Dev | ✅ done |
 | [M-17](stories/M-17-change-objective.md) | Bouton "Changer l'objectif" pendant le jeu | Should | Frontend Dev, UX/UI | ⬜ pending |
 
 ---

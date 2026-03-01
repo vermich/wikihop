@@ -4,9 +4,9 @@ title: Modèle de données GameSession (local)
 phase: 2-MVP
 priority: Must
 agents: [Frontend Dev, Tech Lead]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-02
 ---
 
 # M-07 — Modèle de données GameSession (local)
@@ -15,11 +15,11 @@ completed:
 En tant qu'application, je veux stocker la session de jeu en cours localement, afin de ne pas perdre la progression si l'app est mise en arrière-plan.
 
 ## Critères d'acceptance
-- [ ] Le type `GameSession` est implémenté tel que défini dans `context.md` (dans `packages/shared`)
-- [ ] La session en cours est persistée dans AsyncStorage
-- [ ] Si l'app est fermée puis rouverte, la session en cours est restaurée avec le bon article affiché
-- [ ] Une session terminée (`won` ou `abandoned`) est marquée comme telle avant d'être écrasée
-- [ ] La session est initialisée proprement au démarrage d'une nouvelle partie (pas de données de la partie précédente)
+- [x] Le type `GameSession` est implémenté tel que défini dans `context.md` (dans `packages/shared`)
+- [x] La session en cours est persistée dans AsyncStorage
+- [x] Si l'app est fermée puis rouverte, la session en cours est restaurée avec le bon article affiché
+- [x] Une session terminée (`won` ou `abandoned`) est marquée comme telle avant d'être écrasée
+- [x] La session est initialisée proprement au démarrage d'une nouvelle partie (pas de données de la partie précédente)
 
 ## Notes de réalisation
 
@@ -285,7 +285,27 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 - [ ] Aucun `console.log` — uniquement `console.error` pour les erreurs AsyncStorage
 
 ## Validation QA — Halim
-<!-- Rempli par QA après les tests -->
+
+**Date** : 2026-03-02 | **Testeur** : Halim | **Statut** : Validé
+
+### Critères d'acceptance
+- [x] Type `GameSession` conforme à la spec `packages/shared` — vérifié (champs id, startArticle, targetArticle, path, jumps, startedAt, completedAt?, status)
+- [x] Persistance AsyncStorage clé `@wikihop/game_session` — vérifié par tests unitaires
+- [x] Restauration session au redémarrage (`hydrate()`) — vérifié (reconstitution des Date ISO 8601 incluse)
+- [x] Session `won` / `abandoned` correctement marquée — vérifié (`completeSession`, `abandonSession`)
+- [x] Nouvelle partie initialisée proprement (`startSession` génère un nouvel UUID et écrase l'état) — vérifié
+
+### Tests automatisés
+- Jest : 26/26 tests passants, 0 échec
+- tsc --noEmit : sans erreur
+- npm run lint : 0 erreur (3 warnings `no-console` sur des `console.error` autorisés par la spec)
+
+### Observations
+- `no-console` configuré à `warn` (pas `error`) dans `.eslintrc.js` — les 3 occurrences sont des `console.error` pour les erreurs AsyncStorage, conformes aux specs M-07 et aux conventions ADR-007.
+- `hydrate()` appelée depuis `App.tsx` via `useEffect` (Option A specifiée) — conforme.
+- Sélecteur `isLanguageLocked` documenté en commentaire dans le store — conforme.
+- `exactOptionalPropertyTypes` respecté dans la reconstruction des `Date` dans `hydrate()`.
+- Invariant `jumps === path.length - 1` documenté et vérifié par test dédié.
 
 ## Statut
 pending → in-progress → done
