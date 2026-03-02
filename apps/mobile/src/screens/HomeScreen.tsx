@@ -30,12 +30,12 @@
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { Article } from '@wikihop/shared';
+import { Image } from 'expo-image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   AccessibilityInfo,
   Alert,
   Animated,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -89,7 +89,7 @@ function ArticleCard({ variant, title, extract, thumbnailUrl }: ArticleCardProps
           <Image
             source={{ uri: thumbnailUrl, headers: { 'User-Agent': 'WikiHop/1.0 (contact@wikihop.app)' } }}
             style={cardStyles.thumbnail}
-            resizeMode="cover"
+            contentFit="cover"
             accessible={false}
             onError={() => { setImageError(true); }}
           />
@@ -254,28 +254,37 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
   const handlePlay = useCallback(async (): Promise<void> => {
     if (state.status !== 'success') return;
 
-    // Effacer toute session résiduelle avant de démarrer
-    await clearSession();
+    try {
+      // Effacer toute session résiduelle avant de démarrer
+      await clearSession();
 
-    // Conversion ArticleSummary → Article : construction explicite sans spread
-    // (extract et thumbnailUrl ne font pas partie du type Article)
-    const startArticle: Article = {
-      id: state.start.id,
-      title: state.start.title,
-      url: state.start.url,
-      language: state.start.language,
-    };
-    const targetArticle: Article = {
-      id: state.target.id,
-      title: state.target.title,
-      url: state.target.url,
-      language: state.target.language,
-    };
+      // Conversion ArticleSummary → Article : construction explicite sans spread
+      // (extract et thumbnailUrl ne font pas partie du type Article)
+      const startArticle: Article = {
+        id: state.start.id,
+        title: state.start.title,
+        url: state.start.url,
+        language: state.start.language,
+      };
+      const targetArticle: Article = {
+        id: state.target.id,
+        title: state.target.title,
+        url: state.target.url,
+        language: state.target.language,
+      };
 
-    await startSession(startArticle, targetArticle);
+      await startSession(startArticle, targetArticle);
 
-    // Home est la racine du stack — navigate (pas push)
-    navigation.navigate('Game', { articleTitle: startArticle.title });
+      // Home est la racine du stack — navigate (pas push)
+      navigation.navigate('Game', { articleTitle: startArticle.title });
+    } catch (e: unknown) {
+      // eslint-disable-next-line no-console
+      console.error('[HomeScreen] handlePlay — erreur inattendue :', e);
+      Alert.alert(
+        'Erreur',
+        'Impossible de démarrer la partie. Réessayez.',
+      );
+    }
   }, [state, clearSession, startSession, navigation]);
 
   // ── Calcul de la rotation ────────────────────────────────────────────────
