@@ -30,12 +30,12 @@
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { Article } from '@wikihop/shared';
+import { Image } from 'expo-image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   AccessibilityInfo,
   Alert,
   Animated,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -89,7 +89,7 @@ function ArticleCard({ variant, title, extract, thumbnailUrl }: ArticleCardProps
           <Image
             source={{ uri: thumbnailUrl, headers: { 'User-Agent': 'WikiHop/1.0 (contact@wikihop.app)' } }}
             style={cardStyles.thumbnail}
-            resizeMode="cover"
+            contentFit="cover"
             accessible={false}
             onError={() => { setImageError(true); }}
           />
