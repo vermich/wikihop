@@ -30,7 +30,7 @@
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { Article } from '@wikihop/shared';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   AccessibilityInfo,
   Alert,
@@ -71,6 +71,9 @@ function ArticleCard({ variant, title, extract, thumbnailUrl }: ArticleCardProps
   const labelStyle = variant === 'start' ? cardStyles.labelStart : cardStyles.labelTarget;
   const accessibilityPrefix = variant === 'start' ? 'Article de départ' : 'Article destination';
   const accessibilityText = `${accessibilityPrefix} : ${title}. ${extract.slice(0, 100)}`;
+  const [imageError, setImageError] = useState(false);
+
+  const showImage = thumbnailUrl !== undefined && !imageError;
 
   return (
     <View
@@ -82,12 +85,13 @@ function ArticleCard({ variant, title, extract, thumbnailUrl }: ArticleCardProps
       <Text style={[cardStyles.label, labelStyle]}>{label}</Text>
       <View style={cardStyles.separator} />
       <View style={cardStyles.row}>
-        {thumbnailUrl !== undefined ? (
+        {showImage ? (
           <Image
             source={{ uri: thumbnailUrl }}
             style={cardStyles.thumbnail}
             resizeMode="cover"
             accessible={false}
+            onError={() => { setImageError(true); }}
           />
         ) : (
           <View style={[cardStyles.thumbnail, cardStyles.thumbnailPlaceholder]} accessible={false}>
