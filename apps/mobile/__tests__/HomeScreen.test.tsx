@@ -19,6 +19,7 @@
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import React from 'react';
+import { Alert } from 'react-native';
 
 import type { RandomPairState } from '../src/hooks/useRandomPair';
 
@@ -221,6 +222,25 @@ describe('HomeScreen', () => {
       const refreshButton = getByLabelText('Tirer de nouveaux articles');
       fireEvent.press(refreshButton);
       expect(mockRefresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('affiche une Alert si startSession throw et ne crash pas', async () => {
+      const alertSpy = jest.spyOn(Alert, 'alert');
+
+      mockStartSession.mockRejectedValueOnce(new Error('Erreur inattendue'));
+
+      const { getByLabelText } = renderHomeScreen();
+      const playButton = getByLabelText('Jouer');
+      fireEvent.press(playButton);
+
+      await waitFor(() => {
+        expect(alertSpy).toHaveBeenCalledWith(
+          'Erreur',
+          'Impossible de démarrer la partie. Réessayez.',
+        );
+      });
+
+      alertSpy.mockRestore();
     });
   });
 
