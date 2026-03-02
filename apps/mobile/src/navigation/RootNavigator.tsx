@@ -14,12 +14,17 @@ import React from 'react';
 
 import { ArticleScreen } from '../screens/ArticleScreen';
 import { HomeScreen } from '../screens/HomeScreen';
+import { VictoryScreen } from '../screens/VictoryScreen';
 
 /**
  * Paramètres de chaque route du stack principal.
  *
  * Wave 3 :
  *   - Game : ajout de la route article (M-03)
+ *
+ * Wave 4 :
+ *   - Victory : écran de résultat après victoire (M-06)
+ *   - Home : route explicitement déclarée pour navigation.navigate('Home') (M-01)
  *
  * Note sur detachInactiveScreens (M-04) :
  *   La navigation inter-articles utilise navigation.push('Game', ...) qui empile
@@ -43,7 +48,12 @@ export type RootStackParamList = {
   Game: {
     articleTitle: string;
   };
-  // Phase 3 : Victory, Settings, etc.
+  /**
+   * Route Victory : écran de résultat après une partie gagnée.
+   * La session complétée est lue depuis useGameStore (currentSession).
+   * Aucun paramètre de navigation — les données viennent du store.
+   */
+  Victory: undefined;
 };
 
 /** Type NavigationProp pour le stack racine — exporté pour usage dans les écrans */
@@ -58,7 +68,7 @@ export function RootNavigator(): React.JSX.Element {
         <Stack.Screen
           name="Home"
           component={HomeScreen}
-          options={{ title: 'WikiHop' }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Game"
@@ -70,6 +80,11 @@ export function RootNavigator(): React.JSX.Element {
              */
             headerShown: false,
           }}
+        />
+        <Stack.Screen
+          name="Victory"
+          component={VictoryScreen}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

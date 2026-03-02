@@ -13,7 +13,7 @@
  *   - navigation.push('Game', { articleTitle }) — jamais navigate
  *   - isNavigating ref : anti-double-tap
  *   - isPlayableArticle : filtre les namespaces non jouables
- *   - Victoire : completeSession() + Alert fallback Phase 2
+ *   - Victoire : completeSession() + navigation.navigate('Victory') (Wave 4)
  *
  * Références :
  *   Story : docs/stories/M-03-article-content-display.md
@@ -215,12 +215,8 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
           article.title.trim() === currentSession.targetArticle.title.trim()
         ) {
           await completeSession();
-          // Phase 2 : Alert fallback (VictoryScreen à implémenter Phase 3/4)
-          Alert.alert(
-            'Bravo !',
-            `Vous avez trouvé "${article.title}" en ${jumps + 1} saut${jumps + 1 <= 1 ? '' : 's'} !`,
-            [{ text: 'OK' }],
-          );
+          // Wave 4 : navigation vers VictoryScreen (M-06)
+          navigation.navigate('Victory');
           return;
         }
 
