@@ -87,7 +87,7 @@ function ArticleCard({ variant, title, extract, thumbnailUrl }: ArticleCardProps
       <View style={cardStyles.row}>
         {showImage ? (
           <Image
-            source={{ uri: thumbnailUrl }}
+            source={{ uri: thumbnailUrl, headers: { 'User-Agent': 'WikiHop/1.0 (contact@wikihop.app)' } }}
             style={cardStyles.thumbnail}
             resizeMode="cover"
             accessible={false}
