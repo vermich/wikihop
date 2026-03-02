@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-01 | **Version** : 2.3
+**PM** : Gauderic | **Mis à jour** : 2026-03-02 | **Version** : 2.4
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -53,9 +53,9 @@
 |----|-------|----------|----------|--------|
 | [M-01](stories/M-01-home-screen.md) | Écran d'accueil — affichage départ et destination | Must | Frontend Dev, UX/UI, Backend Dev | ⬜ pending |
 | [M-02](stories/M-02-random-pair-api.md) | Génération d'une paire d'articles aléatoires (backend) | Must | Backend Dev | ✅ done |
-| [M-03](stories/M-03-article-content-display.md) | Récupération et affichage du contenu d'un article Wikipedia | Must | Frontend Dev, Backend Dev | ⬜ pending |
-| [M-04](stories/M-04-article-navigation.md) | Navigation entre articles (tap sur un lien) | Must | Frontend Dev | ⬜ pending |
-| [M-05](stories/M-05-jumps-timer.md) | Compteur de sauts et timer en temps réel | Must | Frontend Dev | ⬜ pending |
+| [M-03](stories/M-03-article-content-display.md) | Récupération et affichage du contenu d'un article Wikipedia | Must | Frontend Dev, Backend Dev | 🔄 in-progress |
+| [M-04](stories/M-04-article-navigation.md) | Navigation entre articles (tap sur un lien) | Must | Frontend Dev | 🔄 in-progress |
+| [M-05](stories/M-05-jumps-timer.md) | Compteur de sauts et timer en temps réel | Must | Frontend Dev | 🔄 in-progress |
 | [M-06](stories/M-06-victory-screen.md) | Détection de victoire et écran de résultat | Must | Frontend Dev, UX/UI | ⬜ pending |
 | [M-07](stories/M-07-game-session-model.md) | Modèle de données GameSession (local) | Must | Frontend Dev, Tech Lead | ✅ done |
 | [M-08](stories/M-08-wikipedia-service.md) | Service Wikipedia API (client mobile) | Must | Frontend Dev, Backend Dev | ✅ done |
@@ -65,7 +65,7 @@
 | [M-12](stories/M-12-language-support.md) | Support de la langue (français par défaut, configurable) | Should | Frontend Dev, Backend Dev | ✅ done |
 | [M-13](stories/M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | ⬜ pending |
 | [M-14](stories/M-14-article-thumbnail.md) | Affichage de l'image de résumé de l'article | Could | Frontend Dev | ⬜ pending |
-| [M-15](stories/M-15-webview-css-injection.md) | WebView Wikipedia avec injection CSS mobile | Must | Frontend Dev | ⬜ pending |
+| [M-15](stories/M-15-webview-css-injection.md) | WebView Wikipedia avec injection CSS mobile | Must | Frontend Dev | 🔄 in-progress |
 | [M-16](stories/M-16-popular-pages-strategy.md) | Pages populaires — stratégie hybride API + cache + fallback JSON | Must | Frontend Dev, Backend Dev | ✅ done |
 | [M-17](stories/M-17-change-objective.md) | Bouton "Changer l'objectif" pendant le jeu | Should | Frontend Dev, UX/UI | ⬜ pending |
 
@@ -162,4 +162,5 @@
 *Backlog géré par Gauderic, PM WikiHop — 2026-03-01*
 *v2.1 : +9 stories créées (M-15 à M-17, F3-10 à F3-15) suite à l'analyse des fonctionnalités V1*
 *v2.3 : Phase 1 — Fondations clôturée (F-01 à F-12 passées en done, validées par QA — Halim et approuvées par Tech Lead — Maxime)*
+*v2.4 : Wave 3 démarrée — M-03, M-04, M-05, M-15 passées en in-progress (2026-03-02)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
