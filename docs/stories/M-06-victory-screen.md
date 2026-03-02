@@ -4,9 +4,9 @@ title: Détection de victoire et écran de résultat
 phase: 2-MVP
 priority: Must
 agents: [Frontend Dev, UX/UI]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-02
 ---
 
 # M-06 — Détection de victoire et écran de résultat
@@ -15,14 +15,14 @@ completed:
 En tant que joueur, je veux être notifié immédiatement quand j'atteins la destination et voir mon score final, afin de ressentir la satisfaction d'avoir réussi.
 
 ## Critères d'acceptance
-- [ ] Quand le joueur navigue vers l'article destination, la victoire est détectée automatiquement
-- [ ] L'écran de victoire affiche : nombre de sauts, temps total, article de départ, article destination
-- [ ] Le chemin complet parcouru est affiché sous forme de liste ordonnée d'articles cliquables (chaque article ouvre la page Wikipedia dans une WebView externe)
-- [ ] Un bouton "Lire [titre de l'article cible]" ouvre l'article destination complet dans une WebView
-- [ ] Un bouton "Rejouer" lance une nouvelle partie avec la même paire d'articles (timer et compteur remis à zéro), sans retourner à l'accueil
-- [ ] Un bouton "Nouvelle partie" tire une nouvelle paire aléatoire et retourne à l'accueil
-- [ ] Un bouton "Retour" retourne à l'écran d'accueil sans démarrer de partie
-- [ ] L'animation de victoire est satisfaisante sans être excessive
+- [x] Quand le joueur navigue vers l'article destination, la victoire est détectée automatiquement
+- [x] L'écran de victoire affiche : nombre de sauts, temps total, article de départ, article destination
+- [x] Le chemin complet parcouru est affiché sous forme de liste ordonnée d'articles cliquables (chaque article ouvre la page Wikipedia dans une WebView externe)
+- [x] Un bouton "Lire [titre de l'article cible]" ouvre l'article destination complet dans une WebView
+- [x] Un bouton "Rejouer" lance une nouvelle partie avec la même paire d'articles (timer et compteur remis à zéro), sans retourner à l'accueil
+- [x] Un bouton "Nouvelle partie" tire une nouvelle paire aléatoire et retourne à l'accueil
+- [x] Un bouton "Retour" retourne à l'écran d'accueil sans démarrer de partie
+- [x] L'animation de victoire est satisfaisante sans être excessive
 
 ## Notes de réalisation
 
@@ -280,18 +280,18 @@ HomeScreen
 
 ### Critères de qualité (code review)
 
-- [ ] Guard d'entrée `status !== 'won'` → `navigation.replace('Home')` au montage
-- [ ] `completedAt` : guard explicite avant appel `computeElapsedSeconds` — pas de `!`
-- [ ] `noUncheckedIndexedAccess` : accès aux éléments de `path` défensifs
-- [ ] `handleReplay` : articles capturés avant `clearSession()` — pas d'accès à `currentSession` après
-- [ ] `navigation.replace` dans Rejouer (pas `push` ni `navigate`)
-- [ ] `navigation.navigate` dans Nouvelle partie et Retour (pas `replace`)
-- [ ] Liens Wikipedia : `Linking.openURL` — `void` devant l'appel (Promise non awaitable dans JSX)
-- [ ] `VictoryStats` calculé en `useMemo`
-- [ ] Zéro `any`
-- [ ] Export nommé `VictoryScreen`
-- [ ] `StyleSheet.create()` en bas du fichier
-- [ ] Tests : `formatElapsed()` et `computeElapsedSeconds()` (fonctions pures exportées séparément ou testées via le composant)
+- [x] Guard d'entrée `status !== 'won'` → `navigation.replace('Home')` au montage
+- [x] `completedAt` : guard explicite avant appel `computeElapsedSeconds` — pas de `!`
+- [x] `noUncheckedIndexedAccess` : accès aux éléments de `path` défensifs
+- [x] `handleReplay` : articles capturés avant `clearSession()` — pas d'accès à `currentSession` après
+- [x] `navigation.replace` dans Rejouer (pas `push` ni `navigate`)
+- [x] `navigation.navigate` dans Nouvelle partie et Retour (pas `replace`)
+- [x] Liens Wikipedia : `Linking.openURL` — `void` devant l'appel (Promise non awaitable dans JSX)
+- [x] `VictoryStats` calculé en `useMemo`
+- [x] Zéro `any`
+- [x] Export nommé `VictoryScreen`
+- [x] `StyleSheet.create()` en bas du fichier
+- [x] Tests : `formatElapsed()` et `computeElapsedSeconds()` (fonctions pures exportées séparément ou testées via le composant)
 
 ## Spécifications visuelles — Benjamin (UX/UI)
 
@@ -470,19 +470,19 @@ Non applicable — même logique que l'état error.
 
 ### Accessibilité
 
-- [ ] `accessibilityRole="header"` sur le titre "Victoire !"
-- [ ] Annonce VoiceOver au montage : `AccessibilityInfo.announceForAccessibility("Victoire ! [N] sauts en [mm:ss]. De [départ] à [destination].")`. Déclencher via `useEffect` au premier rendu.
-- [ ] Bloc stats : `accessibilityLabel="[N] saut(s) effectué(s) en [mm:ss]. De [départ] vers [destination]."` sur le conteneur Animated.View. Les sous-éléments (chiffres, labels) ont `accessible={false}` pour éviter la double lecture.
-- [ ] Liste chemin parcouru : chaque item `accessibilityLabel="[numéro]. [titre article]. Voir sur Wikipedia"`, `accessibilityRole="link"`.
-- [ ] Dernier item du chemin (destination) : `accessibilityLabel="[numéro]. [titre article], article de destination. Voir sur Wikipedia"`.
-- [ ] `accessibilityLabel="Lire l'article [titre complet] sur Wikipedia"` sur le bouton "Lire".
-- [ ] `accessibilityLabel="Rejouer avec les mêmes articles"` sur Rejouer.
-- [ ] `accessibilityLabel="Démarrer une nouvelle partie"` sur Nouvelle partie.
-- [ ] `accessibilityLabel="Retourner à l'accueil"` sur Retour.
-- [ ] Contraste : titre vert `#16A34A` sur `#FFFFFF` : ~4.6:1 (passe AA). Vérifier sur fond `#FFFFFF` uniquement — ne jamais mettre ce vert sur un fond coloré. Texte `#64748B` sur `#FFFFFF` : ~4.6:1. Texte blanc sur `#2563EB` : ~5.9:1.
-- [ ] Zones tactiles : tous les boutons ≥ 44pt de hauteur. Items de liste ≥ 44pt.
-- [ ] Navigation VoiceOver : ordre logique haut → bas. La zone sticky bottom est lue en dernier dans l'ordre naturel de la page.
-- [ ] L'animation spring n'active pas de mouvement excessif : `Animated.spring` scale 0.8→1.0 est dans le seuil acceptable. Si `prefers-reduced-motion` est actif sur l'appareil, React Native ne fournit pas d'API native pour le détecter — Laurent peut utiliser `AccessibilityInfo.isReduceMotionEnabled()` pour désactiver l'animation et afficher directement le scale à 1.0.
+- [x] `accessibilityRole="header"` sur le titre "Victoire !"
+- [x] Annonce VoiceOver au montage : `AccessibilityInfo.announceForAccessibility("Victoire ! [N] sauts en [mm:ss]. De [départ] à [destination].")`. Déclencher via `useEffect` au premier rendu.
+- [x] Bloc stats : `accessibilityLabel="[N] saut(s) effectué(s) en [mm:ss]. De [départ] vers [destination]."` sur le conteneur Animated.View. Les sous-éléments (chiffres, labels) ont `accessible={false}` pour éviter la double lecture.
+- [x] Liste chemin parcouru : chaque item `accessibilityLabel="[numéro]. [titre article]. Voir sur Wikipedia"`, `accessibilityRole="link"`.
+- [x] Dernier item du chemin (destination) : `accessibilityLabel="[numéro]. [titre article], article de destination. Voir sur Wikipedia"`.
+- [x] `accessibilityLabel="Lire l'article [titre complet] sur Wikipedia"` sur le bouton "Lire".
+- [x] `accessibilityLabel="Rejouer avec les mêmes articles"` sur Rejouer.
+- [x] `accessibilityLabel="Démarrer une nouvelle partie"` sur Nouvelle partie.
+- [x] `accessibilityLabel="Retourner à l'accueil"` sur Retour.
+- [x] Contraste : titre vert `#16A34A` sur `#FFFFFF` : ~4.6:1 (passe AA). Vérifier sur fond `#FFFFFF` uniquement — ne jamais mettre ce vert sur un fond coloré. Texte `#64748B` sur `#FFFFFF` : ~4.6:1. Texte blanc sur `#2563EB` : ~5.9:1.
+- [x] Zones tactiles : tous les boutons ≥ 44pt de hauteur. Items de liste ≥ 44pt.
+- [x] Navigation VoiceOver : ordre logique haut → bas. La zone sticky bottom est lue en dernier dans l'ordre naturel de la page.
+- [x] L'animation spring n'active pas de mouvement excessif : `Animated.spring` scale 0.8→1.0 est dans le seuil acceptable. Si `prefers-reduced-motion` est actif sur l'appareil, React Native ne fournit pas d'API native pour le détecter — Laurent peut utiliser `AccessibilityInfo.isReduceMotionEnabled()` pour désactiver l'animation et afficher directement le scale à 1.0.
 
 ---
 
@@ -499,7 +499,23 @@ Non applicable — même logique que l'état error.
 ---
 
 ## Validation QA — Halim
-<!-- Rempli par QA après les tests -->
+
+**Date** : 2026-03-02
+**Testeur** : Halim
+**Statut** : Validé
+
+### Tests automatisés
+- npm test (VictoryScreen, computeElapsedSeconds, formatElapsed) : 28 tests passants, 0 échec
+- tsc --noEmit : sans erreur
+- npm run lint : 0 erreur
+
+### Observations
+- Remplacement du fallback Alert.alert dans ArticleScreen.handleLinkPress : navigation.navigate('Victory') correctement en place.
+- Guard d'entrée (status !== 'won' → replace('Home')) : vérifié en test.
+- handleReplay : capture des articles AVANT clearSession — conforme à la spec, pas de race condition.
+- navigation.replace dans Rejouer, navigation.navigate dans Nouvelle partie et Retour : conforme.
+- clearSummaryCache() appelé dans handleNewGame : nettoyage correct du cache Wikipedia.
+- AccessibilityInfo.isReduceMotionEnabled() : implémenté et testé.
 
 ## Statut
 pending → in-progress → done

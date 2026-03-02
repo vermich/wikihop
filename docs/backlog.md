@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-02 | **Version** : 2.4
+**PM** : Gauderic | **Mis à jour** : 2026-03-02 | **Version** : 2.7
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -51,12 +51,12 @@
 
 | ID | Titre | Priorité | Agent(s) | Statut |
 |----|-------|----------|----------|--------|
-| [M-01](stories/M-01-home-screen.md) | Écran d'accueil — affichage départ et destination | Must | Frontend Dev, UX/UI, Backend Dev | 🔄 in-progress |
+| [M-01](stories/M-01-home-screen.md) | Écran d'accueil — affichage départ et destination | Must | Frontend Dev, UX/UI, Backend Dev | ✅ done |
 | [M-02](stories/M-02-random-pair-api.md) | Génération d'une paire d'articles aléatoires (backend) | Must | Backend Dev | ✅ done |
 | [M-03](stories/M-03-article-content-display.md) | Récupération et affichage du contenu d'un article Wikipedia | Must | Frontend Dev, Backend Dev | ✅ done |
 | [M-04](stories/M-04-article-navigation.md) | Navigation entre articles (tap sur un lien) | Must | Frontend Dev | ✅ done |
 | [M-05](stories/M-05-jumps-timer.md) | Compteur de sauts et timer en temps réel | Must | Frontend Dev | ✅ done |
-| [M-06](stories/M-06-victory-screen.md) | Détection de victoire et écran de résultat | Must | Frontend Dev, UX/UI | 🔄 in-progress |
+| [M-06](stories/M-06-victory-screen.md) | Détection de victoire et écran de résultat | Must | Frontend Dev, UX/UI | ✅ done |
 | [M-07](stories/M-07-game-session-model.md) | Modèle de données GameSession (local) | Must | Frontend Dev, Tech Lead | ✅ done |
 | [M-08](stories/M-08-wikipedia-service.md) | Service Wikipedia API (client mobile) | Must | Frontend Dev, Backend Dev | ✅ done |
 | [M-09](stories/M-09-unit-tests-game-logic.md) | Tests unitaires — logique de jeu | Must | QA, Frontend Dev, Backend Dev | ⬜ pending |
@@ -165,4 +165,5 @@
 *v2.4 : Wave 3 démarrée — M-03, M-04, M-05, M-15 passées en in-progress (2026-03-02)*
 *v2.5 : Wave 3 clôturée — M-03, M-04, M-05, M-15 validées QA et passées en done (2026-03-02)*
 *v2.6 : Wave 4 démarrée — M-01, M-06 passées en in-progress (2026-03-02)*
+*v2.7 : Wave 4 clôturée — M-01, M-06 validées QA et passées en done (2026-03-02). MVP Phase 2 Must complet.*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*

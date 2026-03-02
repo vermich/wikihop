@@ -4,9 +4,9 @@ title: Écran d'accueil — affichage départ et destination
 phase: 2-MVP
 priority: Must
 agents: [Frontend Dev, UX/UI, Backend Dev]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-02
 ---
 
 # M-01 — Écran d'accueil — affichage départ et destination
@@ -15,13 +15,13 @@ completed:
 En tant que joueur, je veux voir clairement les articles de départ et de destination au lancement d'une partie, afin de comprendre immédiatement mon objectif.
 
 ## Critères d'acceptance
-- [ ] L'écran affiche le titre de l'article de départ et de l'article destination
-- [ ] Un extrait (résumé Wikipedia) de chaque article est affiché
-- [ ] Un bouton "Jouer" démarre la partie
-- [ ] Un bouton "Nouvelles articles" tire une nouvelle paire aléatoire
-- [ ] Le chargement d'une paire affiche un indicateur visuel (spinner)
-- [ ] En cas d'erreur de chargement, un message clair est affiché avec un bouton de retry
-- [ ] Le design est conforme aux maquettes UX/UI validées
+- [x] L'écran affiche le titre de l'article de départ et de l'article destination
+- [x] Un extrait (résumé Wikipedia) de chaque article est affiché
+- [x] Un bouton "Jouer" démarre la partie
+- [x] Un bouton "Nouvelles articles" tire une nouvelle paire aléatoire
+- [x] Le chargement d'une paire affiche un indicateur visuel (spinner)
+- [x] En cas d'erreur de chargement, un message clair est affiché avec un bouton de retry
+- [x] Le design est conforme aux maquettes UX/UI validées
 
 ## Notes de réalisation
 
@@ -286,16 +286,16 @@ Quand l'utilisateur tape "Nouvelle partie" depuis `VictoryScreen`, il est rediri
 
 ### Critères de qualité (code review)
 
-- [ ] `useRandomPair` dans un fichier dédié `hooks/useRandomPair.ts` (pas inline dans le composant)
-- [ ] `AbortController` avec `cancelled` flag dans `useEffect` — pas de `setState` après démontage
-- [ ] `handlePlay` : `clearSession()` appelé avant `startSession()` — pas de session orpheline
-- [ ] `isHydrated` vérifié avant toute logique de session résiduelle
-- [ ] `noUncheckedIndexedAccess` : `path[path.length - 1]` défensif
-- [ ] `ArticleSummary → Article` : construction explicite sans spread (les champs `extract` et `thumbnailUrl` ne font pas partie d'`Article`)
-- [ ] Zéro `any`
-- [ ] Export nommé `HomeScreen` (pas de default export)
-- [ ] `StyleSheet.create()` en bas du fichier
-- [ ] Tests : `useRandomPair` — cas succès, cas erreur réseau, cas 503, comportement `refresh()`
+- [x] `useRandomPair` dans un fichier dédié `hooks/useRandomPair.ts` (pas inline dans le composant)
+- [x] `AbortController` avec `cancelled` flag dans `useEffect` — pas de `setState` après démontage
+- [x] `handlePlay` : `clearSession()` appelé avant `startSession()` — pas de session orpheline
+- [x] `isHydrated` vérifié avant toute logique de session résiduelle
+- [x] `noUncheckedIndexedAccess` : `path[path.length - 1]` défensif
+- [x] `ArticleSummary → Article` : construction explicite sans spread (les champs `extract` et `thumbnailUrl` ne font pas partie d'`Article`)
+- [x] Zéro `any`
+- [x] Export nommé `HomeScreen` (pas de default export)
+- [x] `StyleSheet.create()` en bas du fichier
+- [x] Tests : `useRandomPair` — cas succès, cas erreur réseau, cas 503, comportement `refresh()`
 
 ## Spécifications visuelles — Benjamin (UX/UI)
 
@@ -508,17 +508,17 @@ Non applicable — `useRandomPair` est toujours en `loading` ou `success` ou `er
 
 ### Accessibilité
 
-- [ ] `accessibilityLabel="WikiHop, écran d'accueil"` sur le titre principal (`accessibilityRole="header"`)
-- [ ] `accessibilityLabel="Langue française, sélectionnée"` / `accessibilityLabel="Langue anglaise"` sur chaque option de langue. `accessibilityState={{ selected: true/false }}`.
-- [ ] Carte Départ : `accessibilityLabel="Article de départ : [titre]. [extrait tronqué à 100 caractères]"`. La carte entière est un élément accessible (`accessible={true}`) mais non interactif (`accessibilityRole="none"` ou `"text"`).
-- [ ] Carte Destination : même pattern, libellé "Article destination : [titre]. [extrait]".
-- [ ] `accessibilityLabel="Jouer"` sur le bouton Jouer. `accessibilityState={{ disabled: true }}` quand inactif.
-- [ ] `accessibilityLabel="Tirer de nouveaux articles"` sur le bouton Nouveaux articles.
-- [ ] Skeleton loading : `accessibilityElementsHidden={true}` sur toute la zone skeleton. Annoncer via `AccessibilityInfo.announceForAccessibility("Articles chargés. Départ : [titre]. Destination : [titre].")` au passage en état success.
-- [ ] Erreur : `AccessibilityInfo.announceForAccessibility("Erreur de chargement. [message].")` au passage en état error.
-- [ ] Contraste : `#1E293B` sur `#FFFFFF` : ~15.8:1. `#64748B` sur `#FFFFFF` : ~4.6:1 (passe AA). Texte blanc sur `#2563EB` : ~5.9:1. Label "DESTINATION" `#2563EB` sur `#FFFFFF` : ~5.9:1.
-- [ ] Zones tactiles : Bouton Jouer 52pt hauteur. Bouton Nouveaux articles 44pt hauteur. Options de langue 44×44pt minimum.
-- [ ] Navigation VoiceOver / TalkBack : ordre de lecture naturel haut → bas (Header → Langue → Carte Départ → Carte Destination → Jouer → Nouveaux articles).
+- [x] `accessibilityLabel="WikiHop, écran d'accueil"` sur le titre principal (`accessibilityRole="header"`)
+- [x] `accessibilityLabel="Langue française, sélectionnée"` / `accessibilityLabel="Langue anglaise"` sur chaque option de langue. `accessibilityState={{ selected: true/false }}`.
+- [x] Carte Départ : `accessibilityLabel="Article de départ : [titre]. [extrait tronqué à 100 caractères]"`. La carte entière est un élément accessible (`accessible={true}`) mais non interactif (`accessibilityRole="none"` ou `"text"`).
+- [x] Carte Destination : même pattern, libellé "Article destination : [titre]. [extrait]".
+- [x] `accessibilityLabel="Jouer"` sur le bouton Jouer. `accessibilityState={{ disabled: true }}` quand inactif.
+- [x] `accessibilityLabel="Tirer de nouveaux articles"` sur le bouton Nouveaux articles.
+- [x] Skeleton loading : `accessibilityElementsHidden={true}` sur toute la zone skeleton. Annoncer via `AccessibilityInfo.announceForAccessibility("Articles chargés. Départ : [titre]. Destination : [titre].")` au passage en état success.
+- [x] Erreur : `AccessibilityInfo.announceForAccessibility("Erreur de chargement. [message].")` au passage en état error.
+- [x] Contraste : `#1E293B` sur `#FFFFFF` : ~15.8:1. `#64748B` sur `#FFFFFF` : ~4.6:1 (passe AA). Texte blanc sur `#2563EB` : ~5.9:1. Label "DESTINATION" `#2563EB` sur `#FFFFFF` : ~5.9:1.
+- [x] Zones tactiles : Bouton Jouer 52pt hauteur. Bouton Nouveaux articles 44pt hauteur. Options de langue 44×44pt minimum.
+- [x] Navigation VoiceOver / TalkBack : ordre de lecture naturel haut → bas (Header → Langue → Carte Départ → Carte Destination → Jouer → Nouveaux articles).
 
 ---
 
@@ -538,7 +538,21 @@ Non applicable — `useRandomPair` est toujours en `loading` ou `success` ou `er
 ---
 
 ## Validation QA — Halim
-<!-- Rempli par QA après les tests -->
+
+**Date** : 2026-03-02
+**Testeur** : Halim
+**Statut** : Validé
+
+### Tests automatisés
+- npm test (useRandomPair, HomeScreen) : 25 tests passants, 0 échec
+- tsc --noEmit : sans erreur
+- npm run lint : 0 erreur (5 warnings no-console dans game.store.ts/language.store.ts, préexistants, hors scope Wave 4)
+
+### Observations
+- `fetchCount` ref (ligne 70 de useRandomPair.ts) : déclarée et incrémentée dans refresh() mais jamais lue directement — seul le state `trigger` pilote le re-fetch. Redondance non bloquante, signalée au Tech Lead pour nettoyage futur.
+- Skeleton animé (shimmer) conforme aux specs Benjamin.
+- Alert session résiduelle (isHydrated) : implémentation correcte, déclenchée une seule fois.
+- ArticleSummary → Article : construction explicite sans spread, conforme aux specs.
 
 ## Statut
 pending → in-progress → done
