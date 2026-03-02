@@ -4,9 +4,9 @@ title: Génération d'une paire d'articles aléatoires (backend)
 phase: 2-MVP
 priority: Must
 agents: [Backend Dev]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-02
 ---
 
 # M-02 — Génération d'une paire d'articles aléatoires (backend)
@@ -15,12 +15,12 @@ completed:
 En tant que joueur, je veux recevoir deux articles Wikipedia aléatoires et différents pour chaque nouvelle partie, afin de toujours avoir un défi unique.
 
 ## Critères d'acceptance
-- [ ] Endpoint `GET /api/game/random-pair` retourne `{ start: Article, target: Article }`
-- [ ] Les deux articles sont distincts
-- [ ] Les articles sont des articles encyclopédiques (pas des pages de catégorie, portail, aide)
-- [ ] Les articles ont un contenu suffisant (non-ébauche) — critère à définir avec Tech Lead
-- [ ] Le temps de réponse est inférieur à 2 secondes (p95)
-- [ ] L'endpoint gère les erreurs Wikipedia API (timeout, 404) et retourne un code d'erreur approprié
+- [x] Endpoint `GET /api/game/random-pair` retourne `{ start: Article, target: Article }`
+- [x] Les deux articles sont distincts
+- [x] Les articles sont des articles encyclopédiques (pas des pages de catégorie, portail, aide)
+- [x] Les articles ont un contenu suffisant (non-ébauche) — critère à définir avec Tech Lead
+- [x] Le temps de réponse est inférieur à 2 secondes (p95)
+- [x] L'endpoint gère les erreurs Wikipedia API (timeout, 404) et retourne un code d'erreur approprié
 
 ## Notes de réalisation
 
@@ -258,7 +258,19 @@ jest.mock('../../src/services/popular-pages.service', () => ({
 6. **Exports nommés** : `gameRoutes` en export nommé (pas de `export default`).
 
 ## Validation QA — Halim
-<!-- Rempli par QA après les tests -->
+
+**Date** : 2026-03-02 | **Statut** : Validé
+
+- [x] 13/13 tests Jest passants (`game.route.test.ts`)
+- [x] `tsc --noEmit` sans erreur
+- [x] `npm run lint` sans erreur (0 erreur, 0 warning)
+- [x] `gameRoutes` enregistré dans `routes/index.ts`
+- [x] `ArticleSummary` présent et exporté depuis `packages/shared/src/types/index.ts`
+- [x] `Promise.all` sur les deux appels Wikipedia (p95 < 2s garanti)
+- [x] Retry max 5 tentatives + réponse 503 `RANDOM_PAIR_UNAVAILABLE`
+- [x] `clearTimeout` dans `finally` (AbortController correct)
+- [x] `encodeURIComponent` sur les titres Wikipedia
+- [x] Schémas Zod `zod/v4`, exports nommés
 
 ## Statut
 pending → in-progress → done

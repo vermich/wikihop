@@ -4,9 +4,9 @@ title: Service Wikipedia API (client mobile)
 phase: 2-MVP
 priority: Must
 agents: [Frontend Dev, Backend Dev]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-02
 ---
 
 # M-08 — Service Wikipedia API (client mobile)
@@ -15,12 +15,12 @@ completed:
 En tant que développeur, je veux un service centralisé pour appeler l'API Wikipedia, afin de gérer les erreurs, le cache et les timeouts de manière cohérente.
 
 ## Critères d'acceptance
-- [ ] Service `WikipediaService` dans `apps/mobile/src/services/`
-- [ ] Méthodes : `getArticleSummary(title)`, `getArticleContent(title)`, `extractInternalLinks(html)`
-- [ ] Timeout configuré (ex : 10 secondes) avec message d'erreur explicite
-- [ ] Cache en mémoire des articles déjà chargés pendant la session (évite les appels redondants)
-- [ ] Les appels respectent le `User-Agent` recommandé par Wikimedia (`WikiHop/1.0`)
-- [ ] Les erreurs 404 (article non trouvé) sont distinguées des erreurs réseau
+- [x] Service `WikipediaService` dans `apps/mobile/src/services/`
+- [x] Méthodes : `getArticleSummary(title)`, `getArticleContent(title)`, `extractInternalLinks(html)`
+- [x] Timeout configuré (ex : 10 secondes) avec message d'erreur explicite
+- [x] Cache en mémoire des articles déjà chargés pendant la session (évite les appels redondants)
+- [x] Les appels respectent le `User-Agent` recommandé par Wikimedia (`WikiHop/1.0`)
+- [x] Les erreurs 404 (article non trouvé) sont distinguées des erreurs réseau
 
 ## Notes de réalisation
 
@@ -248,7 +248,19 @@ Toutes les méthodes sont testées avec `jest.spyOn(global, 'fetch')` pour mocke
 6. **Export nommé obligatoire** : pas de `export default`. Le fichier exporte `getArticleSummary`, `getArticleContent`, `extractInternalLinks`, `WikipediaNotFoundError`, `WikipediaNetworkError`.
 
 ## Validation QA — Halim
-<!-- Rempli par QA après les tests -->
+
+**Date** : 2026-03-02 | **Statut** : Validé
+
+- [x] 46/46 tests Jest passants (`wikipedia.service.test.ts` : 45 tests + `clearSummaryCache` : 1 test)
+- [x] `tsc --noEmit` sans erreur
+- [x] `npm run lint` sans erreur (0 erreur, 0 warning sur ce fichier)
+- [x] `getArticleSummary` : cache, 404, timeout, HTTP 500, encodage URL, User-Agent
+- [x] `getArticleContent` : HTML brut, 404, timeout, User-Agent, pas de cache
+- [x] `extractInternalLinks` : extraction, filtrage FR+EN, déduplication, encodage, ancres
+- [x] `clearSummaryCache` exportée et fonctionnelle
+- [x] Import depuis `@wikihop/shared` (pas de redéfinition locale de `ArticleSummary`)
+- [x] `clearTimeout` dans `finally` sur les deux méthodes async
+- [x] Exports nommés, pas de `export default`
 
 ## Statut
 pending → in-progress → done

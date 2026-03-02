@@ -4,9 +4,9 @@ title: Support de la langue (français par défaut, configurable)
 phase: 2-MVP
 priority: Should
 agents: [Frontend Dev, Backend Dev]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-02
 ---
 
 # M-12 — Support de la langue (français par défaut, configurable)
@@ -15,11 +15,11 @@ completed:
 En tant que joueur, je veux jouer en français par défaut, afin d'avoir une expérience dans ma langue.
 
 ## Critères d'acceptance
-- [ ] La langue Wikipedia par défaut est `fr`
-- [ ] Le code est conçu pour supporter d'autres langues (`en`, `es`, etc.) sans refactoring majeur
-- [ ] La langue est stockée dans le store Zustand et persistée
-- [ ] L'URL Wikipedia s'adapte à la langue sélectionnée (`fr.wikipedia.org`, `en.wikipedia.org`, etc.)
-- [ ] Note : l'interface de l'app elle-même n'est pas traduite en phase 2 (français uniquement)
+- [x] La langue Wikipedia par défaut est `fr`
+- [x] Le code est conçu pour supporter d'autres langues (`en`, `es`, etc.) sans refactoring majeur
+- [x] La langue est stockée dans le store Zustand et persistée
+- [x] L'URL Wikipedia s'adapte à la langue sélectionnée (`fr.wikipedia.org`, `en.wikipedia.org`, etc.)
+- [x] Note : l'interface de l'app elle-même n'est pas traduite en phase 2 (français uniquement)
 
 ## Notes de réalisation
 
@@ -260,7 +260,19 @@ https://{lang}.wikipedia.org/api/rest_v1/page/summary/{title}
 Le critère d'acceptance "l'URL Wikipedia s'adapte à la langue sélectionnée" est satisfait dès lors que M-02 utilise `lang` comme paramètre dynamique dans la construction de l'URL.
 
 ## Validation QA — Halim
-<!-- Rempli par QA après les tests -->
+
+**Date** : 2026-03-02 | **Statut** : Validé
+
+- [x] 19/19 tests Jest passants (`languageStore.test.ts`)
+- [x] `tsc --noEmit` sans erreur
+- [x] `npm run lint` : 0 erreur (2 warnings `no-console` sur `console.error` — conformes à la spec)
+- [x] Langue défaut `'fr'`, validation stricte `=== 'fr' || === 'en'` dans `hydrateLanguage`
+- [x] `isLanguageLocked` sélecteur calculé (non persisté dans le store — ADR-007)
+- [x] `setLanguage` silencieux si session `in_progress`, persiste si autorisé
+- [x] `hydrateLanguage` : `finally` garantit `isLanguageHydrated: true` dans tous les cas
+- [x] Backend M-12 : `?lang=fr|en` couvert par les tests M-02 (tests `lang=en` passants)
+- [x] URL Wikipedia dynamique par langue vérifiée via M-02 (`${lang}.wikipedia.org`)
+- [x] Accès inter-store `useGameStore.getState()` (hors cycle React)
 
 ## Statut
 pending → in-progress → done
