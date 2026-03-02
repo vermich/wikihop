@@ -4,9 +4,9 @@ title: Récupération et affichage du contenu d'un article Wikipedia
 phase: 2-MVP
 priority: Must
 agents: [Frontend Dev, Backend Dev]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-02
 ---
 
 # M-03 — Récupération et affichage du contenu d'un article Wikipedia
@@ -15,13 +15,13 @@ completed:
 En tant que joueur, je veux lire le contenu d'un article Wikipedia dans l'application, afin de trouver les liens vers l'article destination.
 
 ## Critères d'acceptance
-- [ ] Le contenu de l'article est affiché (texte + liens internes cliquables)
-- [ ] Les liens vers des catégories, portails, pages d'aide et pages spéciales sont filtrés et non affichés comme liens navigables
-- [ ] Les liens internes Wikipedia sont visuellement distingués du texte (couleur, soulignement)
-- [ ] L'article est scrollable verticalement
-- [ ] Le titre de l'article en cours est affiché en haut de l'écran
-- [ ] Le chargement d'un article affiche un indicateur visuel
-- [ ] En cas d'article inexistant ou d'erreur API, un message est affiché
+- [x] Le contenu de l'article est affiché (texte + liens internes cliquables)
+- [x] Les liens vers des catégories, portails, pages d'aide et pages spéciales sont filtrés et non affichés comme liens navigables
+- [x] Les liens internes Wikipedia sont visuellement distingués du texte (couleur, soulignement)
+- [x] L'article est scrollable verticalement
+- [x] Le titre de l'article en cours est affiché en haut de l'écran
+- [x] Le chargement d'un article affiche un indicateur visuel
+- [x] En cas d'article inexistant ou d'erreur API, un message est affiché
 
 ## Notes de réalisation
 
@@ -303,7 +303,39 @@ Permettre au joueur de lire un article Wikipedia et d'y repérer les liens pour 
 ---
 
 ## Validation QA — Halim
-<!-- Rempli par QA après les tests -->
+
+**Date** : 2026-03-02
+**Testeur** : Halim
+**Statut global** : Validé
+
+### Critères d'acceptance
+- [x] Contenu affiché (texte + liens internes cliquables) — `WikipediaWebView` rendue dans `ArticleScreen` sur état `success` du hook `useArticleContent`
+- [x] Liens catégories/portails/aide/spéciaux filtrés — filtrage par `isPlayableArticle` dans `handleLinkPress` + masquage CSS (`.catlinks`, `#mw-panel`) — validé par les 31 tests de `isPlayableArticle.test.ts`
+- [x] Liens internes visuellement distingués — CSS `a[href^="/wiki/"]` : couleur `#3366cc`, `text-decoration: underline`
+- [x] Article scrollable verticalement — `WikipediaWebView` avec `flex: 1`, WebView native gère le scroll vertical
+- [x] Titre affiché en haut de l'écran — header custom `SafeAreaView` affichant `articleTitle` depuis `route.params`, `numberOfLines={1}`, `fontWeight: bold`
+- [x] Indicateur visuel au chargement — skeleton shimmer animé (`Animated.loop`) + fallback `ActivityIndicator` si résumé seul est en attente
+- [x] Message en cas d'article inexistant ou d'erreur API — état `not_found` : "Article introuvable" + titre ; état `error` : "Impossible de charger cet article" + bouton "Réessayer" — logique couverte par `useArticleContent.test.ts`
+
+### Tests automatisés
+- `npm test` (apps/mobile) : 155 tests passants, 0 échec
+- `tsc --noEmit` : sans erreur TypeScript
+- `npm run lint` : 0 erreur
+
+### Cas limites testés
+- Erreur réseau (WikipediaNetworkError) : état `error` avec bouton Réessayer — vérifié par `useArticleContent.test.ts`
+- Erreur 404 (WikipediaNotFoundError) : état `not_found` sans bouton Réessayer — vérifié par test
+- Erreur générique inattendue : traitée comme erreur réseau — vérifié par test
+- `retry()` : relance le fetch, repasse en `loading` pendant la résolution — vérifié par test
+- Changement de titre (navigation vers nouvel article) : le hook relance le fetch — vérifié par test
+- Cleanup au démontage (`let cancelled = false`) : pas de setState sur composant démonté — pattern présent dans `useArticleContent.ts` et dans le `useEffect` résumé de `ArticleScreen`
+- Échec du `getArticleSummary` alors que le HTML est disponible (`summaryError`) : affichage de l'erreur réseau avec bouton Réessayer via `retrySummary` — cas géré, évite le spinner infini
+
+### Bugs identifiés
+Aucun bug identifié.
+
+### Conclusion
+Story validée. Tous les critères d'acceptance sont satisfaits. La gestion des états (`loading / success / not_found / error`) est complète et testée. Le skeleton shimmer est implémenté conformément aux specs UX de Benjamin. La route `Game` est correctement configurée avec `headerShown: false`.
 
 ## Statut
-pending → in-progress → done
+done

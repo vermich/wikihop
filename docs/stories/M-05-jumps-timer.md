@@ -4,9 +4,9 @@ title: Compteur de sauts et timer en temps réel
 phase: 2-MVP
 priority: Must
 agents: [Frontend Dev]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-02
 ---
 
 # M-05 — Compteur de sauts et timer en temps réel
@@ -15,11 +15,11 @@ completed:
 En tant que joueur, je veux voir le nombre de sauts effectués et le temps écoulé pendant ma partie, afin de mesurer ma performance en cours de jeu.
 
 ## Critères d'acceptance
-- [ ] Le compteur de sauts est visible à tout moment pendant la partie (header ou bandeau fixe)
-- [ ] Le timer démarre quand le joueur appuie sur "Jouer" et s'arrête quand il atteint la destination
-- [ ] Le timer affiche le format `mm:ss`
-- [ ] Le timer et le compteur se mettent à jour en temps réel sans affecter les performances de scroll
-- [ ] En cas de mise en arrière-plan de l'app, le timer continue (ou est mis en pause — décision UX à documenter)
+- [x] Le compteur de sauts est visible à tout moment pendant la partie (header ou bandeau fixe)
+- [x] Le timer démarre quand le joueur appuie sur "Jouer" et s'arrête quand il atteint la destination
+- [x] Le timer affiche le format `mm:ss`
+- [x] Le timer et le compteur se mettent à jour en temps réel sans affecter les performances de scroll
+- [x] En cas de mise en arrière-plan de l'app, le timer continue (ou est mis en pause — décision UX à documenter)
 
 ## Notes de réalisation
 
@@ -277,7 +277,42 @@ Le titre cible (troisième zone) prend le flex restant et tronque avec ellipsis 
 ---
 
 ## Validation QA — Halim
-<!-- Rempli par QA après les tests -->
+
+**Date** : 2026-03-02
+**Testeur** : Halim
+**Statut global** : Validé
+
+### Critères d'acceptance
+- [x] Compteur de sauts visible à tout moment — `GameHUD` rendu entre le header et la WebView dans `ArticleScreen`, hauteur fixe 40pt, fond `#F8FAFC`, hors du scroll
+- [x] Timer démarre à "Jouer" et s'arrête à la destination — `useGameTimer` calcule depuis `session.startedAt` si `status === 'in_progress'` ; retourne `0` si `status !== 'in_progress'` (testé avec statuts `won` et `abandoned`)
+- [x] Format `mm:ss` — `formatSeconds` testée exhaustivement : `00:00`, `00:59`, `01:00`, `01:01`, `60:00`, `10:30`, `00:01`
+- [x] Mise à jour en temps réel sans impact sur les performances de scroll — `React.memo` sur `GameHUD` isole les re-rendus du `setInterval` ; la WebView est un composant natif indépendant du cycle React
+- [x] Comportement en arrière-plan documenté — décision UX inscrite dans la story et dans le code : le timer continue, calcul dynamique depuis `startedAt` au retour au premier plan (pas de logique AppState)
+
+### Tests automatisés
+- `npm test` (apps/mobile) : 155 tests passants, 0 échec
+- `tsc --noEmit` : sans erreur TypeScript
+- `npm run lint` : 0 erreur
+- `formatSeconds` : 7 tests de valeurs limites (0, 1, 59, 60, 61, 630, 3600)
+- `useGameTimer` : 8 tests (null session, statuts won/abandoned, calcul depuis startedAt, incrément, reset à null, cleanup au démontage)
+- `GameHUD` : 10 tests (rendu, pluriel, accessibilité, cas dégradé titre vide)
+
+### Cas limites testés
+- `currentSession === null` : retourne `"00:00"` et `0` — vérifié par test
+- `status === 'won'` : retourne `"00:00"` et `0` — vérifié par test
+- `status === 'abandoned'` : retourne `"00:00"` et `0` — vérifié par test
+- Calcul initial immédiat au montage (pas d'attente d'1 seconde) — `setElapsedSeconds(computeElapsed())` avant `setInterval`
+- Drift d'accumulation évité — calcul basé sur `Date.now() - startedAt.getTime()`, pas sur un compteur incrémental
+- Cleanup au démontage — `clearInterval` dans le `return` du `useEffect` ; avance du temps après démontage ne provoque pas d'erreur — vérifié par test
+- Pluriel "saut"/"sauts" — 0 saut, 1 saut, 2 sauts, 10 sauts — vérifié par 4 tests
+- Titre cible vide — rendu sans crash — vérifié par test
+- Mise en arrière-plan : le timer continue grâce au calcul dynamique depuis `startedAt` — décision UX documentée, pas de logique AppState
+
+### Bugs identifiés
+Aucun bug identifié.
+
+### Conclusion
+Story validée. Tous les critères d'acceptance sont satisfaits. La fonction `formatSeconds` est pure et exhaustivement testée. Le hook `useGameTimer` couvre tous les états de session. `React.memo` est correctement appliqué sur `GameHUD` conformément à la spec du Tech Lead.
 
 ## Statut
-pending → in-progress → done
+done

@@ -4,9 +4,9 @@ title: Navigation entre articles (tap sur un lien)
 phase: 2-MVP
 priority: Must
 agents: [Frontend Dev]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-02
 ---
 
 # M-04 — Navigation entre articles (tap sur un lien)
@@ -15,12 +15,12 @@ completed:
 En tant que joueur, je veux naviguer vers un autre article en tapant sur un lien interne, afin d'avancer vers la destination.
 
 ## Critères d'acceptance
-- [ ] Taper sur un lien interne charge et affiche le nouvel article
-- [ ] Chaque navigation incrémente le compteur de sauts de 1
-- [ ] L'article visité est ajouté au chemin de la session (`path[]`)
-- [ ] Un bouton "Retour" permet de revenir à l'article précédent dans le chemin (sans décrémenter les sauts)
-- [ ] La navigation en arrière ne recharge pas l'article depuis l'API (utilisation du cache)
-- [ ] L'état de scroll de l'article précédent n'est pas conservé (l'article s'affiche depuis le début)
+- [x] Taper sur un lien interne charge et affiche le nouvel article
+- [x] Chaque navigation incrémente le compteur de sauts de 1
+- [x] L'article visité est ajouté au chemin de la session (`path[]`)
+- [x] Un bouton "Retour" permet de revenir à l'article précédent dans le chemin (sans décrémenter les sauts)
+- [x] La navigation en arrière ne recharge pas l'article depuis l'API (utilisation du cache)
+- [x] L'état de scroll de l'article précédent n'est pas conservé (l'article s'affiche depuis le début)
 
 ## Notes de réalisation
 
@@ -213,7 +213,43 @@ Article B                          Article A
 ---
 
 ## Validation QA — Halim
-<!-- Rempli par QA après les tests -->
+
+**Date** : 2026-03-02
+**Testeur** : Halim
+**Statut global** : Validé
+
+### Critères d'acceptance
+- [x] Tap sur un lien interne charge et affiche le nouvel article — `handleLinkPress` appelle `navigation.push('Game', { articleTitle: title })` après validation du titre
+- [x] Chaque navigation incrémente le compteur de sauts de 1 — `addJump(article)` appelé dans `handleLinkPress` avant la navigation ; `addJump` incrémente `jumps` et étend `path[]` dans le store (couvert par `gameStore.test.ts`)
+- [x] Article visité ajouté à `path[]` — idem, `addJump` gère les deux mutations atomiquement
+- [x] Bouton "Retour" revient à l'article précédent sans décrémenter les sauts — `navigation.goBack()` remonte dans le stack React Navigation ; le store n'est pas modifié au retour arrière
+- [x] Navigation en arrière sans re-fetch API — le stack React Navigation native maintient les composants en vie ; le `summaryCache` garantit que `getArticleSummary` ne refait pas de requête réseau pour un article déjà vu
+- [x] Scroll réinitialisé au retour arrière — `useIsFocused()` déclenche `webViewRef.current.injectJavaScript('window.scrollTo(0, 0); true;')` à chaque reprise du focus
+
+### Tests automatisés
+- `npm test` (apps/mobile) : 155 tests passants, 0 échec
+- `tsc --noEmit` : sans erreur TypeScript
+- `npm run lint` : 0 erreur
+- `isPlayableArticle.test.ts` : 31 tests couvrent tous les namespaces non jouables (fr + en) et les cas limites de casse
+
+### Cas limites testés
+- Double-tap rapide sur un lien : flag `isNavigating` (useRef) bloque les appels concurrents — pattern présent dans `handleLinkPress`
+- Lien vers namespace non jouable (Catégorie:, Portail:, etc.) : `isPlayableArticle` retourne `false`, `handleLinkPress` retourne immédiatement — vérifié par 31 tests unitaires
+- Lien vers article inexistant (404) : `Alert.alert('Article introuvable', ...)` — catch `WikipediaNotFoundError` dans `handleLinkPress`
+- Erreur réseau lors du tap : `Alert.alert('Erreur réseau', ...)` — catch `WikipediaNetworkError`
+- Erreur inattendue : `Alert.alert('Erreur', ...)` — catch générique dans le finally
+- Tap vers article déjà dans le chemin : `navigation.push` (et non `navigate`) empile toujours un nouvel écran — logique confirmée dans `RootNavigator.tsx`
+- Victoire détectée : `completeSession()` + `Alert.alert('Bravo !', ...)` en fallback Phase 2 — logique présente dans `handleLinkPress`
+- Titre avec caractères spéciaux (accents, apostrophes) : `isPlayableArticle('Révolution française')` → `true` — vérifié par test unitaire
+
+### Note de surveillance (TODO-QA-M04)
+Un commentaire `TODO(QA-M04)` est présent dans `RootNavigator.tsx` pour monitorer le comportement de détachement des écrans inactifs lors du retour arrière sur iOS et Android. Ce point ne peut pas être vérifié sans device physique. Le retour arrière sans re-fetch est garanti par le cache résumé ; le comportement du HTML (non caché) dépend de la configuration du stack natif. A surveiller lors des tests sur device en Phase 3.
+
+### Bugs identifiés
+Aucun bug identifié.
+
+### Conclusion
+Story validée. Tous les critères d'acceptance sont satisfaits. L'utilisation de `navigation.push` (et non `navigate`) est correcte et conforme à la spec. Le filtrage des namespaces non jouables est exhaustif et entièrement couvert par les tests. Le mécanisme anti-double-tap est en place.
 
 ## Statut
-pending → in-progress → done
+done

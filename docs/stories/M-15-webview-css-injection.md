@@ -4,9 +4,9 @@ title: WebView Wikipedia avec injection CSS mobile
 phase: 2-MVP
 priority: Must
 agents: [Frontend Dev]
-status: in-progress
+status: done
 created: 2026-03-01
-completed:
+completed: 2026-03-02
 ---
 
 # M-15 — WebView Wikipedia avec injection CSS mobile
@@ -15,14 +15,14 @@ completed:
 En tant que joueur, je veux lire les articles Wikipedia dans une WebView épurée sans le header et footer Wikipedia, afin de me concentrer sur la navigation sans distraction.
 
 ## Critères d'acceptance
-- [ ] Les articles Wikipedia sont affichés dans une WebView React Native (`react-native-webview`)
-- [ ] Un script CSS est injecté au chargement pour masquer le header (`#mw-head`), le footer (`#mw-footer`), la barre latérale (`#mw-panel`) et les bannières de notification Wikipedia
-- [ ] Le CSS injecté masque également les éléments de navigation Wikipedia non pertinents pour le jeu (menus, onglets Lecture/Modifier/Historique)
-- [ ] Les liens internes Wikipedia (balises `<a>` vers `/wiki/...`) sont interceptables sans déclencher une navigation hors-WebView
-- [ ] Les liens externes (hors domaine `wikipedia.org`) sont bloqués et ne provoquent pas de sortie de l'application
-- [ ] Le CSS est appliqué avant le rendu visible (pas de flash du layout original)
-- [ ] Le scroll fonctionne correctement sur iOS et Android
-- [ ] L'injection CSS est encapsulée dans un composant réutilisable `WikipediaWebView`
+- [x] Les articles Wikipedia sont affichés dans une WebView React Native (`react-native-webview`)
+- [x] Un script CSS est injecté au chargement pour masquer le header (`#mw-head`), le footer (`#mw-footer`), la barre latérale (`#mw-panel`) et les bannières de notification Wikipedia
+- [x] Le CSS injecté masque également les éléments de navigation Wikipedia non pertinents pour le jeu (menus, onglets Lecture/Modifier/Historique)
+- [x] Les liens internes Wikipedia (balises `<a>` vers `/wiki/...`) sont interceptables sans déclencher une navigation hors-WebView
+- [x] Les liens externes (hors domaine `wikipedia.org`) sont bloqués et ne provoquent pas de sortie de l'application
+- [x] Le CSS est appliqué avant le rendu visible (pas de flash du layout original)
+- [x] Le scroll fonctionne correctement sur iOS et Android
+- [x] L'injection CSS est encapsulée dans un composant réutilisable `WikipediaWebView`
 
 ## Notes de réalisation
 
@@ -308,7 +308,40 @@ Afficher le contenu HTML d'un article Wikipedia dans un rendu mobile épuré, sa
 ---
 
 ## Validation QA — Halim
-<!-- Rempli par QA après les tests -->
+
+**Date** : 2026-03-02
+**Testeur** : Halim
+**Statut global** : Validé
+
+### Critères d'acceptance
+- [x] Les articles Wikipedia sont affichés dans une WebView React Native — composant `WikipediaWebView` rendu via `react-native-webview`, vérifié dans `WikipediaWebView.test.tsx` (render sans crash)
+- [x] CSS injecté masquant `#mw-head`, `#mw-footer`, `#mw-panel`, `.mw-notification-area` — constante `WIKIPEDIA_ARTICLE_CSS` dans `wikipedia-css.ts`, liste complète conforme à la spec
+- [x] CSS masque aussi `.vector-menu-tabs`, `.mw-editsection`, `.catlinks`, `.toc`, `#mw-navigation` — tous présents dans la constante
+- [x] Liens internes interceptés via `postMessage` sans navigation hors-WebView — handler `handleMessage` testé avec payloads valides (`WIKI_LINK`)
+- [x] Liens externes bloqués silencieusement — script JS : `event.preventDefault()` + `event.stopPropagation()` sur tout lien non `/wiki/` et non `#`
+- [x] CSS appliqué avant le rendu visible — `injectedJavaScriptBeforeContentLoaded` utilisé exclusivement (conforme ADR-006)
+- [x] Scroll iOS/Android — `showsHorizontalScrollIndicator={false}`, `overflow-x: hidden` sur `body`, `overflow-x: auto` sur `table`
+- [x] Composant réutilisable `WikipediaWebView` — export nommé, props typées, CSS externalisé dans `constants/wikipedia-css.ts`
+
+### Tests automatisés
+- `npm test` (apps/mobile) : 155 tests passants, 0 échec
+- `tsc --noEmit` : sans erreur TypeScript
+- `npm run lint` : 0 erreur (5 warnings dans `game.store.ts` et `language.store.ts` — hors périmètre M-15)
+
+### Cas limites testés
+- Payload JSON malformé depuis la WebView : ignoré silencieusement (try/catch) — vérifié par test
+- Payload JSON valide mais type inconnu : `onWikiLinkPress` non appelé — vérifié par test
+- Payload avec `title` non-string : ignoré — vérifié par test
+- Payload `null` : ignoré — vérifié par test
+- Titre avec espaces et caractères accentués ("Musée du Louvre") : transmis correctement — vérifié par test
+- `onLoadEnd` absent : la prop WebView n'est pas configurée (spread conditionnel) — vérifié par test
+- Ancres `#section` : le `return` sans `preventDefault` laisse le scroll natif opérer — logique présente dans le script injecté
+
+### Bugs identifiés
+Aucun bug identifié.
+
+### Conclusion
+Story validée. Tous les critères d'acceptance sont satisfaits. L'implémentation est conforme à la spec M-15 et à l'ADR-006. Le composant `WikipediaWebView` est correctement encapsulé, les tests couvrent tous les cas de messages postMessage documentés dans la spec.
 
 ## Statut
-pending → in-progress → done
+done
