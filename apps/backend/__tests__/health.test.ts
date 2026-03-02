@@ -57,4 +57,21 @@ describe('GET /health', () => {
 
     expect(response.headers['content-type']).toMatch(/application\/json/);
   });
+
+  it('should use npm_package_version when defined', async () => {
+    const original = process.env['npm_package_version'];
+    process.env['npm_package_version'] = '9.9.9';
+
+    const response = await supertest(app.server).get('/health');
+
+    expect(response.status).toBe(200);
+    expect(response.body.version).toBe('9.9.9');
+
+    // Restore
+    if (original === undefined) {
+      delete process.env['npm_package_version'];
+    } else {
+      process.env['npm_package_version'] = original;
+    }
+  });
 });
