@@ -16,7 +16,7 @@
  */
 
 import type { ArticleSummary } from '@wikihop/shared';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useLanguageStore } from '../store/language.store';
 
@@ -66,12 +66,9 @@ export function useRandomPair(): UseRandomPairReturn {
   const language = useLanguageStore((state) => state.language);
   const [state, setState] = useState<RandomPairState>({ status: 'loading' });
 
-  // fetchCount déclenche le re-fetch quand il est incrémenté par refresh()
-  const fetchCount = useRef(0);
   const [trigger, setTrigger] = useState(0);
 
   const refresh = useCallback((): void => {
-    fetchCount.current += 1;
     setState({ status: 'loading' });
     setTrigger((n) => n + 1);
   }, []);

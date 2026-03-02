@@ -169,6 +169,42 @@ Un agent **ne valide jamais son propre travail** :
 - TypeScript strict partout (zéro `any` non justifié)
 - Tests requis pour toute logique métier
 
+## TDD ciblé — règle obligatoire
+
+Approche Test-Driven Development appliquée selon le type de code :
+
+**TDD strict (tests d'abord, puis implémentation) :**
+- Fonctions pures et utilitaires (`formatSeconds`, `isPlayableArticle`, `computeElapsedSeconds`, etc.)
+- Hooks custom (`useRandomPair`, `useGameTimer`, `useArticleContent`, etc.)
+- Services métier (Wikipedia service, popular-pages service)
+
+**Tests alongside (écrits en même temps que le code) :**
+- Composants React Native (UI complexe, difficile à spécifier sans voir le rendu)
+- Routes Fastify avec intégration Supertest
+
+**Responsabilités :**
+- Le **Tech Lead** identifie les fonctions pures et hooks attendus dans ses specs et les liste explicitement
+- Les **développeurs** (Frontend, Backend) écrivent les tests des fonctions pures AVANT le code pour ces éléments
+- Le **Tech Lead** vérifie en code review que les tests TDD existaient bien avant l'implémentation (pas de tests écrits après coup)
+
+## Commits des specs avant lancement des agents dev
+
+**Règle d'ordre stricte :**
+1. PM marque les stories `in-progress` → commit + push
+2. Tech Lead écrit les specs → commit + push
+3. UX/UI écrit les maquettes → commit + push
+4. **Seulement ensuite** → lancement Frontend Dev / Backend Dev
+
+Les specs doivent être dans `develop` avant que le code ne commence. Jamais de specs commitées après le code.
+
+## Code mort — règle bloquante
+
+Toute variable, fonction, import ou ref déclarée mais jamais lue/utilisée est du **code mort**.
+
+- **En code review** : le code mort est un critère **bloquant** — la PR ne peut pas être approuvée
+- **En implémentation** : supprimer immédiatement, ne pas laisser en "à faire plus tard"
+- Exemples bloquants : `useRef` incrémenté mais jamais lu, variable `const x = ...` jamais utilisée, import non consommé
+
 ---
 
 ## Commandes disponibles
