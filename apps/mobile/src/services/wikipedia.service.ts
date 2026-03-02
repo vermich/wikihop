@@ -337,8 +337,13 @@ export function extractInternalLinks(html: string): string[] {
  * @returns true si l'article est navigable dans le jeu, false sinon
  */
 export function isPlayableArticle(title: string): boolean {
-  // Titres exacts non jouables (pages d'accueil)
-  if ((NON_PLAYABLE_EXACT as readonly string[]).includes(title)) {
+  // Titres exacts non jouables (pages d'accueil) — comparaison insensible à la casse
+  // pour harmoniser avec le traitement des préfixes (B3)
+  if (
+    (NON_PLAYABLE_EXACT as readonly string[]).some(
+      (exact) => title.toLowerCase() === exact.toLowerCase(),
+    )
+  ) {
     return false;
   }
 

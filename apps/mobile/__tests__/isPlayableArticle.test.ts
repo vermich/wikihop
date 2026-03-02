@@ -33,7 +33,7 @@ describe('isPlayableArticle', () => {
     });
 
     it('retourne true pour un article avec des parenthèses', () => {
-      expect(isPlayableArticle('Paris (ville)'));
+      expect(isPlayableArticle('Paris (ville)')).toBe(true);
     });
   });
 
@@ -116,6 +116,23 @@ describe('isPlayableArticle', () => {
 
     it('retourne false pour "Main Page"', () => {
       expect(isPlayableArticle('Main Page')).toBe(false);
+    });
+
+    // Variantes de casse — NON_PLAYABLE_EXACT doit être insensible à la casse (B3)
+    it('retourne false pour "accueil" (minuscule)', () => {
+      expect(isPlayableArticle('accueil')).toBe(false);
+    });
+
+    it('retourne false pour "ACCUEIL" (majuscule)', () => {
+      expect(isPlayableArticle('ACCUEIL')).toBe(false);
+    });
+
+    it('retourne false pour "main page" (minuscule)', () => {
+      expect(isPlayableArticle('main page')).toBe(false);
+    });
+
+    it('retourne false pour "MAIN PAGE" (majuscule)', () => {
+      expect(isPlayableArticle('MAIN PAGE')).toBe(false);
     });
   });
 

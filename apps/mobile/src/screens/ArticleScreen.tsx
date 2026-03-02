@@ -88,6 +88,12 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
   // Article courant construit depuis le résumé
   const [currentArticle, setCurrentArticle] = useState<Article | null>(null);
 
+  // Indicateur d'échec de getArticleSummary — évite le spinner infini (B2)
+  const [summaryError, setSummaryError] = useState(false);
+
+  // Compteur de retry résumé : son incrément retrigge le useEffect résumé (B2)
+  const [summaryRetryCount, setSummaryRetryCount] = useState(0);
+
   // Contenu HTML via le hook
   const { state: contentState, retry } = useArticleContent(articleTitle, lang);
 
@@ -103,8 +109,12 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
   const isFocused = useIsFocused();
 
   // ── Chargement du résumé pour construire l'Article complet ──────────────────
+  // summaryRetryCount dans les deps : son incrément (via retrySummary) retrigge cet effet (B2)
   useEffect(() => {
     let cancelled = false;
+
+    // Réinitialise l'erreur au début de chaque tentative
+    setSummaryError(false);
 
     void (async () => {
       try {
@@ -113,15 +123,19 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
           setCurrentArticle(summary);
         }
       } catch {
-        // Erreur résumé : on ne bloque pas le rendu — le contenu HTML est prioritaire.
-        // currentArticle restera null, WikipediaWebView ne sera pas monté jusqu'au succès HTML.
+        // Erreur résumé : on expose summaryError pour éviter le spinner infini (B2).
+        // Si contentState.status === 'success' et summaryError === true,
+        // l'écran d'erreur réseau standard sera affiché avec un bouton "Réessayer".
+        if (!cancelled) {
+          setSummaryError(true);
+        }
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [articleTitle, lang]);
+  }, [articleTitle, lang, summaryRetryCount]);
 
   // ── Scroll to top quand l'écran reprend le focus (retour arrière) ────────────
   useEffect(() => {
@@ -184,7 +198,10 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
       try {
         const article = await getArticleSummary(title, lang);
 
-        // Enregistrement du saut dans le store
+        // Enregistrement du saut dans le store.
+        // addJump est protégé contre les appels post-victoire : le guard dans
+        // game.store.ts vérifie que status === 'in_progress' avant toute mutation.
+        // Si completeSession() a déjà été appelé (status === 'won'), addJump est un no-op.
         await addJump(article);
 
         // Annonce accessibilité après le saut
@@ -234,6 +251,14 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
     [lang, addJump, completeSession, currentSession, jumps, navigation],
   );
 
+  // ── Retry du chargement du résumé (B2) ───────────────────────────────────────
+  // Incrémenter summaryRetryCount retrigge le useEffect résumé via ses deps.
+  // currentArticle est remis à null pour afficher le spinner le temps du retry.
+  const retrySummary = useCallback((): void => {
+    setCurrentArticle(null);
+    setSummaryRetryCount((c) => c + 1);
+  }, []);
+
   // ── Rendu de la zone de contenu ──────────────────────────────────────────────
   function renderContent(): React.JSX.Element {
     switch (contentState.status) {
@@ -248,8 +273,30 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
         );
 
       case 'success':
-        // On n'affiche la WebView que quand l'article complet est aussi disponible
+        // On n'affiche la WebView que quand le résumé est aussi disponible.
+        // Si le résumé a échoué (summaryError), on affiche l'erreur réseau
+        // avec un bouton "Réessayer" plutôt que de bloquer sur un spinner infini (B2).
         if (currentArticle === null) {
+          if (summaryError) {
+            return (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorTitle}>
+                  {'Impossible de charger cet article.'}
+                </Text>
+                <Text style={styles.errorSubtext}>
+                  {'Vérifiez votre connexion internet.'}
+                </Text>
+                <TouchableOpacity
+                  style={styles.retryButton}
+                  onPress={retrySummary}
+                  accessibilityLabel="Réessayer de charger l'article"
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.retryButtonText}>{'Réessayer'}</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          }
           return (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#2563EB" />

@@ -29,6 +29,10 @@ import { HomeScreen } from '../screens/HomeScreen';
  *   on ne configure pas detachInactiveScreens ici en Phase 2 — React Navigation
  *   native-stack maintient les composants en vie via le stack natif iOS/Android.
  *   Si un re-fetch est observé en QA, envisager detachInactiveScreens={false}.
+ *
+ * TODO(QA-M04): monitorer le comportement de détachement des écrans inactifs
+ *   lors du retour arrière — vérifier qu'aucun re-fetch réseau n'est déclenché
+ *   sur l'article précédemment visité (iOS + Android).
  */
 export type RootStackParamList = {
   Home: undefined;
