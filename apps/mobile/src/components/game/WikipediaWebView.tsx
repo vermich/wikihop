@@ -24,7 +24,10 @@ import type { Article } from '@wikihop/shared';
 import React, { useMemo, type RefObject } from 'react';
 import { StyleSheet } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
-import type { WebViewErrorEvent } from 'react-native-webview/lib/WebViewTypes';
+import type {
+  WebViewErrorEvent,
+  WebViewNavigation,
+} from 'react-native-webview/lib/WebViewTypes';
 
 
 import { WIKIPEDIA_ARTICLE_CSS } from '../../constants/wikipedia-css';
@@ -56,6 +59,11 @@ export interface WikipediaWebViewProps {
    * injectJavaScript (ex: scroll-to-top au retour arrière M-04).
    */
   webViewRef?: RefObject<WebView | null>;
+  /**
+   * Appelé à chaque changement d'état de navigation de la WebView.
+   * Permet au parent de suivre canGoBack pour le BackHandler Android (fix Bug 2).
+   */
+  onNavigationStateChange?: (navState: WebViewNavigation) => void;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -143,8 +151,36 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
     }
   }
 
+  /**
+   * Bloque toute navigation native de la WebView (fix Bug 1).
+   *
+   * Contexte : même avec event.preventDefault() dans le JS injecté, le pont
+   * natif Android peut déclencher une navigation vers l'URL résolue d'un lien
+   * avant que le handler JS ait eu le temps de s'exécuter. Sans ce garde,
+   * la WebView navigue directement vers l'article cible, court-circuitant le
+   * mécanisme postMessage → onWikiLinkPress → addJump.
+   *
+   * Règle : seules les sources "locales" (about:blank, data:, blob:) sont
+   * autorisées — elles correspondent au chargement initial du HTML statique.
+   * Toute autre URL (http://, https://) est bloquée ici : les taps sur liens
+   * /wiki/ sont déjà gérés via postMessage par le JS injecté.
+   */
+  function handleShouldStartLoadWithRequest(request: WebViewNavigation): boolean {
+    const url = request.url;
+    // Autoriser le chargement initial du HTML statique
+    if (
+      url === 'about:blank' ||
+      url.startsWith('data:') ||
+      url.startsWith('blob:')
+    ) {
+      return true;
+    }
+    // Bloquer toute navigation http/https — gérée par postMessage côté JS
+    return false;
+  }
+
   // exactOptionalPropertyTypes : ne pas passer les props optionnelles si elles sont undefined.
-  // Utiliser des spreads conditionnels pour onLoadEnd et onError.
+  // Utiliser des spreads conditionnels pour onLoadEnd, onError et onNavigationStateChange.
   const optionalLoadEnd =
     props.onLoadEnd !== undefined
       ? { onLoadEnd: props.onLoadEnd }
@@ -159,6 +195,11 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
             props.onError!(syntheticEvent.nativeEvent.description);
           },
         }
+      : {};
+
+  const optionalNavStateChange =
+    props.onNavigationStateChange !== undefined
+      ? { onNavigationStateChange: props.onNavigationStateChange }
       : {};
 
   return (
@@ -178,8 +219,10 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
       scalesPageToFit={false}
       injectedJavaScriptBeforeContentLoaded={injectedScript}
       onMessage={handleMessage}
+      onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
       {...optionalLoadEnd}
       {...optionalOnError}
+      {...optionalNavStateChange}
     />
   );
 }

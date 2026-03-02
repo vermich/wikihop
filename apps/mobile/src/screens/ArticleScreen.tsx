@@ -41,6 +41,7 @@ import {
   ActivityIndicator,
   Alert,
   Animated,
+  BackHandler,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -48,6 +49,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { WebView } from 'react-native-webview';
+import type { WebViewNavigation } from 'react-native-webview/lib/WebViewTypes';
 
 
 import { GameHUD } from '../components/game/GameHUD';
@@ -100,6 +102,9 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
   // Ref WebView pour le scroll-to-top au focus (M-04)
   const webViewRef = useRef<WebView | null>(null);
 
+  // Suivi de canGoBack de la WebView pour le BackHandler Android (fix Bug 2)
+  const [webViewCanGoBack, setWebViewCanGoBack] = useState(false);
+
   // Anti-double-tap (M-04)
   const isNavigating = useRef(false);
 
@@ -143,6 +148,50 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
       webViewRef.current.injectJavaScript('window.scrollTo(0, 0); true;');
     }
   }, [isFocused]);
+
+  // ── Mise à jour de canGoBack WebView (fix Bug 2) ─────────────────────────────
+  const handleNavigationStateChange = useCallback(
+    (navState: WebViewNavigation): void => {
+      setWebViewCanGoBack(navState.canGoBack);
+    },
+    [],
+  );
+
+  // ── BackHandler Android — priorité à la navigation WebView (fix Bug 2) ───────
+  //
+  // Contexte : sur Android, le hardware back button déclenche directement
+  // navigation.goBack() via React Navigation, qui remonte le stack RN.
+  // Si la WebView a un historique interne (canGoBack === true), on veut
+  // d'abord reculer dans la WebView, pas dépiler le screen RN.
+  //
+  // Note : avec onShouldStartLoadWithRequest (fix Bug 1), la WebView ne navigue
+  // plus nativement vers de nouveaux articles — son historique interne reste
+  // minimal. Ce BackHandler reste utile pour gérer les ancres (#section) qui
+  // peuvent créer un historique interne, et pour les cas où la WebView
+  // chargerait initialement about:blank avant le HTML.
+  useEffect(() => {
+    if (!isFocused) {
+      return;
+    }
+
+    const subscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        if (webViewCanGoBack && webViewRef.current !== null) {
+          webViewRef.current.goBack();
+          // Retourner true bloque React Navigation (hardware back géré)
+          return true;
+        }
+        // Retourner false laisse React Navigation gérer le retour
+        // (goBack() vers l'écran précédent du stack RN)
+        return false;
+      },
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, [isFocused, webViewCanGoBack]);
 
   // ── Animation shimmer skeleton ───────────────────────────────────────────────
   useEffect(() => {
@@ -307,6 +356,7 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
             onWikiLinkPress={(title) => {
               void handleLinkPress(title);
             }}
+            onNavigationStateChange={handleNavigationStateChange}
           />
         );
 
