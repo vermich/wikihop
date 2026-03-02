@@ -319,6 +319,43 @@ export function extractInternalLinks(html: string): string[] {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// isPlayableArticle
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Vérifie si un titre d'article Wikipedia est jouable dans WikiHop.
+ *
+ * Un article est non jouable s'il appartient à un namespace de maintenance
+ * (Catégorie:, Portail:, Aide:, etc.) ou s'il est une page d'accueil.
+ *
+ * Fonction pure — pas d'appel réseau, testable directement.
+ * Réutilise NON_PLAYABLE_PREFIXES et NON_PLAYABLE_EXACT.
+ *
+ * Utilisée par ArticleScreen.handleLinkPress (M-04) avant d'appeler addJump.
+ *
+ * @param title - Titre de l'article (déjà décodé, espaces normalisés)
+ * @returns true si l'article est navigable dans le jeu, false sinon
+ */
+export function isPlayableArticle(title: string): boolean {
+  // Titres exacts non jouables (pages d'accueil) — comparaison insensible à la casse
+  // pour harmoniser avec le traitement des préfixes (B3)
+  if (
+    (NON_PLAYABLE_EXACT as readonly string[]).some(
+      (exact) => title.toLowerCase() === exact.toLowerCase(),
+    )
+  ) {
+    return false;
+  }
+
+  // Namespaces non jouables (comparaison insensible à la casse pour la robustesse)
+  const isNonPlayable = NON_PLAYABLE_PREFIXES.some((prefix) =>
+    title.toLowerCase().startsWith(prefix.toLowerCase()),
+  );
+
+  return !isNonPlayable;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // clearSummaryCache
 // ─────────────────────────────────────────────────────────────────────────────
 

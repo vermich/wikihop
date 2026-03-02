@@ -1,0 +1,196 @@
+/**
+ * WikipediaWebView — WikiHop Mobile — Wave 3 (M-15)
+ *
+ * Composant fondation qui affiche le contenu HTML d'un article Wikipedia
+ * dans une WebView épurée, sans les éléments de navigation Wikipedia.
+ *
+ * Mécanismes clés :
+ *   - CSS injecté via `injectedJavaScriptBeforeContentLoaded` (ADR-006 : pas de flash Android)
+ *   - Interception des taps sur liens /wiki/ via postMessage
+ *   - Liens externes bloqués silencieusement (pas de sortie de l'app)
+ *   - Ancres #section laissées au scroll natif WebView
+ *
+ * Références :
+ *   ADR-006 : WebView — interception des liens, injection CSS
+ *   Story   : docs/stories/M-15-webview-css-injection.md
+ *
+ * Conventions :
+ *   - Export nommé
+ *   - CSS dans constants/wikipedia-css.ts (jamais inline)
+ *   - useMemo pour le script injecté (la constante CSS ne change pas)
+ */
+
+import type { Article } from '@wikihop/shared';
+import React, { useMemo, type RefObject } from 'react';
+import { StyleSheet } from 'react-native';
+import { WebView, type WebViewMessageEvent } from 'react-native-webview';
+import type { WebViewErrorEvent } from 'react-native-webview/lib/WebViewTypes';
+
+
+import { WIKIPEDIA_ARTICLE_CSS } from '../../constants/wikipedia-css';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Types
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Type du message postMessage reçu depuis la WebView */
+export interface WikiLinkMessage {
+  type: 'WIKI_LINK';
+  /** Titre de l'article cible, déjà décodé (replace(/_/g, ' ') appliqué côté JS injecté) */
+  title: string;
+}
+
+export interface WikipediaWebViewProps {
+  /** HTML brut retourné par getArticleContent() */
+  html: string;
+  /** Article actuellement affiché — utilisé pour construire le baseUrl */
+  article: Article;
+  /** Appelé quand le joueur tape un lien interne Wikipedia navigable */
+  onWikiLinkPress: (title: string) => void;
+  /** Appelé quand le chargement initial de la WebView est terminé */
+  onLoadEnd?: () => void;
+  /** Appelé en cas d'erreur de chargement WebView */
+  onError?: (error: string) => void;
+  /**
+   * Ref optionnelle vers la WebView native — permet au parent d'appeler
+   * injectJavaScript (ex: scroll-to-top au retour arrière M-04).
+   */
+  webViewRef?: RefObject<WebView | null>;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Composant
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Element {
+  /**
+   * Script injecté avant le premier paint (mitigation flash Android — ADR-006).
+   * JSON.stringify(WIKIPEDIA_ARTICLE_CSS) garantit l'échappement correct
+   * des guillemets et retours à la ligne dans le CSS.
+   *
+   * Calculé avec useMemo car la constante CSS ne change jamais —
+   * pas de recréation à chaque rendu.
+   */
+  const injectedScript = useMemo(
+    () => `
+  (function() {
+    // 1. Injection CSS avant le premier paint (mitigation flash Android — ADR-006)
+    var style = document.createElement('style');
+    style.textContent = ${JSON.stringify(WIKIPEDIA_ARTICLE_CSS)};
+    document.head.appendChild(style);
+
+    // 2. Interception des taps sur les liens (phase capture = true)
+    document.addEventListener('click', function(event) {
+      var target = event.target;
+      // Remonter jusqu'à l'ancre parente (le tap peut être sur un enfant du lien)
+      while (target && target.tagName !== 'A') {
+        target = target.parentElement;
+      }
+      if (!target) return;
+
+      var href = target.getAttribute('href');
+      if (!href) return;
+
+      // Ancres internes (#section) — laisser le scroll natif de la WebView opérer
+      if (href.startsWith('#')) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      // Liens internes Wikipedia — navigables dans le jeu
+      if (href.startsWith('/wiki/')) {
+        var rawTitle = href.replace('/wiki/', '');
+        var decodedTitle;
+        try {
+          decodedTitle = decodeURIComponent(rawTitle).replace(/_/g, ' ');
+        } catch (e) {
+          return; // Titre malformé — ignorer
+        }
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'WIKI_LINK',
+          title: decodedTitle
+        }));
+        return;
+      }
+
+      // Liens externes — bloqués silencieusement (pas de postMessage)
+    }, true); // true = phase de capture, intercepte avant les handlers Wikipedia
+
+    true; // Obligatoire Android — le script doit retourner true
+  })();
+`,
+    [],
+  );
+
+  function handleMessage(event: WebViewMessageEvent): void {
+    try {
+      const data = JSON.parse(event.nativeEvent.data) as unknown;
+      if (
+        typeof data === 'object' &&
+        data !== null &&
+        'type' in data &&
+        (data as Record<string, unknown>)['type'] === 'WIKI_LINK' &&
+        'title' in data &&
+        typeof (data as Record<string, unknown>)['title'] === 'string'
+      ) {
+        const message = data as WikiLinkMessage;
+        props.onWikiLinkPress(message.title);
+      }
+    } catch {
+      // Message JSON malformé ou inattendu — ignorer silencieusement
+    }
+  }
+
+  // exactOptionalPropertyTypes : ne pas passer les props optionnelles si elles sont undefined.
+  // Utiliser des spreads conditionnels pour onLoadEnd et onError.
+  const optionalLoadEnd =
+    props.onLoadEnd !== undefined
+      ? { onLoadEnd: props.onLoadEnd }
+      : {};
+
+  const optionalOnError =
+    props.onError !== undefined
+      ? {
+          onError: (syntheticEvent: WebViewErrorEvent) => {
+            // props.onError est forcément défini ici (guard ci-dessus)
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            props.onError!(syntheticEvent.nativeEvent.description);
+          },
+        }
+      : {};
+
+  return (
+    <WebView
+      ref={props.webViewRef}
+      style={styles.webView}
+      source={{
+        html: props.html,
+        baseUrl: `https://${props.article.language}.wikipedia.org`,
+      }}
+      originWhitelist={['*']}
+      javaScriptEnabled={true}
+      domStorageEnabled={false}
+      allowsInlineMediaPlayback={false}
+      mediaPlaybackRequiresUserAction={true}
+      showsHorizontalScrollIndicator={false}
+      scalesPageToFit={false}
+      injectedJavaScriptBeforeContentLoaded={injectedScript}
+      onMessage={handleMessage}
+      {...optionalLoadEnd}
+      {...optionalOnError}
+    />
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Styles
+// ─────────────────────────────────────────────────────────────────────────────
+
+const styles = StyleSheet.create({
+  webView: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+});
