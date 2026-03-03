@@ -1,22 +1,24 @@
 /**
- * WikipediaWebView — WikiHop Mobile — Réécriture WebView native
+ * WikipediaWebView — WikiHop Mobile — Rollback V1
  *
  * Charge directement `https://{lang}.m.wikipedia.org/wiki/{titre}` dans la WebView.
- * Approche native Wikipedia mobile : layout officiel, zéro manipulation HTML custom.
+ * Approche V1 : source={{ uri }} direct, onNavigationStateChange pour détecter les sauts,
+ * CSS injecté via injectedJavaScript (post-chargement), zéro manipulation des liens.
  *
  * Mécanismes clés :
  *   - source={{ uri }} : URL Wikipedia mobile directe (pas de HTML injecté)
- *   - CSS minimal injecté via `injectedJavaScriptBeforeContentLoaded` : masque header/footer uniquement
- *   - `onShouldStartLoadWithRequest` : autorise les articles Wikipedia mobile jouables,
- *     bloque les namespaces non jouables et les liens externes
- *   - `onNavigationStateChange` : détecte chaque changement de page → compte les sauts,
- *     vérifie la victoire. Le comptage est délégué au parent via `onPageChange`.
- *   - Back button Android : géré par le parent via `webViewRef.current.goBack()`
+ *   - injectedJavaScript : CSS minimal injecté après chargement pour masquer header/footer
+ *     (post-chargement = moins de risque de page blanche Android vs BeforeContentLoaded)
+ *   - Pas de onShouldStartLoadWithRequest : on laisse Wikipedia gérer ses propres redirections
+ *   - onNavigationStateChange : détecte chaque changement de page → compte les sauts,
+ *     vérifie la victoire. Le comptage est délégué au parent via onPageChange.
+ *   - Back button Android : géré par le parent via webViewRef.current.goBack()
  *
  * Fonctions pures exportées (TDD) :
- *   - `isPlayableWikipediaUrl(url, lang)` : filtre les URLs autorisées
- *   - `titlesMatch(a, b)` : comparaison de titres insensible à la casse/underscores
- *   - `extractTitleFromUrl(url, lang)` : extrait le titre depuis une URL Wikipedia mobile
+ *   - isPlayableWikipediaUrl(url, lang) : filtre les URLs autorisées (utilisée pour le logging)
+ *   - titlesMatch(a, b) : comparaison de titres insensible à la casse/underscores
+ *   - extractTitleFromUrl(url, lang) : extrait le titre depuis une URL Wikipedia mobile
+ *   - buildArticleUrl(title, lang) : construit l'URL Wikipedia mobile
  *
  * Références :
  *   Story : docs/stories/M-15-webview-css-injection.md
@@ -42,7 +44,7 @@ import type {
 
 /**
  * Préfixes de namespaces non jouables dans les URLs Wikipedia mobile.
- * Ces préfixes correspondent à des pages de maintenance ou méta Wikipedia.
+ * Utilisés pour le filtrage dans isPlayableWikipediaUrl (fonction pure TDD).
  * Note : les namespaces Wikipedia mobile sont identiques au desktop (même encodage).
  */
 const BLOCKED_URL_PREFIXES = [
@@ -65,9 +67,11 @@ const BLOCKED_URL_PREFIXES = [
 ] as const;
 
 /**
- * Script CSS injecté avant le premier paint pour masquer header/footer Minerva
- * (thème Wikipedia mobile). Injecté via `injectedJavaScriptBeforeContentLoaded`
- * pour éviter tout flash du layout Wikipedia original.
+ * Script CSS injecté après chargement de la page pour masquer header/footer Minerva
+ * (thème Wikipedia mobile). Injecté via injectedJavaScript (post-chargement).
+ *
+ * Approche V1 : on injecte après le premier paint, ce qui évite les problèmes
+ * de page blanche observés avec injectedJavaScriptBeforeContentLoaded sur Android.
  *
  * Sélecteurs Minerva (layout mobile Wikipedia officiel) :
  *   - .header-container, .minerva-header, header.header-container : header Wikipedia mobile
@@ -143,10 +147,12 @@ export function extractTitleFromUrl(url: string, lang: Language): string | null 
  *   - Tout le reste → bloqué (liens externes, autres langues, namespaces maintenance)
  *
  * Fonction pure — testable directement (TDD).
+ * Note : cette fonction n'est plus utilisée dans onShouldStartLoadWithRequest
+ * (supprimé pour le rollback V1), mais reste exportée pour usage futur ou logging.
  *
  * @param url  - URL à évaluer
  * @param lang - Langue courante du jeu
- * @returns true si la WebView peut charger cette URL
+ * @returns true si l'URL correspond à un article Wikipedia jouable
  */
 export function isPlayableWikipediaUrl(url: string, lang: Language): boolean {
   // Chargement initial de la WebView
@@ -236,16 +242,9 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
   const [isLoading, setIsLoading] = React.useState(true);
 
   /**
-   * Filtre les navigations autorisées dans la WebView.
-   * Autorise : about:blank, articles Wikipedia mobile jouables de la bonne langue.
-   * Bloque : liens externes, namespaces maintenance, autres langues.
-   */
-  function handleShouldStartLoadWithRequest(request: WebViewNavigation): boolean {
-    return isPlayableWikipediaUrl(request.url, lang);
-  }
-
-  /**
    * Déclenché à chaque changement d'état de navigation (nouvelle page chargée).
+   * Approche V1 : seul mécanisme pour détecter les changements de page.
+   *
    * - Notifie le parent de canGoBack (pour BackHandler Android)
    * - Ignore les états "en cours de chargement"
    * - Extrait le titre depuis l'URL
@@ -294,8 +293,7 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
         ref={webViewRef}
         style={styles.webView}
         source={{ uri: buildArticleUrl(currentTitle, lang) }}
-        injectedJavaScriptBeforeContentLoaded={CSS_INJECTION_SCRIPT}
-        onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
+        injectedJavaScript={CSS_INJECTION_SCRIPT}
         onNavigationStateChange={handleNavigationStateChange}
         onLoadStart={() => { setIsLoading(true); }}
         onLoadEnd={() => {

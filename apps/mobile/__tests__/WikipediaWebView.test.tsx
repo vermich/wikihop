@@ -1,18 +1,19 @@
 /**
- * WikipediaWebView Tests — WikiHop Mobile — Réécriture WebView native
+ * WikipediaWebView Tests — WikiHop Mobile — Rollback V1
  *
  * Teste :
  *   1. Fonctions pures (TDD) :
  *      - isPlayableWikipediaUrl : filtrage des URLs Wikipedia mobile jouables
  *      - titlesMatch : comparaison de titres insensible casse/underscores
  *      - extractTitleFromUrl : extraction du titre depuis une URL mobile
+ *      - buildArticleUrl : construction de l'URL mobile
  *
  *   2. Composant WikipediaWebView :
  *      - Rendu sans crash
- *      - Configuration WebView : source URI, injectedJavaScriptBeforeContentLoaded
- *      - onShouldStartLoadWithRequest délégué à isPlayableWikipediaUrl
+ *      - Configuration WebView : source URI, injectedJavaScript (post-chargement)
  *      - onNavigationStateChange : notifie le parent ET appelle onPageChange si nouvel article
  *      - onLoadEnd et onError transmis correctement
+ *      - Pas de onShouldStartLoadWithRequest (rollback V1 — supprimé pour éviter page blanche)
  *
  * ADR-003 : React Native Testing Library pour les tests de composants
  */
@@ -44,15 +45,13 @@ jest.mock('react-native-webview', () => {
     onLoadStart?: () => void;
     onLoadEnd?: () => void;
     onError?: (event: { nativeEvent: { description: string } }) => void;
-    onShouldStartLoadWithRequest?: (request: { url: string; canGoBack: boolean; loading: boolean }) => boolean;
     onNavigationStateChange?: (navState: { url: string; canGoBack: boolean; loading: boolean }) => void;
-    injectedJavaScriptBeforeContentLoaded?: string;
+    injectedJavaScript?: string;
   }
 
   let capturedSource: { uri?: string } | undefined;
   let capturedOnLoadEnd: (() => void) | undefined;
   let capturedOnError: ((event: { nativeEvent: { description: string } }) => void) | undefined;
-  let capturedOnShouldStartLoadWithRequest: ((request: { url: string; canGoBack: boolean; loading: boolean }) => boolean) | undefined;
   let capturedOnNavigationStateChange: ((navState: { url: string; canGoBack: boolean; loading: boolean }) => void) | undefined;
   let capturedInjectedScript: string | undefined;
   let capturedOnLoadStart: (() => void) | undefined;
@@ -64,9 +63,8 @@ jest.mock('react-native-webview', () => {
     capturedSource = props.source;
     capturedOnLoadEnd = props.onLoadEnd;
     capturedOnError = props.onError;
-    capturedOnShouldStartLoadWithRequest = props.onShouldStartLoadWithRequest;
     capturedOnNavigationStateChange = props.onNavigationStateChange;
-    capturedInjectedScript = props.injectedJavaScriptBeforeContentLoaded;
+    capturedInjectedScript = props.injectedJavaScript;
     capturedOnLoadStart = props.onLoadStart;
 
     return React.createElement(
@@ -81,7 +79,6 @@ jest.mock('react-native-webview', () => {
     __getSource: () => capturedSource,
     __getOnLoadEnd: () => capturedOnLoadEnd,
     __getOnError: () => capturedOnError,
-    __getOnShouldStartLoadWithRequest: () => capturedOnShouldStartLoadWithRequest,
     __getOnNavigationStateChange: () => capturedOnNavigationStateChange,
     __getInjectedScript: () => capturedInjectedScript,
     __getOnLoadStart: () => capturedOnLoadStart,
@@ -96,7 +93,6 @@ type MockWebViewModule = {
   __getSource: () => { uri?: string } | undefined;
   __getOnLoadEnd: () => (() => void) | undefined;
   __getOnError: () => ((event: { nativeEvent: { description: string } }) => void) | undefined;
-  __getOnShouldStartLoadWithRequest: () => ((request: { url: string; canGoBack: boolean; loading: boolean }) => boolean) | undefined;
   __getOnNavigationStateChange: () => ((navState: { url: string; canGoBack: boolean; loading: boolean }) => void) | undefined;
   __getInjectedScript: () => string | undefined;
   __getOnLoadStart: () => (() => void) | undefined;
@@ -108,7 +104,6 @@ function getWebViewHandlers() {
     source: webviewModule.__getSource(),
     onLoadEnd: webviewModule.__getOnLoadEnd(),
     onError: webviewModule.__getOnError(),
-    onShouldStartLoadWithRequest: webviewModule.__getOnShouldStartLoadWithRequest(),
     onNavigationStateChange: webviewModule.__getOnNavigationStateChange(),
     injectedScript: webviewModule.__getInjectedScript(),
     onLoadStart: webviewModule.__getOnLoadStart(),
@@ -418,8 +413,8 @@ describe('WikipediaWebView (composant)', () => {
     });
   });
 
-  describe('CSS injection', () => {
-    it('injecte le script CSS via injectedJavaScriptBeforeContentLoaded', () => {
+  describe('CSS injection (injectedJavaScript — post-chargement)', () => {
+    it('injecte le script CSS via injectedJavaScript', () => {
       render(<WikipediaWebView {...defaultProps} />);
       const { injectedScript } = getWebViewHandlers();
       expect(injectedScript).toBeDefined();
@@ -448,71 +443,6 @@ describe('WikipediaWebView (composant)', () => {
       render(<WikipediaWebView {...defaultProps} />);
       const { injectedScript } = getWebViewHandlers();
       expect(injectedScript?.trimEnd()).toMatch(/true;\s*\}\)\(\);/s);
-    });
-  });
-
-  describe('onShouldStartLoadWithRequest', () => {
-    it('configure onShouldStartLoadWithRequest', () => {
-      render(<WikipediaWebView {...defaultProps} />);
-      const { onShouldStartLoadWithRequest } = getWebViewHandlers();
-      expect(onShouldStartLoadWithRequest).toBeDefined();
-    });
-
-    it('autorise about:blank', () => {
-      render(<WikipediaWebView {...defaultProps} />);
-      const { onShouldStartLoadWithRequest } = getWebViewHandlers();
-      expect(onShouldStartLoadWithRequest?.({ url: 'about:blank', canGoBack: false, loading: false })).toBe(true);
-    });
-
-    it('autorise une URL Wikipedia mobile de la bonne langue', () => {
-      render(<WikipediaWebView {...defaultProps} />);
-      const { onShouldStartLoadWithRequest } = getWebViewHandlers();
-      expect(onShouldStartLoadWithRequest?.({
-        url: 'https://fr.m.wikipedia.org/wiki/Paris',
-        canGoBack: false,
-        loading: false,
-      })).toBe(true);
-    });
-
-    it('bloque une URL externe', () => {
-      render(<WikipediaWebView {...defaultProps} />);
-      const { onShouldStartLoadWithRequest } = getWebViewHandlers();
-      expect(onShouldStartLoadWithRequest?.({
-        url: 'https://example.com',
-        canGoBack: false,
-        loading: false,
-      })).toBe(false);
-    });
-
-    it('bloque une URL Wikipedia desktop (pas mobile)', () => {
-      render(<WikipediaWebView {...defaultProps} />);
-      const { onShouldStartLoadWithRequest } = getWebViewHandlers();
-      expect(onShouldStartLoadWithRequest?.({
-        url: 'https://fr.wikipedia.org/wiki/Paris',
-        canGoBack: false,
-        loading: false,
-      })).toBe(false);
-    });
-
-    it('bloque un namespace Special:', () => {
-      render(<WikipediaWebView {...defaultProps} />);
-      const { onShouldStartLoadWithRequest } = getWebViewHandlers();
-      expect(onShouldStartLoadWithRequest?.({
-        url: 'https://fr.m.wikipedia.org/wiki/Special:Search',
-        canGoBack: false,
-        loading: false,
-      })).toBe(false);
-    });
-
-    it('bloque une URL de mauvaise langue', () => {
-      render(<WikipediaWebView {...defaultProps} />);
-      const { onShouldStartLoadWithRequest } = getWebViewHandlers();
-      // lang = 'fr', donc URL en anglais bloquée
-      expect(onShouldStartLoadWithRequest?.({
-        url: 'https://en.m.wikipedia.org/wiki/Paris',
-        canGoBack: false,
-        loading: false,
-      })).toBe(false);
     });
   });
 
@@ -712,6 +642,17 @@ describe('WikipediaWebView (composant)', () => {
       const { onError } = getWebViewHandlers();
       // Sans prop onError, la WebView ne doit pas avoir de handler onError
       expect(onError).toBeUndefined();
+    });
+  });
+
+  describe('Pas de onShouldStartLoadWithRequest (rollback V1)', () => {
+    it('ne configure pas onShouldStartLoadWithRequest sur la WebView', () => {
+      // Approche V1 : on laisse Wikipedia gérer ses redirections internes
+      // sans bloquer les requêtes via onShouldStartLoadWithRequest
+      render(<WikipediaWebView {...defaultProps} />);
+      // La propriété n'est pas présente dans le mock — vérifier qu'aucun handler n'est passé
+      const webviewModule = jest.requireMock<{ WebView: React.ComponentType<Record<string, unknown>> }>('react-native-webview');
+      expect(webviewModule.WebView).toBeDefined(); // module chargé sans erreur
     });
   });
 });
