@@ -107,9 +107,15 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
       event.preventDefault();
       event.stopPropagation();
 
-      // Liens internes Wikipedia — navigables dans le jeu
-      if (href.startsWith('/wiki/')) {
-        var rawTitle = href.replace('/wiki/', '');
+      // Liens internes Wikipedia — navigables dans le jeu.
+      //
+      // L'API REST Wikipedia /page/html/ retourne du HTML Parsoid où les liens
+      // internes ont un href relatif "./Titre_Article" (pas "/wiki/Titre").
+      // Le baseUrl "https://{lang}.wikipedia.org" passé à la WebView résout ces
+      // chemins correctement côté navigateur, mais getAttribute('href') retourne
+      // l'attribut brut du DOM, c'est-à-dire "./Titre_Article".
+      if (href.startsWith('./')) {
+        var rawTitle = href.slice(2); // Retire le "./" initial
         var decodedTitle;
         try {
           decodedTitle = decodeURIComponent(rawTitle).replace(/_/g, ' ');

@@ -36,12 +36,14 @@ jest.mock('react-native-webview', () => {
     onMessage?: (event: { nativeEvent: { data: string } }) => void;
     onLoadEnd?: () => void;
     onError?: (event: { nativeEvent: { description: string } }) => void;
+    injectedJavaScriptBeforeContentLoaded?: string;
   }
 
-  // Exposer les handlers via une ref de module pour les tests
+  // Exposer les handlers et le script injecté via une ref de module pour les tests
   let capturedOnMessage: ((event: { nativeEvent: { data: string } }) => void) | undefined;
   let capturedOnLoadEnd: (() => void) | undefined;
   let capturedOnError: ((event: { nativeEvent: { description: string } }) => void) | undefined;
+  let capturedInjectedScript: string | undefined;
 
   const MockWebView = React.forwardRef(function MockWebView(
     props: MockWebViewProps,
@@ -50,6 +52,7 @@ jest.mock('react-native-webview', () => {
     capturedOnMessage = props.onMessage;
     capturedOnLoadEnd = props.onLoadEnd;
     capturedOnError = props.onError;
+    capturedInjectedScript = props.injectedJavaScriptBeforeContentLoaded;
 
     return React.createElement(
       View,
@@ -63,6 +66,7 @@ jest.mock('react-native-webview', () => {
     __getOnMessage: () => capturedOnMessage,
     __getOnLoadEnd: () => capturedOnLoadEnd,
     __getOnError: () => capturedOnError,
+    __getInjectedScript: () => capturedInjectedScript,
   };
 });
 
@@ -82,11 +86,13 @@ function getWebViewHandlers() {
     __getOnMessage: () => ((event: { nativeEvent: { data: string } }) => void) | undefined;
     __getOnLoadEnd: () => (() => void) | undefined;
     __getOnError: () => ((event: { nativeEvent: { description: string } }) => void) | undefined;
+    __getInjectedScript: () => string | undefined;
   }>('react-native-webview');
   return {
     onMessage: webviewModule.__getOnMessage(),
     onLoadEnd: webviewModule.__getOnLoadEnd(),
     onError: webviewModule.__getOnError(),
+    injectedScript: webviewModule.__getInjectedScript(),
   };
 }
 
@@ -308,6 +314,78 @@ describe('WikipediaWebView', () => {
       const { onError: capturedError } = getWebViewHandlers();
       capturedError?.({ nativeEvent: { description: 'Network request failed' } });
       expect(onError).toHaveBeenCalledWith('Network request failed');
+    });
+  });
+
+  describe('script injecté — format Parsoid (fix liens gris)', () => {
+    /**
+     * Vérifie que le script JS injecté détecte les liens internes Wikipedia
+     * au format Parsoid "./Titre_Article" (href relatif avec point-slash).
+     *
+     * Contexte du bug :
+     *   L'API REST Wikipedia /api/rest_v1/page/html/ retourne du HTML Parsoid
+     *   où les liens internes ont un href en "./Titre" et non "/wiki/Titre".
+     *   L'ancienne implémentation cherchait href.startsWith('/wiki/') —
+     *   ce qui ne matchait jamais, empêchant tout postMessage.
+     *
+     * La condition correcte est href.startsWith('./').
+     */
+    it('contient la détection de liens au format Parsoid (./) et non /wiki/', () => {
+      const onWikiLinkPress = jest.fn();
+      render(
+        <WikipediaWebView
+          html="<p>Test</p>"
+          article={mockArticle}
+          onWikiLinkPress={onWikiLinkPress}
+        />,
+      );
+
+      const { injectedScript } = getWebViewHandlers();
+      expect(injectedScript).toBeDefined();
+
+      // Le script doit détecter href.startsWith('./')
+      expect(injectedScript).toContain("href.startsWith('./')");
+
+      // Le script NE doit PAS chercher l'ancien format /wiki/ pour les liens internes
+      // (le sélecteur /wiki/ était le bug — vérification régressive)
+      expect(injectedScript).not.toContain("href.startsWith('/wiki/')");
+    });
+
+    it('contient l\'extraction du titre via slice(2) pour retirer "./"', () => {
+      const onWikiLinkPress = jest.fn();
+      render(
+        <WikipediaWebView
+          html="<p>Test</p>"
+          article={mockArticle}
+          onWikiLinkPress={onWikiLinkPress}
+        />,
+      );
+
+      const { injectedScript } = getWebViewHandlers();
+      expect(injectedScript).toBeDefined();
+
+      // Le titre est extrait avec slice(2) pour supprimer le "./" initial
+      expect(injectedScript).toContain('href.slice(2)');
+    });
+
+    it('contient le sélecteur CSS Parsoid a[href^="./"] pour les liens bleus', () => {
+      /**
+       * Le CSS est injecté via JSON.stringify(WIKIPEDIA_ARTICLE_CSS) dans le script.
+       * Dans le script sérialisé, les guillemets doubles sont échappés en \".
+       * On cherche donc la forme sérialisée : a[href^=\"./\"]
+       *
+       * On importe et teste aussi la constante directement pour garantir
+       * que le CSS source contient bien le bon sélecteur avant sérialisation.
+       */
+      const { WIKIPEDIA_ARTICLE_CSS } = require('../src/constants/wikipedia-css') as {
+        WIKIPEDIA_ARTICLE_CSS: string;
+      };
+
+      // Vérification directe de la constante CSS (avant sérialisation)
+      expect(WIKIPEDIA_ARTICLE_CSS).toContain('a[href^="./"]');
+
+      // Vérification régressive : l'ancien sélecteur /wiki/ ne doit plus exister
+      expect(WIKIPEDIA_ARTICLE_CSS).not.toContain('a[href^="/wiki/"]');
     });
   });
 });

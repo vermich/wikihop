@@ -60,14 +60,23 @@ export const WIKIPEDIA_ARTICLE_CSS: string = `
     height: auto;
   }
 
-  /* Liens internes — couleur distincte (critère M-03) */
-  a[href^="/wiki/"] {
+  /* Liens internes — couleur distincte (critère M-03)
+   *
+   * L'API Wikipedia REST /page/html/ retourne du HTML Parsoid où les href
+   * des liens internes sont en chemin relatif "./Titre_Article" (pas "/wiki/...").
+   * Le sélecteur cible donc href^="./" pour matcher ce format.
+   */
+  a[href^="./"] {
     color: #3366cc;
     text-decoration: underline;
   }
 
-  /* Liens externes visuellement différenciés (bloqués au niveau JS) */
-  a:not([href^="/wiki/"]):not([href^="#"]) {
+  /* Liens externes visuellement différenciés (bloqués au niveau JS)
+   *
+   * Tout lien qui n'est pas un lien interne Parsoid (./) ni une ancre (#)
+   * est traité comme externe : grisé et sans soulignement.
+   */
+  a:not([href^="./"]):not([href^="#"]) {
     color: #888888;
     text-decoration: none;
   }
