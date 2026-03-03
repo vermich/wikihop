@@ -79,7 +79,7 @@ export function useRandomPair(): UseRandomPairReturn {
 
     void (async () => {
       try {
-        const url = `http://localhost:3000/api/game/random-pair?lang=${language}`;
+        const url = `http://192.168.1.30:3000/api/game/random-pair?lang=${language}`;
         const response = await fetch(url, {
           signal: controller.signal,
         });

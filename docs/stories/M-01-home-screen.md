@@ -554,5 +554,36 @@ Non applicable — `useRandomPair` est toujours en `loading` ou `success` ou `er
 - Alert session résiduelle (isHydrated) : implémentation correcte, déclenchée une seule fois.
 - ArticleSummary → Article : construction explicite sans spread, conforme aux specs.
 
+---
+
+## Bug fix — Thumbnails Wikimedia HTTP 403 (2026-03-02)
+
+**Détecté par** : Tests utilisateur sur device physique iOS.
+**Diagnostic** : Le CDN Wikimedia (`upload.wikimedia.org`) bloque les requêtes `Image` React Native sans header `User-Agent` → HTTP 403 systématique sur toutes les thumbnails.
+**Corrigé dans** : `apps/mobile/src/screens/HomeScreen.tsx` — composant `ArticleCard`.
+**Approuvé par** : Tech Lead (Maxime).
+
+### Changements appliqués
+
+```tsx
+// Avant — aucun header → HTTP 403
+source={{ uri: thumbnailUrl }}
+
+// Après — User-Agent correct → HTTP 200
+source={{ uri: thumbnailUrl, headers: { 'User-Agent': 'WikiHop/1.0 (contact@wikihop.app)' } }}
+```
+
+Le `console.warn` de diagnostic sur `onError` a également été retiré. Le fallback `onError={() => { setImageError(true); }}` est conservé.
+
+### Validation du fix (2026-03-02)
+
+- User-Agent `WikiHop/1.0 (contact@wikihop.app)` : conforme à la constante `WIKIPEDIA_USER_AGENT` dans `apps/backend/src/routes/game.route.ts` (ligne 31).
+- Aucun `console.warn` résiduel dans `HomeScreen.tsx`.
+- Fallback `onError` : présent et inchangé.
+- npm test (suite complète) : 205 tests passants, 0 échec — aucune régression.
+- tsc --noEmit : sans erreur.
+- npm run lint : 0 erreur (5 warnings no-console préexistants dans game.store.ts/language.store.ts, hors scope).
+- Note : le chargement réel des images depuis `upload.wikimedia.org` n'est pas testable via tests automatisés (Image RN non mockée). Validé par le Client sur device physique iOS (log HTTP 403 confirmé avant fix, HTTP 200 après).
+
 ## Statut
 pending → in-progress → done

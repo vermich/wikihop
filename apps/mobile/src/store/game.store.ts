@@ -25,6 +25,25 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Article, GameSession } from '@wikihop/shared';
 import { create } from 'zustand';
 
+/**
+ * Génère un UUID v4 conforme RFC 4122 sans dépendance sur l'API Web Crypto.
+ *
+ * Motivation : `crypto.randomUUID()` n'est pas disponible sur le moteur Hermes
+ * utilisé par React Native / Expo sur device physique (voir bug ReferenceError
+ * "Property 'crypto' doesn't exist").
+ *
+ * L'implémentation suit le format xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx :
+ *   - version  : 4 (nibble haut du 3e groupe = 0x4)
+ *   - variante : 8, 9, a ou b (bits 7-6 du 4e groupe = 0b10)
+ */
+function generateUUID(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 /** Clé AsyncStorage de la session courante (ADR-005) */
 const STORAGE_KEY = '@wikihop/game_session';
 
@@ -125,7 +144,7 @@ export const useGameStore = create<GameSessionSlice>()((set, get) => ({
 
   startSession: async (startArticle: Article, targetArticle: Article): Promise<void> => {
     const session: GameSession = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       startArticle,
       targetArticle,
       path: [startArticle],

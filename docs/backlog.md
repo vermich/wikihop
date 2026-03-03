@@ -68,6 +68,7 @@
 | [M-15](stories/M-15-webview-css-injection.md) | WebView Wikipedia avec injection CSS mobile | Must | Frontend Dev | ✅ done |
 | [M-16](stories/M-16-popular-pages-strategy.md) | Pages populaires — stratégie hybride API + cache + fallback JSON | Must | Frontend Dev, Backend Dev | ✅ done |
 | [M-17](stories/M-17-change-objective.md) | Bouton "Changer l'objectif" pendant le jeu | Should | Frontend Dev, UX/UI | ⬜ pending |
+| [M-18](stories/M-18-happy-path-physical-device.md) | Validation happy path complet sur device physique | Must | QA | ⬜ pending |
 
 ---
 
@@ -137,11 +138,11 @@
 | Phase | Must | Should | Could | Total |
 |-------|------|--------|-------|-------|
 | 1-Fondations | 10 | 2 | 0 | 12 |
-| 2-MVP | 11 | 5 | 1 | 17 |
+| 2-MVP | 12 | 5 | 1 | 18 |
 | 3-Features | 4 | 6 | 5 | 15 |
 | 4-Production | 9 | 4 | 2 | 15 |
 | Won't | — | — | — | 4 |
-| **Total** | **34** | **17** | **8** | **63** |
+| **Total** | **35** | **17** | **8** | **64** |
 
 ---
 
@@ -153,7 +154,7 @@
 | Frontend Dev | F-04, M-01, M-03, M-04, M-05, M-06, M-07, M-08, M-10, M-11, M-12, M-13, M-14, M-15, M-16, M-17, F3-02, F3-03, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-13, F3-14, F3-15, P-07, P-08, P-12, P-13, P-14 |
 | Backend Dev | F-05, F-06, F-11, M-02, M-08, M-12, M-16, F3-01, F3-05, F3-14, P-03, P-05, P-06, P-09 |
 | UX/UI | M-01, M-06, M-13, M-14, M-17, F3-01, F3-02, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-14 |
-| QA | F-08, M-09, F3-07, P-05, P-11 |
+| QA | F-08, M-09, M-18, F3-07, P-05, P-11 |
 | Security | P-02, P-03, P-04, P-15 |
 | DPO | F3-04, F3-06, F3-14, F3-15, P-01, P-10, P-13, P-14 |
 
@@ -166,4 +167,5 @@
 *v2.5 : Wave 3 clôturée — M-03, M-04, M-05, M-15 validées QA et passées en done (2026-03-02)*
 *v2.6 : Wave 4 démarrée — M-01, M-06 passées en in-progress (2026-03-02)*
 *v2.7 : Wave 4 clôturée — M-01, M-06 validées QA et passées en done (2026-03-02). MVP Phase 2 Must complet.*
+*v2.8 : M-18 créée — gate bloquant validation happy path device physique (2026-03-03)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*

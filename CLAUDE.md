@@ -197,6 +197,21 @@ Approche Test-Driven Development appliquée selon le type de code :
 
 Les specs doivent être dans `develop` avant que le code ne commence. Jamais de specs commitées après le code.
 
+## Gate device physique — règle bloquante (A2 rétro 2026-03-03)
+
+Toute PR touchant la **WebView, la navigation, le store de jeu ou le flux Home→Game→Victory** requiert une confirmation manuelle avant merge :
+
+> *"Le chemin complet Home → article de départ → navigation inter-articles → VictoryScreen a été joué sur device physique."*
+
+**Responsabilités :**
+- **Laurent** (Frontend Dev) confirme dans la description de sa PR qu'il a testé sur device physique, ou indique explicitement qu'il n'a pas accès au device
+- **Halim** (QA) coche ce critère avant d'émettre son rapport de validation
+- **Maxime** (Tech Lead) ne peut pas approuver une PR concernée si ce critère n'est pas coché
+
+Ce gate s'applique **en plus** des critères existants (`tsc --noEmit`, lint, tests automatisés).
+
+---
+
 ## Code mort — règle bloquante
 
 Toute variable, fonction, import ou ref déclarée mais jamais lue/utilisée est du **code mort**.
