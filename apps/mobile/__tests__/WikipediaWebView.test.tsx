@@ -47,6 +47,7 @@ jest.mock('react-native-webview', () => {
     onError?: (event: { nativeEvent: { description: string } }) => void;
     onNavigationStateChange?: (navState: { url: string; canGoBack: boolean; loading: boolean }) => void;
     injectedJavaScript?: string;
+    onShouldStartLoadWithRequest?: unknown;
   }
 
   let capturedSource: { uri?: string } | undefined;
@@ -55,6 +56,7 @@ jest.mock('react-native-webview', () => {
   let capturedOnNavigationStateChange: ((navState: { url: string; canGoBack: boolean; loading: boolean }) => void) | undefined;
   let capturedInjectedScript: string | undefined;
   let capturedOnLoadStart: (() => void) | undefined;
+  let capturedOnShouldStartLoadWithRequest: unknown;
 
   const MockWebView = React.forwardRef(function MockWebView(
     props: MockWebViewProps,
@@ -66,6 +68,7 @@ jest.mock('react-native-webview', () => {
     capturedOnNavigationStateChange = props.onNavigationStateChange;
     capturedInjectedScript = props.injectedJavaScript;
     capturedOnLoadStart = props.onLoadStart;
+    capturedOnShouldStartLoadWithRequest = props.onShouldStartLoadWithRequest;
 
     return React.createElement(
       View,
@@ -82,6 +85,7 @@ jest.mock('react-native-webview', () => {
     __getOnNavigationStateChange: () => capturedOnNavigationStateChange,
     __getInjectedScript: () => capturedInjectedScript,
     __getOnLoadStart: () => capturedOnLoadStart,
+    __getOnShouldStartLoadWithRequest: () => capturedOnShouldStartLoadWithRequest,
   };
 });
 
@@ -96,6 +100,7 @@ type MockWebViewModule = {
   __getOnNavigationStateChange: () => ((navState: { url: string; canGoBack: boolean; loading: boolean }) => void) | undefined;
   __getInjectedScript: () => string | undefined;
   __getOnLoadStart: () => (() => void) | undefined;
+  __getOnShouldStartLoadWithRequest: () => unknown;
 };
 
 function getWebViewHandlers() {
@@ -650,9 +655,8 @@ describe('WikipediaWebView (composant)', () => {
       // Approche V1 : on laisse Wikipedia gérer ses redirections internes
       // sans bloquer les requêtes via onShouldStartLoadWithRequest
       render(<WikipediaWebView {...defaultProps} />);
-      // La propriété n'est pas présente dans le mock — vérifier qu'aucun handler n'est passé
-      const webviewModule = jest.requireMock<{ WebView: React.ComponentType<Record<string, unknown>> }>('react-native-webview');
-      expect(webviewModule.WebView).toBeDefined(); // module chargé sans erreur
+      const webviewModule = jest.requireMock<MockWebViewModule>('react-native-webview');
+      expect(webviewModule.__getOnShouldStartLoadWithRequest()).toBeUndefined();
     });
   });
 });
