@@ -166,14 +166,21 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
    * la WebView navigue directement vers l'article cible, court-circuitant le
    * mécanisme postMessage → onWikiLinkPress → addJump.
    *
-   * Règle : seules les sources "locales" (about:blank, data:, blob:) sont
-   * autorisées — elles correspondent au chargement initial du HTML statique.
-   * Toute autre URL (http://, https://) est bloquée ici : les taps sur liens
-   * /wiki/ sont déjà gérés via postMessage par le JS injecté.
+   * Règle :
+   *   - about:blank, data:, blob: → autorisé (chargement initial HTML statique)
+   *   - baseUrl exact (ex: "https://fr.wikipedia.org") → autorisé
+   *     react-native-webview appelle ce callback avec request.url = baseUrl
+   *     lors du chargement initial via source={{ html, baseUrl }}.
+   *     Sans cette exception, la page 2 et au-delà ne chargent jamais
+   *     car le premier callback bloque le rendu du HTML statique.
+   *   - Toute autre URL (http://, https://) → bloquée
+   *     Les taps sur liens /wiki/ sont gérés via postMessage côté JS injecté.
    */
+  const articleBaseUrl = `https://${props.article.language}.wikipedia.org`;
+
   function handleShouldStartLoadWithRequest(request: WebViewNavigation): boolean {
     const url = request.url;
-    // Autoriser le chargement initial du HTML statique
+    // Autoriser le chargement initial du HTML statique (URLs locales)
     if (
       url === 'about:blank' ||
       url.startsWith('data:') ||
@@ -181,7 +188,13 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
     ) {
       return true;
     }
-    // Bloquer toute navigation http/https — gérée par postMessage côté JS
+    // Autoriser le baseUrl exact — react-native-webview l'utilise comme URL
+    // initiale lors du chargement de source={{ html, baseUrl }}.
+    // Ce cas se produit systématiquement à partir de la 2e page affichée.
+    if (url === articleBaseUrl) {
+      return true;
+    }
+    // Bloquer toute navigation http/https réelle — gérée par postMessage côté JS
     return false;
   }
 

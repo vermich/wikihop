@@ -36,6 +36,7 @@ jest.mock('react-native-webview', () => {
     onMessage?: (event: { nativeEvent: { data: string } }) => void;
     onLoadEnd?: () => void;
     onError?: (event: { nativeEvent: { description: string } }) => void;
+    onShouldStartLoadWithRequest?: (request: { url: string }) => boolean;
     injectedJavaScriptBeforeContentLoaded?: string;
   }
 
@@ -43,6 +44,7 @@ jest.mock('react-native-webview', () => {
   let capturedOnMessage: ((event: { nativeEvent: { data: string } }) => void) | undefined;
   let capturedOnLoadEnd: (() => void) | undefined;
   let capturedOnError: ((event: { nativeEvent: { description: string } }) => void) | undefined;
+  let capturedOnShouldStartLoadWithRequest: ((request: { url: string }) => boolean) | undefined;
   let capturedInjectedScript: string | undefined;
 
   const MockWebView = React.forwardRef(function MockWebView(
@@ -52,6 +54,7 @@ jest.mock('react-native-webview', () => {
     capturedOnMessage = props.onMessage;
     capturedOnLoadEnd = props.onLoadEnd;
     capturedOnError = props.onError;
+    capturedOnShouldStartLoadWithRequest = props.onShouldStartLoadWithRequest;
     capturedInjectedScript = props.injectedJavaScriptBeforeContentLoaded;
 
     return React.createElement(
@@ -66,6 +69,7 @@ jest.mock('react-native-webview', () => {
     __getOnMessage: () => capturedOnMessage,
     __getOnLoadEnd: () => capturedOnLoadEnd,
     __getOnError: () => capturedOnError,
+    __getOnShouldStartLoadWithRequest: () => capturedOnShouldStartLoadWithRequest,
     __getInjectedScript: () => capturedInjectedScript,
   };
 });
@@ -86,12 +90,14 @@ function getWebViewHandlers() {
     __getOnMessage: () => ((event: { nativeEvent: { data: string } }) => void) | undefined;
     __getOnLoadEnd: () => (() => void) | undefined;
     __getOnError: () => ((event: { nativeEvent: { description: string } }) => void) | undefined;
+    __getOnShouldStartLoadWithRequest: () => ((request: { url: string }) => boolean) | undefined;
     __getInjectedScript: () => string | undefined;
   }>('react-native-webview');
   return {
     onMessage: webviewModule.__getOnMessage(),
     onLoadEnd: webviewModule.__getOnLoadEnd(),
     onError: webviewModule.__getOnError(),
+    onShouldStartLoadWithRequest: webviewModule.__getOnShouldStartLoadWithRequest(),
     injectedScript: webviewModule.__getInjectedScript(),
   };
 }
@@ -314,6 +320,114 @@ describe('WikipediaWebView', () => {
       const { onError: capturedError } = getWebViewHandlers();
       capturedError?.({ nativeEvent: { description: 'Network request failed' } });
       expect(onError).toHaveBeenCalledWith('Network request failed');
+    });
+  });
+
+  describe('onShouldStartLoadWithRequest — blocage navigation native', () => {
+    /**
+     * Vérifie que handleShouldStartLoadWithRequest autorise le chargement
+     * initial de la WebView (baseUrl exact) et bloque les navigations réelles.
+     *
+     * Contexte du bug page 2+ :
+     *   react-native-webview appelle ce callback avec request.url = baseUrl
+     *   ("https://fr.wikipedia.org") lors du chargement initial de
+     *   source={{ html, baseUrl }}.
+     *   Sans l'exception baseUrl, toutes les pages à partir de la 2e sont
+     *   bloquées et les listeners de clic ne s'installent jamais.
+     */
+    it('autorise about:blank (source initiale)', () => {
+      const onWikiLinkPress = jest.fn();
+      render(
+        <WikipediaWebView
+          html="<p>Test</p>"
+          article={mockArticle}
+          onWikiLinkPress={onWikiLinkPress}
+        />,
+      );
+      const { onShouldStartLoadWithRequest } = getWebViewHandlers();
+      expect(onShouldStartLoadWithRequest?.({ url: 'about:blank' })).toBe(true);
+    });
+
+    it('autorise les URLs data:', () => {
+      const onWikiLinkPress = jest.fn();
+      render(
+        <WikipediaWebView
+          html="<p>Test</p>"
+          article={mockArticle}
+          onWikiLinkPress={onWikiLinkPress}
+        />,
+      );
+      const { onShouldStartLoadWithRequest } = getWebViewHandlers();
+      expect(onShouldStartLoadWithRequest?.({ url: 'data:text/html,<html/>' })).toBe(true);
+    });
+
+    it('autorise les URLs blob:', () => {
+      const onWikiLinkPress = jest.fn();
+      render(
+        <WikipediaWebView
+          html="<p>Test</p>"
+          article={mockArticle}
+          onWikiLinkPress={onWikiLinkPress}
+        />,
+      );
+      const { onShouldStartLoadWithRequest } = getWebViewHandlers();
+      expect(onShouldStartLoadWithRequest?.({ url: 'blob:https://fr.wikipedia.org/abc' })).toBe(true);
+    });
+
+    it('autorise le baseUrl exact — fix chargement initial page 2+', () => {
+      const onWikiLinkPress = jest.fn();
+      render(
+        <WikipediaWebView
+          html="<p>Test</p>"
+          article={mockArticle}
+          onWikiLinkPress={onWikiLinkPress}
+        />,
+      );
+      const { onShouldStartLoadWithRequest } = getWebViewHandlers();
+      // mockArticle.language === 'fr' → baseUrl === 'https://fr.wikipedia.org'
+      expect(onShouldStartLoadWithRequest?.({ url: 'https://fr.wikipedia.org' })).toBe(true);
+    });
+
+    it('bloque une URL Wikipedia avec chemin /wiki/', () => {
+      const onWikiLinkPress = jest.fn();
+      render(
+        <WikipediaWebView
+          html="<p>Test</p>"
+          article={mockArticle}
+          onWikiLinkPress={onWikiLinkPress}
+        />,
+      );
+      const { onShouldStartLoadWithRequest } = getWebViewHandlers();
+      expect(onShouldStartLoadWithRequest?.({ url: 'https://fr.wikipedia.org/wiki/Paris' })).toBe(false);
+    });
+
+    it('bloque une URL https externe', () => {
+      const onWikiLinkPress = jest.fn();
+      render(
+        <WikipediaWebView
+          html="<p>Test</p>"
+          article={mockArticle}
+          onWikiLinkPress={onWikiLinkPress}
+        />,
+      );
+      const { onShouldStartLoadWithRequest } = getWebViewHandlers();
+      expect(onShouldStartLoadWithRequest?.({ url: 'https://example.com' })).toBe(false);
+    });
+
+    it('autorise le baseUrl exact pour la langue anglaise', () => {
+      const onWikiLinkPress = jest.fn();
+      const englishArticle = { ...mockArticle, language: 'en' as const };
+      render(
+        <WikipediaWebView
+          html="<p>Test</p>"
+          article={englishArticle}
+          onWikiLinkPress={onWikiLinkPress}
+        />,
+      );
+      const { onShouldStartLoadWithRequest } = getWebViewHandlers();
+      expect(onShouldStartLoadWithRequest?.({ url: 'https://en.wikipedia.org' })).toBe(true);
+      // La langue française ne doit pas être autorisée pour un article anglais
+      expect(onShouldStartLoadWithRequest?.({ url: 'https://fr.wikipedia.org' })).toBe(false);
     });
   });
 
