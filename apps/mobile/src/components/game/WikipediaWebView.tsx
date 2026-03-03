@@ -158,6 +158,18 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
   }
 
   /**
+   * URL de base Wikipedia pour la langue de l'article courant.
+   *
+   * Calculé avec useMemo par cohérence avec injectedScript — évite de
+   * reconstruire la string à chaque rendu et garantit une source de vérité
+   * unique réutilisée dans handleShouldStartLoadWithRequest et dans source.baseUrl.
+   */
+  const articleBaseUrl = useMemo(
+    () => `https://${props.article.language}.wikipedia.org`,
+    [props.article.language],
+  );
+
+  /**
    * Bloque toute navigation native de la WebView (fix Bug 1).
    *
    * Contexte : même avec event.preventDefault() dans le JS injecté, le pont
@@ -176,7 +188,6 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
    *   - Toute autre URL (http://, https://) → bloquée
    *     Les taps sur liens /wiki/ sont gérés via postMessage côté JS injecté.
    */
-  const articleBaseUrl = `https://${props.article.language}.wikipedia.org`;
 
   function handleShouldStartLoadWithRequest(request: WebViewNavigation): boolean {
     const url = request.url;
@@ -227,7 +238,7 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
       style={styles.webView}
       source={{
         html: props.html,
-        baseUrl: `https://${props.article.language}.wikipedia.org`,
+        baseUrl: articleBaseUrl,
       }}
       originWhitelist={['*']}
       javaScriptEnabled={true}
