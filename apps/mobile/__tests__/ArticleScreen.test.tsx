@@ -331,6 +331,25 @@ describe('ArticleScreen', () => {
       // Ce que le pont natif Android verrait après résolution du href /wiki/Paris
       expect(handler?.({ url: 'https://fr.wikipedia.org/wiki/Paris' })).toBe(false);
     });
+
+    it('autorise le baseUrl exact — chargement initial de la WebView (fix page 2+)', async () => {
+      // react-native-webview appelle onShouldStartLoadWithRequest avec request.url = baseUrl
+      // lors du chargement initial de source={{ html, baseUrl }}.
+      // Sans cette exception, les pages 2, 3, etc. ne chargent jamais.
+      renderArticleScreen('Tour Eiffel');
+      await act(async () => { await Promise.resolve(); });
+      const handler = capturedWebViewHandlers.onShouldStartLoadWithRequest;
+      // Article en français → baseUrl = "https://fr.wikipedia.org"
+      expect(handler?.({ url: 'https://fr.wikipedia.org' })).toBe(true);
+    });
+
+    it('bloque une URL wikipedia avec chemin même si elle commence par le baseUrl', async () => {
+      // Garantit que l'exception baseUrl est stricte (égalité, pas startsWith)
+      renderArticleScreen('Tour Eiffel');
+      await act(async () => { await Promise.resolve(); });
+      const handler = capturedWebViewHandlers.onShouldStartLoadWithRequest;
+      expect(handler?.({ url: 'https://fr.wikipedia.org/wiki/Tour_Eiffel' })).toBe(false);
+    });
   });
 
   // ── Bug 1 — addJump appelé via postMessage ───────────────────────────────────

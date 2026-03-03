@@ -158,6 +158,18 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
   }
 
   /**
+   * URL de base Wikipedia pour la langue de l'article courant.
+   *
+   * Calculé avec useMemo par cohérence avec injectedScript — évite de
+   * reconstruire la string à chaque rendu et garantit une source de vérité
+   * unique réutilisée dans handleShouldStartLoadWithRequest et dans source.baseUrl.
+   */
+  const articleBaseUrl = useMemo(
+    () => `https://${props.article.language}.wikipedia.org`,
+    [props.article.language],
+  );
+
+  /**
    * Bloque toute navigation native de la WebView (fix Bug 1).
    *
    * Contexte : même avec event.preventDefault() dans le JS injecté, le pont
@@ -166,14 +178,20 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
    * la WebView navigue directement vers l'article cible, court-circuitant le
    * mécanisme postMessage → onWikiLinkPress → addJump.
    *
-   * Règle : seules les sources "locales" (about:blank, data:, blob:) sont
-   * autorisées — elles correspondent au chargement initial du HTML statique.
-   * Toute autre URL (http://, https://) est bloquée ici : les taps sur liens
-   * /wiki/ sont déjà gérés via postMessage par le JS injecté.
+   * Règle :
+   *   - about:blank, data:, blob: → autorisé (chargement initial HTML statique)
+   *   - baseUrl exact (ex: "https://fr.wikipedia.org") → autorisé
+   *     react-native-webview appelle ce callback avec request.url = baseUrl
+   *     lors du chargement initial via source={{ html, baseUrl }}.
+   *     Sans cette exception, la page 2 et au-delà ne chargent jamais
+   *     car le premier callback bloque le rendu du HTML statique.
+   *   - Toute autre URL (http://, https://) → bloquée
+   *     Les taps sur liens /wiki/ sont gérés via postMessage côté JS injecté.
    */
+
   function handleShouldStartLoadWithRequest(request: WebViewNavigation): boolean {
     const url = request.url;
-    // Autoriser le chargement initial du HTML statique
+    // Autoriser le chargement initial du HTML statique (URLs locales)
     if (
       url === 'about:blank' ||
       url.startsWith('data:') ||
@@ -181,7 +199,13 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
     ) {
       return true;
     }
-    // Bloquer toute navigation http/https — gérée par postMessage côté JS
+    // Autoriser le baseUrl exact — react-native-webview l'utilise comme URL
+    // initiale lors du chargement de source={{ html, baseUrl }}.
+    // Ce cas se produit systématiquement à partir de la 2e page affichée.
+    if (url === articleBaseUrl) {
+      return true;
+    }
+    // Bloquer toute navigation http/https réelle — gérée par postMessage côté JS
     return false;
   }
 
@@ -214,7 +238,7 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
       style={styles.webView}
       source={{
         html: props.html,
-        baseUrl: `https://${props.article.language}.wikipedia.org`,
+        baseUrl: articleBaseUrl,
       }}
       originWhitelist={['*']}
       javaScriptEnabled={true}
