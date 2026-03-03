@@ -1,24 +1,24 @@
 /**
- * ArticleScreen — WikiHop Mobile — Wave 3 (M-03 + M-04)
+ * ArticleScreen — WikiHop Mobile — Réécriture WebView native
  *
- * Écran principal du jeu. Affiche un article Wikipedia et permet la navigation
- * vers d'autres articles via les liens internes.
+ * Écran principal du jeu. Charge directement m.wikipedia.org dans la WebView.
+ *
+ * Nouvelle architecture (réécriture WebView native) :
+ *   - Plus de fetch HTML custom : la WebView charge l'URL Wikipedia mobile directement
+ *   - Plus de postMessage : la navigation est détectée via onNavigationStateChange
+ *   - Chaque changement de page (aller ET retour) = +1 saut via addJump
+ *   - La victoire est vérifiée dans handlePageChange via titlesMatch
+ *   - BackHandler Android : webViewRef.current.goBack() → déclenche onNavigationStateChange
+ *     → compte comme saut. Si webView ne peut pas reculer → Alert abandon → HomeScreen
  *
  * Layout :
  *   [Header fixe — 52pt — SafeAreaView]
  *   [GameHUD — 40pt]
- *   [WikipediaWebView — flex:1 — contenu scrollable]
- *
- * Navigation (M-04) :
- *   - navigation.push('Game', { articleTitle }) — jamais navigate
- *   - isNavigating ref : anti-double-tap
- *   - isPlayableArticle : filtre les namespaces non jouables
- *   - Victoire : completeSession() + navigation.navigate('Victory') (Wave 4)
+ *   [WikipediaWebView — flex:1 — charge m.wikipedia.org directement]
  *
  * Références :
  *   Story : docs/stories/M-03-article-content-display.md
  *   Story : docs/stories/M-04-article-navigation.md
- *   UX    : Benjamin — spécifications visuelles M-03 / M-04
  *
  * Conventions :
  *   - Export nommé
@@ -29,7 +29,6 @@
 
 import { useIsFocused } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { Article } from '@wikihop/shared';
 import React, {
   useCallback,
   useEffect,
@@ -37,10 +36,7 @@ import React, {
   useState,
 } from 'react';
 import {
-  AccessibilityInfo,
-  ActivityIndicator,
   Alert,
-  Animated,
   BackHandler,
   StyleSheet,
   Text,
@@ -49,19 +45,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { WebView } from 'react-native-webview';
-import type { WebViewNavigation } from 'react-native-webview/lib/WebViewTypes';
-
 
 import { GameHUD } from '../components/game/GameHUD';
-import { WikipediaWebView } from '../components/game/WikipediaWebView';
-import { useArticleContent } from '../hooks/useArticleContent';
-import type { RootStackParamList } from '../navigation/RootNavigator';
 import {
-  WikipediaNetworkError,
-  WikipediaNotFoundError,
-  getArticleSummary,
-  isPlayableArticle,
-} from '../services/wikipedia.service';
+  WikipediaWebView,
+  titlesMatch,
+} from '../components/game/WikipediaWebView';
+import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useGameStore } from '../store/game.store';
 import { useLanguageStore } from '../store/language.store';
 
@@ -86,89 +76,76 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
 
   const jumps = currentSession?.jumps ?? 0;
   const targetTitle = currentSession?.targetArticle.title ?? '';
+  const targetArticle = currentSession?.targetArticle ?? null;
 
-  // Article courant construit depuis le résumé
-  const [currentArticle, setCurrentArticle] = useState<Article | null>(null);
+  // Titre de l'article actuellement affiché dans la WebView
+  // (peut diverger de articleTitle si l'utilisateur navigue en avant/arrière)
+  const [currentTitle, setCurrentTitle] = useState(articleTitle);
 
-  // Indicateur d'échec de getArticleSummary — évite le spinner infini (B2)
-  const [summaryError, setSummaryError] = useState(false);
-
-  // Compteur de retry résumé : son incrément retrigge le useEffect résumé (B2)
-  const [summaryRetryCount, setSummaryRetryCount] = useState(0);
-
-  // Contenu HTML via le hook
-  const { state: contentState, retry } = useArticleContent(articleTitle, lang);
-
-  // Ref WebView pour le scroll-to-top au focus (M-04)
+  // Ref WebView pour le BackHandler Android
   const webViewRef = useRef<WebView | null>(null);
 
-  // Suivi de canGoBack de la WebView pour le BackHandler Android (fix Bug 2)
+  // canGoBack WebView pour le BackHandler Android
   const [webViewCanGoBack, setWebViewCanGoBack] = useState(false);
 
-  // Anti-double-tap (M-04)
-  const isNavigating = useRef(false);
-
-  // Animation skeleton
-  const shimmerAnim = useRef(new Animated.Value(0.4)).current;
+  // Erreur WebView
+  const [webViewError, setWebViewError] = useState<string | null>(null);
 
   const isFocused = useIsFocused();
 
-  // ── Chargement du résumé pour construire l'Article complet ──────────────────
-  // summaryRetryCount dans les deps : son incrément (via retrySummary) retrigge cet effet (B2)
-  useEffect(() => {
-    let cancelled = false;
+  // ── Gestion des sauts et de la victoire ─────────────────────────────────────
+  //
+  // Appelé par WikipediaWebView quand l'utilisateur change de page.
+  // Chaque changement de page = +1 saut (aller ET retour).
+  const handlePageChange = useCallback(
+    async (newTitle: string): Promise<void> => {
+      // Mise à jour du titre courant
+      setCurrentTitle(newTitle);
 
-    // Réinitialise l'erreur au début de chaque tentative
-    setSummaryError(false);
+      // Trouver l'article dans le path existant ou construire un Article minimal
+      // addJump accepte un Article complet — on construit un objet minimal conforme au type
+      const article = {
+        id: newTitle,
+        title: newTitle,
+        url: `https://${lang}.m.wikipedia.org/wiki/${encodeURIComponent(newTitle)}`,
+        language: lang,
+      };
 
-    void (async () => {
-      try {
-        const summary = await getArticleSummary(articleTitle, lang);
-        if (!cancelled) {
-          setCurrentArticle(summary);
-        }
-      } catch {
-        // Erreur résumé : on expose summaryError pour éviter le spinner infini (B2).
-        // Si contentState.status === 'success' et summaryError === true,
-        // l'écran d'erreur réseau standard sera affiché avec un bouton "Réessayer".
-        if (!cancelled) {
-          setSummaryError(true);
-        }
+      await addJump(article);
+
+      // Vérification de la victoire
+      if (
+        targetArticle !== null &&
+        titlesMatch(newTitle, targetArticle.title)
+      ) {
+        await completeSession();
+        navigation.navigate('Victory');
       }
-    })();
+    },
+    [lang, addJump, completeSession, targetArticle, navigation],
+  );
 
-    return () => {
-      cancelled = true;
-    };
-  }, [articleTitle, lang, summaryRetryCount]);
+  // ── Wrapper non-async pour onPageChange (prop de WikipediaWebView) ───────────
+  const handlePageChangeSync = useCallback(
+    (newTitle: string): void => {
+      void handlePageChange(newTitle);
+    },
+    [handlePageChange],
+  );
 
-  // ── Scroll to top quand l'écran reprend le focus (retour arrière) ────────────
-  useEffect(() => {
-    if (isFocused && webViewRef.current !== null) {
-      webViewRef.current.injectJavaScript('window.scrollTo(0, 0); true;');
-    }
-  }, [isFocused]);
-
-  // ── Mise à jour de canGoBack WebView (fix Bug 2) ─────────────────────────────
+  // ── onNavigationStateChange pour suivre canGoBack ────────────────────────────
   const handleNavigationStateChange = useCallback(
-    (navState: WebViewNavigation): void => {
+    (navState: { canGoBack: boolean; url: string }): void => {
       setWebViewCanGoBack(navState.canGoBack);
     },
     [],
   );
 
-  // ── BackHandler Android — priorité à la navigation WebView (fix Bug 2) ───────
+  // ── BackHandler Android ──────────────────────────────────────────────────────
   //
-  // Contexte : sur Android, le hardware back button déclenche directement
-  // navigation.goBack() via React Navigation, qui remonte le stack RN.
-  // Si la WebView a un historique interne (canGoBack === true), on veut
-  // d'abord reculer dans la WebView, pas dépiler le screen RN.
-  //
-  // Note : avec onShouldStartLoadWithRequest (fix Bug 1), la WebView ne navigue
-  // plus nativement vers de nouveaux articles — son historique interne reste
-  // minimal. Ce BackHandler reste utile pour gérer les ancres (#section) qui
-  // peuvent créer un historique interne, et pour les cas où la WebView
-  // chargerait initialement about:blank avant le HTML.
+  // Avec la nouvelle approche (URL directe), le BackHandler navigue dans l'historique
+  // WebView. La navigation arrière déclenche onNavigationStateChange → onPageChange
+  // → +1 saut. Si la WebView ne peut pas reculer, on propose d'abandonner.
   useEffect(() => {
     if (!isFocused) {
       return;
@@ -179,220 +156,35 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
       () => {
         if (webViewCanGoBack && webViewRef.current !== null) {
           webViewRef.current.goBack();
-          // Retourner true bloque React Navigation (hardware back géré)
           return true;
         }
-        // Retourner false laisse React Navigation gérer le retour
-        // (goBack() vers l'écran précédent du stack RN)
-        return false;
+        // WebView ne peut pas reculer → proposer abandon ou laisser RN gérer
+        if (navigation.canGoBack()) {
+          return false;
+        }
+        // Premier écran du stack → proposer abandon de la partie
+        Alert.alert(
+          'Quitter la partie ?',
+          'Votre progression sera perdue.',
+          [
+            { text: 'Continuer à jouer', style: 'cancel' },
+            {
+              text: 'Quitter',
+              style: 'destructive',
+              onPress: () => { navigation.navigate('Home'); },
+            },
+          ],
+        );
+        return true;
       },
     );
 
     return () => {
       subscription.remove();
     };
-  }, [isFocused, webViewCanGoBack]);
+  }, [isFocused, webViewCanGoBack, navigation]);
 
-  // ── Animation shimmer skeleton ───────────────────────────────────────────────
-  useEffect(() => {
-    if (contentState.status !== 'loading') {
-      return;
-    }
-
-    const animation = Animated.loop(
-      Animated.sequence([
-        Animated.timing(shimmerAnim, {
-          toValue: 1.0,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-        Animated.timing(shimmerAnim, {
-          toValue: 0.4,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-      ]),
-    );
-
-    animation.start();
-
-    return () => {
-      animation.stop();
-    };
-  }, [contentState.status, shimmerAnim]);
-
-  // ── Annonce accessibilité quand l'article est chargé ────────────────────────
-  useEffect(() => {
-    if (contentState.status === 'success') {
-      void AccessibilityInfo.announceForAccessibility(
-        `Article ${articleTitle} chargé.`,
-      );
-    }
-  }, [contentState.status, articleTitle]);
-
-  // ── Handler de navigation inter-articles (M-04) ──────────────────────────────
-  const handleLinkPress = useCallback(
-    async (title: string): Promise<void> => {
-      // Filtre les namespaces non jouables
-      if (!isPlayableArticle(title)) {
-        return;
-      }
-
-      // Anti-double-tap
-      if (isNavigating.current) {
-        return;
-      }
-      isNavigating.current = true;
-
-      try {
-        const article = await getArticleSummary(title, lang);
-
-        // Enregistrement du saut dans le store.
-        // addJump est protégé contre les appels post-victoire : le guard dans
-        // game.store.ts vérifie que status === 'in_progress' avant toute mutation.
-        // Si completeSession() a déjà été appelé (status === 'won'), addJump est un no-op.
-        await addJump(article);
-
-        // Annonce accessibilité après le saut
-        void AccessibilityInfo.announceForAccessibility(
-          `Saut effectué. ${jumps + 1} saut${jumps + 1 <= 1 ? '' : 's'} au total.`,
-        );
-
-        // Vérification de victoire
-        if (
-          currentSession !== null &&
-          article.title.trim() === currentSession.targetArticle.title.trim()
-        ) {
-          await completeSession();
-          // Wave 4 : navigation vers VictoryScreen (M-06)
-          navigation.navigate('Victory');
-          return;
-        }
-
-        // Navigation vers le nouvel article
-        // push (pas navigate) : empile toujours un nouvel écran même si déjà dans le stack
-        navigation.push('Game', { articleTitle: title });
-      } catch (error: unknown) {
-        if (error instanceof WikipediaNotFoundError) {
-          Alert.alert(
-            'Article introuvable',
-            `"${title}" n'existe pas sur Wikipedia.`,
-          );
-        } else if (error instanceof WikipediaNetworkError) {
-          Alert.alert(
-            'Erreur réseau',
-            'Impossible de charger cet article. Vérifiez votre connexion.',
-          );
-        } else {
-          Alert.alert(
-            'Erreur',
-            'Une erreur inattendue s\'est produite.',
-          );
-        }
-      } finally {
-        isNavigating.current = false;
-      }
-    },
-    [lang, addJump, completeSession, currentSession, jumps, navigation],
-  );
-
-  // ── Retry du chargement du résumé (B2) ───────────────────────────────────────
-  // Incrémenter summaryRetryCount retrigge le useEffect résumé via ses deps.
-  // currentArticle est remis à null pour afficher le spinner le temps du retry.
-  const retrySummary = useCallback((): void => {
-    setCurrentArticle(null);
-    setSummaryRetryCount((c) => c + 1);
-  }, []);
-
-  // ── Rendu de la zone de contenu ──────────────────────────────────────────────
-  function renderContent(): React.JSX.Element {
-    switch (contentState.status) {
-      case 'loading':
-        return (
-          <View
-            style={styles.loadingContainer}
-            accessibilityElementsHidden={true}
-          >
-            <SkeletonLoader shimmerAnim={shimmerAnim} />
-          </View>
-        );
-
-      case 'success':
-        // On n'affiche la WebView que quand le résumé est aussi disponible.
-        // Si le résumé a échoué (summaryError), on affiche l'erreur réseau
-        // avec un bouton "Réessayer" plutôt que de bloquer sur un spinner infini (B2).
-        if (currentArticle === null) {
-          if (summaryError) {
-            return (
-              <View style={styles.errorContainer}>
-                <Text style={styles.errorTitle}>
-                  {'Impossible de charger cet article.'}
-                </Text>
-                <Text style={styles.errorSubtext}>
-                  {'Vérifiez votre connexion internet.'}
-                </Text>
-                <TouchableOpacity
-                  style={styles.retryButton}
-                  onPress={retrySummary}
-                  accessibilityLabel="Réessayer de charger l'article"
-                  accessibilityRole="button"
-                >
-                  <Text style={styles.retryButtonText}>{'Réessayer'}</Text>
-                </TouchableOpacity>
-              </View>
-            );
-          }
-          return (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#2563EB" />
-            </View>
-          );
-        }
-        return (
-          <WikipediaWebView
-            webViewRef={webViewRef}
-            html={contentState.html}
-            article={currentArticle}
-            onWikiLinkPress={(title) => {
-              void handleLinkPress(title);
-            }}
-            onNavigationStateChange={handleNavigationStateChange}
-          />
-        );
-
-      case 'not_found':
-        return (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorTitle} accessibilityRole="header">
-              {'Article introuvable'}
-            </Text>
-            <Text style={styles.errorMessage}>
-              {`"${contentState.title}" n'existe pas sur Wikipedia.`}
-            </Text>
-          </View>
-        );
-
-      case 'error':
-        return (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorTitle}>
-              {'Impossible de charger cet article.'}
-            </Text>
-            <Text style={styles.errorSubtext}>
-              {'Vérifiez votre connexion internet.'}
-            </Text>
-            <TouchableOpacity
-              style={styles.retryButton}
-              onPress={retry}
-              accessibilityLabel="Réessayer de charger l'article"
-              accessibilityRole="button"
-            >
-              <Text style={styles.retryButtonText}>{'Réessayer'}</Text>
-            </TouchableOpacity>
-          </View>
-        );
-    }
-  }
+  // ── Rendu ────────────────────────────────────────────────────────────────────
 
   const canGoBack = navigation.canGoBack();
 
@@ -418,7 +210,7 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
             numberOfLines={1}
             accessibilityRole="header"
           >
-            {articleTitle}
+            {currentTitle}
           </Text>
           {/* Espace à droite pour équilibrer le bouton retour */}
           <View style={styles.headerRight} />
@@ -428,32 +220,39 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
       {/* HUD fixe */}
       <GameHUD jumps={jumps} targetTitle={targetTitle} />
 
-      {/* Contenu WebView / loader / erreur */}
+      {/* Contenu WebView */}
       <View style={styles.contentArea}>
-        {renderContent()}
+        {webViewError !== null ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorTitle}>
+              {'Impossible de charger cet article.'}
+            </Text>
+            <Text style={styles.errorSubtext}>
+              {'Vérifiez votre connexion internet.'}
+            </Text>
+            <TouchableOpacity
+              style={styles.retryButton}
+              onPress={() => {
+                setWebViewError(null);
+                setCurrentTitle(articleTitle);
+              }}
+              accessibilityLabel="Réessayer de charger l'article"
+              accessibilityRole="button"
+            >
+              <Text style={styles.retryButtonText}>{'Réessayer'}</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <WikipediaWebView
+            currentTitle={currentTitle}
+            lang={lang}
+            onPageChange={handlePageChangeSync}
+            webViewRef={webViewRef}
+            onError={(error) => { setWebViewError(error); }}
+            onNavigationStateChange={handleNavigationStateChange}
+          />
+        )}
       </View>
-    </View>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Composant skeleton interne
-// ─────────────────────────────────────────────────────────────────────────────
-
-interface SkeletonLoaderProps {
-  shimmerAnim: Animated.Value;
-}
-
-function SkeletonLoader({ shimmerAnim }: SkeletonLoaderProps): React.JSX.Element {
-  return (
-    <View style={skeletonStyles.container}>
-      <Animated.View style={[skeletonStyles.line, skeletonStyles.lineFullWidth, { opacity: shimmerAnim }]} />
-      <Animated.View style={[skeletonStyles.line, skeletonStyles.line80, { opacity: shimmerAnim }]} />
-      <Animated.View style={[skeletonStyles.line, skeletonStyles.line60, { opacity: shimmerAnim }]} />
-      <View style={skeletonStyles.spacer} />
-      <Animated.View style={[skeletonStyles.imageBlock, { opacity: shimmerAnim }]} />
-      <Animated.View style={[skeletonStyles.line, skeletonStyles.lineFullWidth, { opacity: shimmerAnim }]} />
-      <Animated.View style={[skeletonStyles.line, skeletonStyles.line80, { opacity: shimmerAnim }]} />
     </View>
   );
 }
@@ -506,10 +305,6 @@ const styles = StyleSheet.create({
   contentArea: {
     flex: 1,
   },
-  loadingContainer: {
-    flex: 1,
-    padding: 16,
-  },
   errorContainer: {
     flex: 1,
     alignItems: 'center',
@@ -522,12 +317,6 @@ const styles = StyleSheet.create({
     color: '#1E293B',
     textAlign: 'center',
     marginBottom: 12,
-  },
-  errorMessage: {
-    fontSize: 14,
-    color: '#64748B',
-    textAlign: 'center',
-    fontStyle: 'italic',
   },
   errorSubtext: {
     fontSize: 13,
@@ -548,37 +337,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#FFFFFF',
-  },
-});
-
-const skeletonStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingVertical: 16,
-  },
-  line: {
-    height: 16,
-    backgroundColor: '#E2E8F0',
-    borderRadius: 4,
-    marginBottom: 10,
-  },
-  lineFullWidth: {
-    width: '100%',
-  },
-  line80: {
-    width: '80%',
-  },
-  line60: {
-    width: '60%',
-  },
-  spacer: {
-    height: 16,
-  },
-  imageBlock: {
-    width: '100%',
-    height: 120,
-    backgroundColor: '#E2E8F0',
-    borderRadius: 4,
-    marginBottom: 16,
   },
 });

@@ -1,69 +1,229 @@
 /**
- * WikipediaWebView — WikiHop Mobile — Wave 3 (M-15)
+ * WikipediaWebView — WikiHop Mobile — Réécriture WebView native
  *
- * Composant fondation qui affiche le contenu HTML d'un article Wikipedia
- * dans une WebView épurée, sans les éléments de navigation Wikipedia.
+ * Charge directement `https://{lang}.m.wikipedia.org/wiki/{titre}` dans la WebView.
+ * Approche native Wikipedia mobile : layout officiel, zéro manipulation HTML custom.
  *
  * Mécanismes clés :
- *   - CSS injecté via `injectedJavaScriptBeforeContentLoaded` (ADR-006 : pas de flash Android)
- *   - Interception des taps sur liens /wiki/ via postMessage
- *   - Liens externes bloqués silencieusement (pas de sortie de l'app)
- *   - Ancres #section laissées au scroll natif WebView
+ *   - source={{ uri }} : URL Wikipedia mobile directe (pas de HTML injecté)
+ *   - CSS minimal injecté via `injectedJavaScriptBeforeContentLoaded` : masque header/footer uniquement
+ *   - `onShouldStartLoadWithRequest` : autorise les articles Wikipedia mobile jouables,
+ *     bloque les namespaces non jouables et les liens externes
+ *   - `onNavigationStateChange` : détecte chaque changement de page → compte les sauts,
+ *     vérifie la victoire. Le comptage est délégué au parent via `onPageChange`.
+ *   - Back button Android : géré par le parent via `webViewRef.current.goBack()`
+ *
+ * Fonctions pures exportées (TDD) :
+ *   - `isPlayableWikipediaUrl(url, lang)` : filtre les URLs autorisées
+ *   - `titlesMatch(a, b)` : comparaison de titres insensible à la casse/underscores
+ *   - `extractTitleFromUrl(url, lang)` : extrait le titre depuis une URL Wikipedia mobile
  *
  * Références :
- *   ADR-006 : WebView — interception des liens, injection CSS
- *   Story   : docs/stories/M-15-webview-css-injection.md
+ *   Story : docs/stories/M-15-webview-css-injection.md
+ *   Story : docs/stories/M-04-article-navigation.md
  *
  * Conventions :
  *   - Export nommé
- *   - CSS dans constants/wikipedia-css.ts (jamais inline)
- *   - useMemo pour le script injecté (la constante CSS ne change pas)
+ *   - StyleSheet.create() en bas du fichier
  */
 
-import type { Article } from '@wikihop/shared';
-import React, { useMemo, type RefObject } from 'react';
-import { StyleSheet } from 'react-native';
-import { WebView, type WebViewMessageEvent } from 'react-native-webview';
+import type { Language } from '@wikihop/shared';
+import React, { type RefObject } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { WebView } from 'react-native-webview';
 import type {
   WebViewErrorEvent,
   WebViewNavigation,
 } from 'react-native-webview/lib/WebViewTypes';
 
-
-import { WIKIPEDIA_ARTICLE_CSS } from '../../constants/wikipedia-css';
-
 // ─────────────────────────────────────────────────────────────────────────────
-// Types
+// Constantes
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Type du message postMessage reçu depuis la WebView */
-export interface WikiLinkMessage {
-  type: 'WIKI_LINK';
-  /** Titre de l'article cible, déjà décodé (replace(/_/g, ' ') appliqué côté JS injecté) */
-  title: string;
+/**
+ * Préfixes de namespaces non jouables dans les URLs Wikipedia mobile.
+ * Ces préfixes correspondent à des pages de maintenance ou méta Wikipedia.
+ * Note : les namespaces Wikipedia mobile sont identiques au desktop (même encodage).
+ */
+const BLOCKED_URL_PREFIXES = [
+  'Special:',
+  'Spécial:',
+  'File:',
+  'Fichier:',
+  'Help:',
+  'Aide:',
+  'Category:',
+  'Catégorie:',
+  'Template:',
+  'Modèle:',
+  'Talk:',
+  'Discussion:',
+  'Wikipedia:',
+  'Wikipédia:',
+  'Portal:',
+  'Portail:',
+] as const;
+
+/**
+ * Script CSS injecté avant le premier paint pour masquer header/footer Minerva
+ * (thème Wikipedia mobile). Injecté via `injectedJavaScriptBeforeContentLoaded`
+ * pour éviter tout flash du layout Wikipedia original.
+ *
+ * Sélecteurs Minerva (layout mobile Wikipedia officiel) :
+ *   - .header-container, .minerva-header, header.header-container : header Wikipedia mobile
+ *   - #footer, .minerva-footer : footer Wikipedia mobile
+ *   - .mw-editsection : boutons d'édition en ligne
+ *   - .pre-content, #content : ajustement padding top après suppression header
+ */
+const CSS_INJECTION_SCRIPT = `
+(function() {
+  var css = [
+    '.header-container { display: none !important; }',
+    '.minerva-header { display: none !important; }',
+    'header.header-container { display: none !important; }',
+    '#footer { display: none !important; }',
+    '.minerva-footer { display: none !important; }',
+    '.mw-editsection { display: none !important; }',
+    '.pre-content { padding-top: 8px !important; }',
+    '#content { padding-top: 8px !important; }'
+  ].join('\\n');
+  var style = document.createElement('style');
+  style.textContent = css;
+  document.head.appendChild(style);
+  true;
+})();
+`;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Fonctions pures exportées (TDD)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Construit l'URL Wikipedia mobile pour un titre et une langue.
+ *
+ * @param title - Titre de l'article (non encodé, ex: "Tour Eiffel")
+ * @param lang  - Langue ('fr' | 'en')
+ * @returns URL complète Wikipedia mobile
+ */
+export function buildArticleUrl(title: string, lang: Language): string {
+  return `https://${lang}.m.wikipedia.org/wiki/${encodeURIComponent(title)}`;
 }
 
+/**
+ * Extrait le titre d'article depuis une URL Wikipedia mobile.
+ * Retire les underscores, décode l'encodage URL, ignore les ancres (#).
+ *
+ * @param url  - URL Wikipedia mobile complète
+ * @param lang - Langue attendue ('fr' | 'en')
+ * @returns Titre décodé avec espaces, ou null si l'URL ne correspond pas
+ */
+export function extractTitleFromUrl(url: string, lang: Language): string | null {
+  const mobileBase = `https://${lang}.m.wikipedia.org/wiki/`;
+  if (!url.startsWith(mobileBase)) {
+    return null;
+  }
+  // Retire le segment après /wiki/ et ignore les ancres (#section)
+  const rawPath = url.slice(mobileBase.length).split('#')[0];
+  if (rawPath === undefined || rawPath.length === 0) {
+    return null;
+  }
+  try {
+    return decodeURIComponent(rawPath).replace(/_/g, ' ');
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Vérifie si une URL Wikipedia mobile est jouable dans WikiHop.
+ *
+ * Règles :
+ *   - about:blank → autorisé (chargement initial WebView)
+ *   - URL Wikipedia mobile de la bonne langue → autorisé si le path n'est pas un namespace bloqué
+ *   - Tout le reste → bloqué (liens externes, autres langues, namespaces maintenance)
+ *
+ * Fonction pure — testable directement (TDD).
+ *
+ * @param url  - URL à évaluer
+ * @param lang - Langue courante du jeu
+ * @returns true si la WebView peut charger cette URL
+ */
+export function isPlayableWikipediaUrl(url: string, lang: Language): boolean {
+  // Chargement initial de la WebView
+  if (url === 'about:blank') {
+    return true;
+  }
+
+  const mobileBase = `https://${lang}.m.wikipedia.org/wiki/`;
+  if (!url.startsWith(mobileBase)) {
+    return false;
+  }
+
+  // Extraire le segment après /wiki/ (ignorer ancres)
+  const rawPath = url.slice(mobileBase.length).split('#')[0];
+  if (rawPath === undefined || rawPath.length === 0) {
+    // URL = base exacte sans titre → page principale, bloquée
+    return false;
+  }
+
+  let path: string;
+  try {
+    path = decodeURIComponent(rawPath);
+  } catch {
+    return false;
+  }
+
+  // Vérifier que le path n'est pas un namespace non jouable
+  const isBlocked = BLOCKED_URL_PREFIXES.some((prefix) =>
+    path.startsWith(prefix),
+  );
+
+  return !isBlocked;
+}
+
+/**
+ * Compare deux titres d'articles Wikipedia de façon normalisée.
+ * Insensible à la casse et aux underscores (Wikipedia utilise les deux).
+ *
+ * Fonction pure — testable directement (TDD).
+ *
+ * @param a - Premier titre
+ * @param b - Deuxième titre
+ * @returns true si les titres correspondent au même article
+ */
+export function titlesMatch(a: string, b: string): boolean {
+  return a.toLowerCase().replace(/_/g, ' ') === b.toLowerCase().replace(/_/g, ' ');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Types du composant
+// ─────────────────────────────────────────────────────────────────────────────
+
 export interface WikipediaWebViewProps {
-  /** HTML brut retourné par getArticleContent() */
-  html: string;
-  /** Article actuellement affiché — utilisé pour construire le baseUrl */
-  article: Article;
-  /** Appelé quand le joueur tape un lien interne Wikipedia navigable */
-  onWikiLinkPress: (title: string) => void;
-  /** Appelé quand le chargement initial de la WebView est terminé */
+  /** Titre de l'article courant à afficher (non encodé) */
+  currentTitle: string;
+  /** Langue Wikipedia courante */
+  lang: Language;
+  /**
+   * Appelé quand le joueur navigue vers un nouvel article (saut comptabilisé).
+   * Reçoit le titre de l'article cible (déjà décodé, espaces normalisés).
+   * Appelé également pour les retours arrière (chaque changement de page = 1 saut).
+   */
+  onPageChange: (newTitle: string) => void;
+  /** Appelé quand le chargement de la page est terminé */
   onLoadEnd?: () => void;
   /** Appelé en cas d'erreur de chargement WebView */
   onError?: (error: string) => void;
   /**
    * Ref optionnelle vers la WebView native — permet au parent d'appeler
-   * injectJavaScript (ex: scroll-to-top au retour arrière M-04).
+   * goBack() via le BackHandler Android.
    */
   webViewRef?: RefObject<WebView | null>;
   /**
-   * Appelé à chaque changement d'état de navigation de la WebView.
-   * Permet au parent de suivre canGoBack pour le BackHandler Android (fix Bug 2).
+   * Appelé à chaque changement d'état de navigation.
+   * Permet au parent de suivre canGoBack pour le BackHandler Android.
    */
-  onNavigationStateChange?: (navState: WebViewNavigation) => void;
+  onNavigationStateChange?: (navState: { canGoBack: boolean; url: string }) => void;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -71,151 +231,52 @@ export interface WikipediaWebViewProps {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Element {
-  /**
-   * Script injecté avant le premier paint (mitigation flash Android — ADR-006).
-   * JSON.stringify(WIKIPEDIA_ARTICLE_CSS) garantit l'échappement correct
-   * des guillemets et retours à la ligne dans le CSS.
-   *
-   * Calculé avec useMemo car la constante CSS ne change jamais —
-   * pas de recréation à chaque rendu.
-   */
-  const injectedScript = useMemo(
-    () => `
-  (function() {
-    // 1. Injection CSS avant le premier paint (mitigation flash Android — ADR-006)
-    var style = document.createElement('style');
-    style.textContent = ${JSON.stringify(WIKIPEDIA_ARTICLE_CSS)};
-    document.head.appendChild(style);
+  const { currentTitle, lang, onPageChange, webViewRef } = props;
 
-    // 2. Interception des taps sur les liens (phase capture = true)
-    document.addEventListener('click', function(event) {
-      var target = event.target;
-      // Remonter jusqu'à l'ancre parente (le tap peut être sur un enfant du lien)
-      while (target && target.tagName !== 'A') {
-        target = target.parentElement;
-      }
-      if (!target) return;
-
-      var href = target.getAttribute('href');
-      if (!href) return;
-
-      // Ancres internes (#section) — laisser le scroll natif de la WebView opérer
-      if (href.startsWith('#')) {
-        return;
-      }
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      // Liens internes Wikipedia — navigables dans le jeu.
-      //
-      // L'API REST Wikipedia /page/html/ retourne du HTML Parsoid où les liens
-      // internes ont un href relatif "./Titre_Article" (pas "/wiki/Titre").
-      // Le baseUrl "https://{lang}.wikipedia.org" passé à la WebView résout ces
-      // chemins correctement côté navigateur, mais getAttribute('href') retourne
-      // l'attribut brut du DOM, c'est-à-dire "./Titre_Article".
-      if (href.startsWith('./')) {
-        var rawTitle = href.slice(2); // Retire le "./" initial
-        var decodedTitle;
-        try {
-          decodedTitle = decodeURIComponent(rawTitle).replace(/_/g, ' ');
-        } catch (e) {
-          return; // Titre malformé — ignorer
-        }
-        window.ReactNativeWebView.postMessage(JSON.stringify({
-          type: 'WIKI_LINK',
-          title: decodedTitle
-        }));
-        return;
-      }
-
-      // Liens externes — bloqués silencieusement (pas de postMessage)
-    }, true); // true = phase de capture, intercepte avant les handlers Wikipedia
-
-    true; // Obligatoire Android — le script doit retourner true
-  })();
-`,
-    [],
-  );
-
-  function handleMessage(event: WebViewMessageEvent): void {
-    try {
-      const data = JSON.parse(event.nativeEvent.data) as unknown;
-      if (
-        typeof data === 'object' &&
-        data !== null &&
-        'type' in data &&
-        (data as Record<string, unknown>)['type'] === 'WIKI_LINK' &&
-        'title' in data &&
-        typeof (data as Record<string, unknown>)['title'] === 'string'
-      ) {
-        const message = data as WikiLinkMessage;
-        props.onWikiLinkPress(message.title);
-      }
-    } catch {
-      // Message JSON malformé ou inattendu — ignorer silencieusement
-    }
-  }
+  const [isLoading, setIsLoading] = React.useState(true);
 
   /**
-   * URL de base Wikipedia pour la langue de l'article courant.
-   *
-   * Calculé avec useMemo par cohérence avec injectedScript — évite de
-   * reconstruire la string à chaque rendu et garantit une source de vérité
-   * unique réutilisée dans handleShouldStartLoadWithRequest et dans source.baseUrl.
+   * Filtre les navigations autorisées dans la WebView.
+   * Autorise : about:blank, articles Wikipedia mobile jouables de la bonne langue.
+   * Bloque : liens externes, namespaces maintenance, autres langues.
    */
-  const articleBaseUrl = useMemo(
-    () => `https://${props.article.language}.wikipedia.org`,
-    [props.article.language],
-  );
-
-  /**
-   * Bloque toute navigation native de la WebView (fix Bug 1).
-   *
-   * Contexte : même avec event.preventDefault() dans le JS injecté, le pont
-   * natif Android peut déclencher une navigation vers l'URL résolue d'un lien
-   * avant que le handler JS ait eu le temps de s'exécuter. Sans ce garde,
-   * la WebView navigue directement vers l'article cible, court-circuitant le
-   * mécanisme postMessage → onWikiLinkPress → addJump.
-   *
-   * Règle :
-   *   - about:blank, data:, blob: → autorisé (chargement initial HTML statique)
-   *   - baseUrl exact (ex: "https://fr.wikipedia.org") → autorisé
-   *     react-native-webview appelle ce callback avec request.url = baseUrl
-   *     lors du chargement initial via source={{ html, baseUrl }}.
-   *     Sans cette exception, la page 2 et au-delà ne chargent jamais
-   *     car le premier callback bloque le rendu du HTML statique.
-   *   - Toute autre URL (http://, https://) → bloquée
-   *     Les taps sur liens /wiki/ sont gérés via postMessage côté JS injecté.
-   */
-
   function handleShouldStartLoadWithRequest(request: WebViewNavigation): boolean {
-    const url = request.url;
-    // Autoriser le chargement initial du HTML statique (URLs locales)
-    if (
-      url === 'about:blank' ||
-      url.startsWith('data:') ||
-      url.startsWith('blob:')
-    ) {
-      return true;
-    }
-    // Autoriser le baseUrl exact — react-native-webview l'utilise comme URL
-    // initiale lors du chargement de source={{ html, baseUrl }}.
-    // Ce cas se produit systématiquement à partir de la 2e page affichée.
-    if (url === articleBaseUrl) {
-      return true;
-    }
-    // Bloquer toute navigation http/https réelle — gérée par postMessage côté JS
-    return false;
+    return isPlayableWikipediaUrl(request.url, lang);
   }
 
-  // exactOptionalPropertyTypes : ne pas passer les props optionnelles si elles sont undefined.
-  // Utiliser des spreads conditionnels pour onLoadEnd, onError et onNavigationStateChange.
-  const optionalLoadEnd =
-    props.onLoadEnd !== undefined
-      ? { onLoadEnd: props.onLoadEnd }
-      : {};
+  /**
+   * Déclenché à chaque changement d'état de navigation (nouvelle page chargée).
+   * - Notifie le parent de canGoBack (pour BackHandler Android)
+   * - Ignore les états "en cours de chargement"
+   * - Extrait le titre depuis l'URL
+   * - Ignore si c'est la même page (ancre #section ou navigation initiale)
+   * - Appelle onPageChange pour que le parent comptabilise le saut et vérifie la victoire
+   */
+  function handleNavigationStateChange(navState: WebViewNavigation): void {
+    // Notifier le parent du canGoBack courant (pour le BackHandler Android)
+    if (props.onNavigationStateChange !== undefined) {
+      props.onNavigationStateChange({ canGoBack: navState.canGoBack, url: navState.url });
+    }
 
+    // Ne traiter que les pages chargées (pas en cours)
+    if (navState.loading) {
+      return;
+    }
+
+    const title = extractTitleFromUrl(navState.url, lang);
+    if (title === null) {
+      return;
+    }
+
+    // Ignorer si même page (ancre #section ou navigation initiale vers currentTitle)
+    if (titlesMatch(title, currentTitle)) {
+      return;
+    }
+
+    onPageChange(title);
+  }
+
+  // exactOptionalPropertyTypes : spread conditionnel pour onError
   const optionalOnError =
     props.onError !== undefined
       ? {
@@ -227,33 +288,33 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
         }
       : {};
 
-  const optionalNavStateChange =
-    props.onNavigationStateChange !== undefined
-      ? { onNavigationStateChange: props.onNavigationStateChange }
-      : {};
-
   return (
-    <WebView
-      ref={props.webViewRef}
-      style={styles.webView}
-      source={{
-        html: props.html,
-        baseUrl: articleBaseUrl,
-      }}
-      originWhitelist={['*']}
-      javaScriptEnabled={true}
-      domStorageEnabled={false}
-      allowsInlineMediaPlayback={false}
-      mediaPlaybackRequiresUserAction={true}
-      showsHorizontalScrollIndicator={false}
-      scalesPageToFit={false}
-      injectedJavaScriptBeforeContentLoaded={injectedScript}
-      onMessage={handleMessage}
-      onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
-      {...optionalLoadEnd}
-      {...optionalOnError}
-      {...optionalNavStateChange}
-    />
+    <View style={styles.container}>
+      <WebView
+        ref={webViewRef}
+        style={styles.webView}
+        source={{ uri: buildArticleUrl(currentTitle, lang) }}
+        injectedJavaScriptBeforeContentLoaded={CSS_INJECTION_SCRIPT}
+        onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
+        onNavigationStateChange={handleNavigationStateChange}
+        onLoadStart={() => { setIsLoading(true); }}
+        onLoadEnd={() => {
+          setIsLoading(false);
+          if (props.onLoadEnd !== undefined) {
+            props.onLoadEnd();
+          }
+        }}
+        javaScriptEnabled={true}
+        domStorageEnabled={true}
+        startInLoadingState={false}
+        {...optionalOnError}
+      />
+      {isLoading && (
+        <View style={styles.loadingOverlay} pointerEvents="none">
+          <ActivityIndicator size="large" color="#2563EB" />
+        </View>
+      )}
+    </View>
   );
 }
 
@@ -262,8 +323,17 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
 // ─────────────────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   webView: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
