@@ -90,7 +90,7 @@ export function formatElapsed(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return m > 0
-    ? `${String(m)} min ${String(s).padStart(2, '0')} s`
+    ? `${String(m)} m ${String(s).padStart(2, '0')} s`
     : `${String(s)} s`;
 }
 
@@ -198,13 +198,6 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
     // navigate (pas replace) — Home est déjà dans le stack
     navigation.navigate('Home');
   }, [clearSession, navigation]);
-
-  // ── handleBack : retour à l'article courant (Game screen) ───────────────
-  const handleBack = useCallback((): void => {
-    // goBack() revient à l'ArticleScreen (dernier article visité)
-    // La session reste en mémoire (status: 'won') — pas de clearSession
-    navigation.goBack();
-  }, [navigation]);
 
   // ── handleReadArticle : ouvrir l'article destination en in-app ──────────
   const handleReadArticle = useCallback((): void => {
@@ -336,14 +329,6 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
       <View style={styles.stickyButtons}>
         <View style={styles.primaryButtonsRow}>
           <TouchableOpacity
-            style={[styles.primaryButton, styles.replayButton]}
-            onPress={() => { void handleReplay(); }}
-            accessibilityLabel="Rejouer avec les mêmes articles"
-            accessibilityRole="button"
-          >
-            <Text style={styles.replayButtonText}>{'Rejouer'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
             style={[styles.primaryButton, styles.newGameButton]}
             onPress={handleNewGame}
             accessibilityLabel="Démarrer une nouvelle partie"
@@ -351,15 +336,15 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
           >
             <Text style={styles.newGameButtonText}>{'Nouvelle partie'}</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.primaryButton, styles.replayButton]}
+            onPress={() => { void handleReplay(); }}
+            accessibilityLabel="Rejouer avec les mêmes articles"
+            accessibilityRole="button"
+          >
+            <Text style={styles.replayButtonText}>{'Rejouer'}</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={handleBack}
-          accessibilityLabel="Retourner à l'accueil"
-          accessibilityRole="button"
-        >
-          <Text style={styles.backButtonText}>{'Retour'}</Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -549,33 +534,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 12,
   },
-  replayButton: {
+  newGameButton: {
     backgroundColor: '#2563EB',
     marginRight: 8,
   },
-  replayButtonText: {
+  newGameButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
-  newGameButton: {
+  replayButton: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#2563EB',
     marginLeft: 8,
   },
-  newGameButtonText: {
+  replayButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#2563EB',
-  },
-  backButton: {
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backButtonText: {
-    fontSize: 16,
-    color: '#64748B',
   },
 });

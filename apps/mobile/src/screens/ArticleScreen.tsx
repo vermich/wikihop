@@ -38,6 +38,7 @@ import React, {
 import {
   Alert,
   BackHandler,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -188,6 +189,7 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
 
   return (
     <View style={styles.screen}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       {/* Header fixe avec SafeAreaView edges top */}
       <SafeAreaView edges={['top']} style={styles.headerSafeArea}>
         <View style={styles.header}>
@@ -214,8 +216,14 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
           >
             {currentTitle}
           </Text>
-          {/* Espace à droite pour équilibrer le bouton retour */}
-          <View style={styles.headerRight} />
+          <TouchableOpacity
+            style={styles.homeButton}
+            onPress={() => { navigation.navigate('Home'); }}
+            accessibilityLabel="Retour à l'accueil"
+            accessibilityRole="button"
+          >
+            <Text style={styles.homeButtonText}>{'Accueil'}</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
 
@@ -301,8 +309,14 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     marginHorizontal: 8,
   },
-  headerRight: {
-    width: 44,
+  homeButton: {
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+  },
+  homeButtonText: {
+    fontSize: 16,
+    color: '#2563EB',
   },
   contentArea: {
     flex: 1,

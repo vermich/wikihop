@@ -32,12 +32,11 @@ import {
 
 const mockReplace = jest.fn();
 const mockNavigate = jest.fn();
-const mockGoBack = jest.fn();
 const mockNavigation = {
   replace: mockReplace,
   navigate: mockNavigate,
   push: jest.fn(),
-  goBack: mockGoBack,
+  goBack: jest.fn(),
   canGoBack: jest.fn(() => false),
 };
 
@@ -157,15 +156,15 @@ describe('formatElapsed', () => {
   });
 
   it('formate correctement en minutes et secondes', () => {
-    expect(formatElapsed(125)).toBe('2 min 05 s');
+    expect(formatElapsed(125)).toBe('2 m 05 s');
   });
 
   it('pad les secondes avec zéro si < 10', () => {
-    expect(formatElapsed(65)).toBe('1 min 05 s');
+    expect(formatElapsed(65)).toBe('1 m 05 s');
   });
 
   it('formate 60 secondes exactes', () => {
-    expect(formatElapsed(60)).toBe('1 min 00 s');
+    expect(formatElapsed(60)).toBe('1 m 00 s');
   });
 
   it('formate 0 seconde', () => {
@@ -256,10 +255,6 @@ describe('VictoryScreen', () => {
       expect(screen.getByText('Nouvelle partie')).toBeTruthy();
     });
 
-    it('affiche le bouton Retour', () => {
-      renderVictoryScreen();
-      expect(screen.getByText('Retour')).toBeTruthy();
-    });
   });
 
   describe('Bouton Rejouer', () => {
@@ -305,16 +300,6 @@ describe('VictoryScreen', () => {
       fireEvent.press(newGameButton);
       expect(mockNavigate).toHaveBeenCalledWith('Home');
       expect(mockReplace).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Bouton Retour', () => {
-    it('appelle goBack sans clearSession', () => {
-      const { getByLabelText } = renderVictoryScreen();
-      const backButton = getByLabelText("Retourner à l'accueil");
-      fireEvent.press(backButton);
-      expect(mockGoBack).toHaveBeenCalled();
-      expect(mockClearSession).not.toHaveBeenCalled();
     });
   });
 

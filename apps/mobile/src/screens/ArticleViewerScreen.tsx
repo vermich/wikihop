@@ -46,11 +46,11 @@ export function ArticleViewerScreen({ route, navigation }: ArticleViewerScreenPr
           </Text>
           <TouchableOpacity
             style={styles.homeButton}
-            onPress={() => { navigation.navigate('Home'); }}
-            accessibilityLabel="Retour à l'accueil"
+            onPress={() => { navigation.goBack(); }}
+            accessibilityLabel="Retour"
             accessibilityRole="button"
           >
-            <Text style={styles.homeButtonText}>{'Accueil'}</Text>
+            <Text style={styles.homeButtonText}>{'← Retour'}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
