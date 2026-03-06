@@ -389,6 +389,217 @@ Le Tech Lead vérifiera en code review que les commits de test précèdent les c
 - **Clé AsyncStorage distincte** : `@wikihop/game_history` est différente de `@wikihop/game_session` — ne jamais confondre les deux
 - **Fire-and-forget dans `game.store`** : le `void ScoreStorage.save()` est intentionnel pour ne pas bloquer `completeSession` / `abandonSession`. Une erreur d'écriture dans l'historique ne doit jamais empêcher la navigation vers VictoryScreen
 
+---
+
+## Spécifications visuelles — Benjamin
+
+---
+
+## Écran : HistoryScreen
+
+### Objectif
+Permettre au joueur de consulter ses 50 dernières parties et d'effacer l'historique complet.
+
+### Layout (ASCII)
+
+```
+┌─────────────────────────────────┐  [FIXED - SafeAreaView top]
+│  ←   Historique                 │  Header 64pt
+├─────────────────────────────────┤  Bordure #E2E8F0 1pt
+│                                 │  [SCROLL - FlatList]
+│  ┌─────────────────────────────┐│
+│  │ [HistoryItem]               ││  Entrée partie
+│  └─────────────────────────────┘│
+│  ─────────────────────────────  │  Séparateur #E2E8F0 1pt
+│  ┌─────────────────────────────┐│
+│  │ [HistoryItem]               ││
+│  └─────────────────────────────┘│
+│  ─────────────────────────────  │
+│  ...                            │
+│                                 │
+│  [ Effacer l'historique ]       │  Bouton texte rouge, 44pt, centré
+│                                 │  16pt bottom padding
+└─────────────────────────────────┘  [FIXED - SafeAreaView bottom]
+```
+
+### Composants
+
+- **Header** — Hauteur 64pt, fond `#FFFFFF`, bordure bas `#E2E8F0` 1pt. Bouton retour "←" à gauche (touch target 44×44pt), titre "Historique" centré Bold 24px `#1E293B`. Pas de sélecteur FR/EN (hors scope de cet écran).
+
+- **BoutonRetour** — Zone tactile 44×44pt minimum, positionnée en `position: 'absolute', left: 16`. Texte "←" 24px couleur `#1E293B`. `accessibilityLabel="Retour"`, `accessibilityRole="button"`.
+
+- **FlatList** — `flex:1`, `contentContainerStyle` avec `paddingTop: 12` et `paddingBottom: 24`. `ItemSeparatorComponent` = View hauteur 1pt couleur `#E2E8F0`, marginLeft 16pt (aligné sur le contenu texte, pas sur le bord gauche). `showsVerticalScrollIndicator={false}`.
+
+- **BoutonEffacer** — Rendu dans `ListFooterComponent` de la FlatList (visible uniquement si `records.length > 0`). Hauteur 44pt minimum, texte Regular 16px couleur `#E11D48` (rouge destructif — seule exception justifiée au design system : action destructive irréversible). Centré horizontalement. Marge top 24pt par rapport au dernier item.
+
+- **ActivityIndicator** — Affiché centré à la place de la liste si `isLoading === true`. Couleur `#2563EB`.
+
+### États
+
+- **Default :** FlatList avec les `GameRecord` du plus récent au plus ancien. Bouton "Effacer l'historique" visible en bas de liste.
+- **Loading :** `ActivityIndicator` centré (couleur `#2563EB`) pendant le chargement AsyncStorage. Pas de skeleton sur cet écran — le chargement AsyncStorage est quasi-instantané ; un skeleton serait une sur-ingénierie visuelle.
+- **Error :** Pas d'état d'erreur propre — `ScoreStorage.getAll()` retourne `[]` en cas d'erreur (jamais d'exception). L'état vide s'affiche à la place.
+- **Empty :** Aucune partie jouée. Illustration textuelle centrée (flex:1, justify center) :
+  ```
+  📋
+  Aucune partie jouée
+  pour l'instant.
+  ```
+  Icône 40px, texte Regular 16px `#64748B`, centré, paddingHorizontal 32pt. Le bouton "Effacer l'historique" est masqué.
+
+### Accessibilité
+
+- [x] `accessibilityLabel="Retour"` sur le bouton retour
+- [x] `accessibilityRole="button"` sur le bouton retour et le bouton effacer
+- [x] `accessibilityLabel="Effacer tout l'historique"` sur le bouton destructif (pas "Effacer l'historique" — le mot "tout" rend l'action non ambiguë)
+- [x] `accessibilityRole="header"` sur le titre "Historique"
+- [x] Contraste "Historique" `#1E293B` sur `#FFFFFF` : 16.1:1 — conforme
+- [x] Contraste bouton retour `#1E293B` sur `#FFFFFF` : 16.1:1 — conforme
+- [x] Contraste bouton "Effacer" `#E11D48` sur `#FFFFFF` : 4.6:1 — conforme WCAG AA
+- [x] Zone tactile bouton retour : 44×44pt minimum
+- [x] Zone tactile bouton effacer : 44pt hauteur minimum, pleine largeur
+- [x] Ordre VoiceOver : Header titre → (liste) HistoryItem 1 → HistoryItem 2 → ... → Bouton Effacer
+- [x] `accessibilityElementsHidden={true}` sur l'ActivityIndicator, `AccessibilityInfo.announceForAccessibility("Chargement de l'historique")` au montage si `isLoading`
+- [x] État vide : "📋" décoratif `accessible={false}`, texte "Aucune partie jouée pour l'instant." lu normalement
+- [x] Animations : aucune animation sur cet écran — `reduceMotion` sans impact
+
+### Notes pour Laurent
+
+- Le bouton retour est positionné en `position: 'absolute', left: 16` dans le header, pour ne pas décaler le titre centré. Même pattern que les écrans existants.
+- La couleur `#E11D48` pour le bouton "Effacer" est une exception justifiée au design system : c'est la seule action destructive irréversible de l'app. Elle doit rester confinée à ce seul usage.
+- Le `ListFooterComponent` est la bonne approche React Native pour placer le bouton Effacer en bas de liste — il scroll avec le contenu, ce qui est l'intention UX (l'utilisateur doit voir les données avant de les effacer).
+- L'`ActivityIndicator` remplace la FlatList entière pendant `isLoading` — afficher les deux en même temps créerait un flash visuel indésirable.
+- Pas de `ScrollView` wrappant la FlatList — un FlatList est déjà scrollable.
+
+---
+
+## Composant : HistoryItem
+
+### Objectif
+Afficher les informations essentielles d'une partie terminée dans la liste de l'historique.
+
+### Layout (ASCII)
+
+```
+┌───────────────────────────────────────┐
+│ [BADGE]   Départ → Destination   ←   │  Ligne 1 : badge + trajet
+│           06/03/2026 à 14:30          │  Ligne 2 : date
+│           3 sauts · 2 min 05 s        │  Ligne 3 : stats
+└───────────────────────────────────────┘
+  paddingVertical: 14   paddingHorizontal: 16
+```
+
+Détail de la ligne 1 (flexDirection: row, alignItems: center) :
+
+```
+│ [VICTOIRE]  Albert Camus → Existentialisme       ↗ │
+│ ou                                                  │
+│ [ABANDONNÉ] Albert Camus → Existentialisme       ↗ │
+```
+
+### Composants
+
+- **Conteneur** — `TouchableOpacity` (prévu pour F3-11). `minHeight: 68pt` (deux lignes de texte + padding). `paddingVertical: 14pt`, `paddingHorizontal: 16pt`. Fond `#FFFFFF`. Pas d'ombre, pas de bordure sur le composant lui-même (les séparateurs sont gérés par FlatList).
+
+- **Badge statut (Victoire)** — Pill : fond `#DCFCE7` (vert très clair), texte Bold 11px `#16A34A`, paddingHorizontal 8pt, paddingVertical 3pt, borderRadius 4pt. Texte : "Victoire". Largeur fixe non forcée — s'adapte au texte.
+
+- **Badge statut (Abandonné)** — Pill : fond `#F1F5F9` (gris très clair), texte Bold 11px `#64748B`, paddingHorizontal 8pt, paddingVertical 3pt, borderRadius 4pt. Texte : "Abandonné".
+
+- **Titre trajet** — `flex: 1`, marginLeft 8pt (après le badge). `numberOfLines={1}`, `ellipsizeMode="tail"`. Texte Regular 15px `#1E293B`. Format : `"[départ] → [destination]"`. La flèche "→" est une partie du texte, pas une icône séparée.
+
+- **Icône navigation** — Texte "↗" 14px `#2563EB`, marginLeft 8pt. Décoratif pour l'instant (F3-11 l'activera). `accessible={false}`.
+
+- **Date** — Ligne 2. Regular 13px `#64748B`. Format : `"06/03/2026 à 14:30"` (via `formatRecordDate`). marginTop 4pt.
+
+- **Stats** — Ligne 3. Regular 13px `#64748B`. Format : `"3 sauts · 2 min 05 s"` (point médian U+00B7 entre sauts et durée). marginTop 2pt.
+
+### États
+
+- **Default Victoire :** Badge vert `#DCFCE7` / `#16A34A` + contenu normal.
+- **Default Abandonné :** Badge gris `#F1F5F9` / `#64748B` + contenu normal. Le titre reste `#1E293B` (pas de couleur spéciale — l'abandon n'est pas stigmatisé visuellement au-delà du badge).
+- **Pressed :** Fond `#F8FAFC` (retour d'animation tactile). L'icône "↗" ne change pas.
+- **Sans `onPress`** (F3-02) : le `TouchableOpacity` est rendu avec `activeOpacity={1}` pour désactiver le feedback visuel jusqu'à F3-11, sans rendre le composant non tactile.
+
+### Accessibilité
+
+- [x] `accessibilityLabel` construit dynamiquement : `"[Statut]. [Départ] vers [Destination]. [N] saut(s). [Durée]. Le [date]."` — ex. : `"Victoire. Albert Camus vers Existentialisme. 3 sauts. 2 min 05 s. Le 06/03/2026 à 14:30."`
+- [x] `accessibilityRole="button"` (sera activé en F3-11) — en F3-02, le rôle est déclaré pour la cohérence future
+- [x] Badge, icône "↗", date et stats sont `accessible={false}` — toute l'info est dans le label du conteneur
+- [x] Contraste titre `#1E293B` sur `#FFFFFF` : 16.1:1 — conforme
+- [x] Contraste texte badge Victoire `#16A34A` sur `#DCFCE7` : 3.1:1 — acceptable pour texte Bold 11px (taille large WCAG)
+- [x] Contraste texte badge Abandonné `#64748B` sur `#F1F5F9` : 4.6:1 — conforme
+- [x] Contraste date/stats `#64748B` sur `#FFFFFF` : 4.6:1 — conforme
+- [x] Zone tactile : minHeight 68pt — conforme (supérieur au minimum 44pt)
+- [x] L'information de statut n'est pas transmise par la couleur seule — le texte "Victoire" / "Abandonné" est toujours présent dans le badge
+
+### Notes pour Laurent
+
+- Le fond de badge `#DCFCE7` (vert très clair) est une nouvelle couleur de surface. Elle ne figure pas dans le design system actuel — elle est justifiée ici comme teinte de fond pour badge sémantique, uniquement dans `HistoryItem`. Ne pas l'utiliser ailleurs.
+- Le séparateur entre items est géré par `ItemSeparatorComponent` dans la FlatList — ne pas mettre de bordure sur `HistoryItem` lui-même.
+- En F3-02, `onPress` est `undefined`. Le composant doit être rendu avec `TouchableOpacity activeOpacity={onPress ? 0.7 : 1}` pour désactiver le feedback visuel tant qu'il n'y a pas d'action.
+- Le point médian (·) dans les stats s'écrit en UTF-8 : U+00B7. Pas de tiret ni de slash.
+- La largeur du badge est libre (pas de largeur fixe) — les deux labels "Victoire" et "Abandonné" sont de longueur proche et s'adaptent naturellement.
+
+---
+
+## Modifications HomeScreen — ajout bouton Historique
+
+Le Tech Lead délègue la position du bouton à Benjamin.
+
+**Décision UX :** Le bouton "Historique" est positionné dans la zone `buttonsContainer`, sous le bouton "Nouveaux articles", comme bouton texte secondaire. Cette position est cohérente avec le flux : l'utilisateur voit les articles → joue ou consulte ses parties passées. Le header ne doit pas être alourdi (il contient déjà le sélecteur FR/EN).
+
+### Layout (ASCII) — zone buttonsContainer complète
+
+```
+┌─────────────────────────────────────────┐
+│  [ Jouer ]                              │  Bouton primaire plein 52pt #2563EB
+│                                         │
+│  Nouveaux articles  ↺                   │  Bouton texte 44pt #2563EB
+│                                         │
+│          Historique                     │  Bouton texte 44pt #64748B (centré)
+└─────────────────────────────────────────┘
+```
+
+**Spécification du bouton "Historique" :**
+- Type : bouton texte seul (pas de fond, pas de bordure)
+- Hauteur : 44pt minimum (touch target)
+- Texte : "Historique" Regular 16px `#64748B`
+- Alignement : centré horizontalement
+- Marge top : 4pt après le bouton "Nouveaux articles"
+- `accessibilityLabel="Voir mon historique de parties"`
+- `accessibilityRole="button"`
+
+**Justification de la couleur `#64748B`** : Le bouton "Historique" est une action secondaire, moins prioritaire que "Jouer" (action principale) et "Nouveaux articles" (action liée directement au jeu). La couleur secondaire `#64748B` indique visuellement cette hiérarchie sans créer de compétition visuelle avec les deux boutons bleus.
+
+---
+
+## Modifications VictoryScreen — ajout bouton Voir l'historique
+
+**Position :** Sous la `primaryButtonsRow` (Nouvelle partie | Rejouer), dans la zone `stickyButtons`.
+
+### Layout (ASCII) — zone stickyButtons complète
+
+```
+┌─────────────────────────────────────────────┐  Bordure top #E2E8F0 1pt
+│  [ Nouvelle partie ]  |  [ Rejouer ]        │  primaryButtonsRow — 52pt chacun
+│                                             │  marginBottom 8pt
+│         Voir l'historique                   │  Bouton texte 44pt #64748B
+│                                             │  paddingBottom via SafeAreaView
+└─────────────────────────────────────────────┘
+```
+
+**Spécification du bouton "Voir l'historique" :**
+- Type : bouton texte seul (identique au bouton "Historique" sur HomeScreen)
+- Hauteur : 44pt minimum
+- Texte : "Voir l'historique" Regular 16px `#64748B`
+- Alignement : centré horizontalement
+- `accessibilityLabel="Voir l'historique de mes parties"`
+- `accessibilityRole="button"`
+
+**Justification :** Sur VictoryScreen, la hiérarchie d'actions est : 1. Rejouer (outline), 2. Nouvelle partie (primaire plein), 3. Voir l'historique (texte secondaire). Mettre "Voir l'historique" en texte secondaire `#64748B` maintient la focale sur les actions de jeu directes et respecte la hiérarchie existante.
+
+---
+
 ## Validation QA — Halim
 <!-- Rempli par QA après les tests -->
 
