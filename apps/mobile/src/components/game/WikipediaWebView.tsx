@@ -114,20 +114,27 @@ export function buildArticleUrl(title: string, lang: Language): string {
 }
 
 /**
- * Extrait le titre d'article depuis une URL Wikipedia mobile.
- * Retire les underscores, décode l'encodage URL, ignore les ancres (#).
+ * Extrait le titre d'article depuis une URL Wikipedia.
+ * Cherche le segment `/wiki/` dans l'URL (sans contrainte de domaine),
+ * retire les ancres (#) et les query params (?), décode l'encodage URL.
  *
- * @param url  - URL Wikipedia mobile complète
- * @param lang - Langue attendue ('fr' | 'en')
- * @returns Titre décodé avec espaces, ou null si l'URL ne correspond pas
+ * Approche permissive (alignée V1) : on accepte les URLs desktop et mobile,
+ * les redirections Wikipedia, et les URLs avec query params.
+ *
+ * @param url  - URL à analyser
+ * @param _lang - Langue (non utilisée, conservée pour compatibilité interface)
+ * @returns Titre décodé avec espaces, ou null si l'URL ne contient pas /wiki/[titre]
  */
-export function extractTitleFromUrl(url: string, lang: Language): string | null {
-  const mobileBase = `https://${lang}.m.wikipedia.org/wiki/`;
-  if (!url.startsWith(mobileBase)) {
+export function extractTitleFromUrl(url: string, _lang: Language): string | null {
+  const wikiIndex = url.indexOf('/wiki/');
+  if (wikiIndex === -1) {
     return null;
   }
-  // Retire le segment après /wiki/ et ignore les ancres (#section)
-  const rawPath = url.slice(mobileBase.length).split('#')[0];
+  // Extrait tout après /wiki/, ignore les ancres et les query params
+  const rawPath = url
+    .slice(wikiIndex + '/wiki/'.length)
+    .split('#')[0]
+    .split('?')[0];
   if (rawPath === undefined || rawPath.length === 0) {
     return null;
   }
@@ -241,15 +248,7 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
 
   const [isLoading, setIsLoading] = React.useState(true);
 
-  /**
-   * URI fixée au montage — jamais modifiée ensuite.
-   *
-   * Raison : si `source` change après chaque onPageChange (car currentTitle change
-   * dans ArticleScreen), la WebView Android recharge la page via loadUrl() et
-   * réinitialise son historique interne → canGoBack = false, sauts non comptés.
-   * En fixant l'URI au montage, on laisse la WebView gérer sa propre navigation.
-   */
-  const initialUri = React.useRef(buildArticleUrl(currentTitle, lang));
+  // Pas de initialUri fixée — source dynamique alignée sur currentTitle (approche V1)
 
   /**
    * Dernier titre rapporté au parent via onPageChange.
@@ -294,6 +293,8 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
       return;
     }
 
+    // eslint-disable-next-line no-console
+    console.log('[WikiHop] onPageChange:', title, '| url:', navState.url, '| loading:', navState.loading);
     lastReportedTitle.current = title;
     onPageChange(title);
   }
@@ -315,7 +316,7 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
       <WebView
         ref={webViewRef}
         style={styles.webView}
-        source={{ uri: initialUri.current }}
+        source={{ uri: buildArticleUrl(currentTitle, lang) }}
         injectedJavaScript={CSS_INJECTION_SCRIPT}
         onNavigationStateChange={handleNavigationStateChange}
         onLoadStart={() => { setIsLoading(true); }}

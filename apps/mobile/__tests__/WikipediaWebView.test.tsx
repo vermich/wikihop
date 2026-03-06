@@ -307,14 +307,21 @@ describe('extractTitleFromUrl (fonction pure)', () => {
       .toBe('Musée du Louvre');
   });
 
-  it('retourne null pour une URL de mauvaise langue', () => {
+  it('extrait le titre d\'une URL Wikipedia de mauvaise langue (approche permissive)', () => {
+    // Pas de restriction de domaine — on accepte toute URL contenant /wiki/
     expect(extractTitleFromUrl('https://en.m.wikipedia.org/wiki/Paris', 'fr'))
-      .toBeNull();
+      .toBe('Paris');
   });
 
-  it('retourne null pour une URL desktop (pas mobile)', () => {
+  it('extrait le titre d\'une URL desktop (approche permissive)', () => {
+    // Pas de restriction mobile/desktop — on accepte toute URL contenant /wiki/
     expect(extractTitleFromUrl('https://fr.wikipedia.org/wiki/Paris', 'fr'))
-      .toBeNull();
+      .toBe('Paris');
+  });
+
+  it('ignore les query params dans le titre', () => {
+    expect(extractTitleFromUrl('https://fr.m.wikipedia.org/wiki/Paris?useskin=minerva', 'fr'))
+      .toBe('Paris');
   });
 
   it('retourne null pour about:blank', () => {
@@ -393,9 +400,7 @@ describe('WikipediaWebView (composant)', () => {
       expect(source?.uri).toBe('https://fr.m.wikipedia.org/wiki/Tour%20Eiffel');
     });
 
-    it('ne modifie pas la source quand currentTitle change (source fixée au montage)', () => {
-      // La source est fixée à la valeur initiale pour éviter les rechargements Android
-      // qui réinitialisent l'historique WebView et empêchent le comptage des sauts.
+    it('met à jour la source quand currentTitle change', () => {
       const { rerender } = render(<WikipediaWebView {...defaultProps} />);
       rerender(
         <WikipediaWebView
@@ -404,7 +409,7 @@ describe('WikipediaWebView (composant)', () => {
         />,
       );
       const { source } = getWebViewHandlers();
-      expect(source?.uri).toBe('https://fr.m.wikipedia.org/wiki/Tour%20Eiffel');
+      expect(source?.uri).toBe('https://fr.m.wikipedia.org/wiki/Louvre');
     });
 
     it('utilise la langue anglaise correctement', () => {
