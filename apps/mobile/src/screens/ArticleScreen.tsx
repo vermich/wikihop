@@ -38,7 +38,6 @@ import React, {
 import {
   Alert,
   BackHandler,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -189,7 +188,6 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
 
   return (
     <View style={styles.screen}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       {/* Header fixe avec SafeAreaView edges top */}
       <SafeAreaView edges={['top']} style={styles.headerSafeArea}>
         <View style={styles.header}>

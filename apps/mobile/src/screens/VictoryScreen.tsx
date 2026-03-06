@@ -42,7 +42,6 @@ import {
   AccessibilityInfo,
   Animated,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -221,7 +220,6 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
 
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       {/* Header */}
       <View style={styles.header}>
         <Text
