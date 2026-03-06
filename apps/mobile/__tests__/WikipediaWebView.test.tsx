@@ -393,7 +393,9 @@ describe('WikipediaWebView (composant)', () => {
       expect(source?.uri).toBe('https://fr.m.wikipedia.org/wiki/Tour%20Eiffel');
     });
 
-    it('met à jour la source quand currentTitle change', () => {
+    it('ne modifie pas la source quand currentTitle change (source fixée au montage)', () => {
+      // La source est fixée à la valeur initiale pour éviter les rechargements Android
+      // qui réinitialisent l'historique WebView et empêchent le comptage des sauts.
       const { rerender } = render(<WikipediaWebView {...defaultProps} />);
       rerender(
         <WikipediaWebView
@@ -402,7 +404,7 @@ describe('WikipediaWebView (composant)', () => {
         />,
       );
       const { source } = getWebViewHandlers();
-      expect(source?.uri).toBe('https://fr.m.wikipedia.org/wiki/Louvre');
+      expect(source?.uri).toBe('https://fr.m.wikipedia.org/wiki/Tour%20Eiffel');
     });
 
     it('utilise la langue anglaise correctement', () => {

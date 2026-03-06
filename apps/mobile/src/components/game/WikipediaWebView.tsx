@@ -242,13 +242,33 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
   const [isLoading, setIsLoading] = React.useState(true);
 
   /**
+   * URI fixée au montage — jamais modifiée ensuite.
+   *
+   * Raison : si `source` change après chaque onPageChange (car currentTitle change
+   * dans ArticleScreen), la WebView Android recharge la page via loadUrl() et
+   * réinitialise son historique interne → canGoBack = false, sauts non comptés.
+   * En fixant l'URI au montage, on laisse la WebView gérer sa propre navigation.
+   */
+  const initialUri = React.useRef(buildArticleUrl(currentTitle, lang));
+
+  /**
+   * Dernier titre rapporté au parent via onPageChange.
+   * Utilisé pour le dédoublonnage (ancres #section, rechargement du même article).
+   *
+   * Ref (pas state) pour ne pas déclencher de re-rendu et éviter les stale closures
+   * liées aux re-rendus de WikipediaWebView.
+   */
+  const lastReportedTitle = React.useRef<string>(currentTitle);
+
+  /**
    * Déclenché à chaque changement d'état de navigation (nouvelle page chargée).
    * Approche V1 : seul mécanisme pour détecter les changements de page.
    *
    * - Notifie le parent de canGoBack (pour BackHandler Android)
    * - Ignore les états "en cours de chargement"
    * - Extrait le titre depuis l'URL
-   * - Ignore si c'est la même page (ancre #section ou navigation initiale)
+   * - Ignore si même titre que le dernier rapporté (ancre #section, rechargement)
+   * - Met à jour lastReportedTitle AVANT d'appeler onPageChange (évite double-comptage)
    * - Appelle onPageChange pour que le parent comptabilise le saut et vérifie la victoire
    */
   function handleNavigationStateChange(navState: WebViewNavigation): void {
@@ -267,11 +287,12 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
       return;
     }
 
-    // Ignorer si même page (ancre #section ou navigation initiale vers currentTitle)
-    if (titlesMatch(title, currentTitle)) {
+    // Ignorer si même titre que le dernier rapporté (ancre #section ou rechargement)
+    if (titlesMatch(title, lastReportedTitle.current)) {
       return;
     }
 
+    lastReportedTitle.current = title;
     onPageChange(title);
   }
 
@@ -292,7 +313,7 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
       <WebView
         ref={webViewRef}
         style={styles.webView}
-        source={{ uri: buildArticleUrl(currentTitle, lang) }}
+        source={{ uri: initialUri.current }}
         injectedJavaScript={CSS_INJECTION_SCRIPT}
         onNavigationStateChange={handleNavigationStateChange}
         onLoadStart={() => { setIsLoading(true); }}

@@ -195,16 +195,27 @@ describe('ArticleScreen', () => {
       expect(getByText('Tour Eiffel')).toBeTruthy();
     });
 
-    it('affiche le bouton retour si canGoBack === true', () => {
-      mockCanGoBack.mockReturnValue(true);
-      const { getByText } = renderArticleScreen();
-      expect(getByText('← Retour')).toBeTruthy();
-    });
-
-    it('n\'affiche pas le bouton retour si canGoBack === false', () => {
-      mockCanGoBack.mockReturnValue(false);
+    it('n\'affiche pas le bouton retour si webViewCanGoBack === false (état initial)', () => {
+      // webViewCanGoBack démarre à false → bouton caché
       const { queryByText } = renderArticleScreen();
       expect(queryByText('← Retour')).toBeNull();
+    });
+
+    it('affiche le bouton retour quand webViewCanGoBack devient true', async () => {
+      const { getByText } = renderArticleScreen();
+      await act(async () => { await Promise.resolve(); });
+
+      // Simuler onNavigationStateChange avec canGoBack = true
+      await act(async () => {
+        capturedWebViewProps.onNavigationStateChange?.({
+          canGoBack: true,
+          url: 'https://fr.m.wikipedia.org/wiki/Paris',
+          loading: false,
+        });
+        await Promise.resolve();
+      });
+
+      expect(getByText('← Retour')).toBeTruthy();
     });
 
     it('affiche le GameHUD', () => {

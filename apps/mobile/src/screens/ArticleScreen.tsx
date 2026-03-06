@@ -186,17 +186,19 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
 
   // ── Rendu ────────────────────────────────────────────────────────────────────
 
-  const canGoBack = navigation.canGoBack();
-
   return (
     <View style={styles.screen}>
       {/* Header fixe avec SafeAreaView edges top */}
       <SafeAreaView edges={['top']} style={styles.headerSafeArea}>
         <View style={styles.header}>
-          {canGoBack ? (
+          {webViewCanGoBack ? (
             <TouchableOpacity
               style={styles.backButton}
-              onPress={() => { navigation.goBack(); }}
+              onPress={() => {
+                if (webViewRef.current !== null) {
+                  webViewRef.current.goBack();
+                }
+              }}
               accessibilityLabel="Retour à l'article précédent"
               accessibilityRole="button"
             >
