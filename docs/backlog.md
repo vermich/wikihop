@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-02 | **Version** : 2.7
+**PM** : Gauderic | **Mis à jour** : 2026-03-06 | **Version** : 2.9
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -79,9 +79,9 @@
 | ID | Titre | Priorité | Agent(s) | Statut |
 |----|-------|----------|----------|--------|
 | [F3-01](stories/phase-3/⬜-F3-01-daily-challenge.md) | Défi quotidien (même paire pour tous les joueurs) | Must | Backend Dev, Frontend Dev, UX/UI | ⬜ pending |
-| [F3-02](stories/phase-3/⬜-F3-02-game-history.md) | Historique des parties (stockage local) | Must | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-02](stories/phase-3/🔄-F3-02-game-history.md) | Historique des parties (stockage local) | Must | Frontend Dev, UX/UI | 🔄 in-progress |
 | [F3-03](stories/phase-3/⬜-F3-03-share-result.md) | Partage du résultat | Must | Frontend Dev | ⬜ pending |
-| [F3-04](stories/phase-3/⬜-F3-04-donation-page.md) | Page donation Wikipedia | Must | Frontend Dev, UX/UI, DPO | ⬜ pending |
+| [F3-04](stories/phase-3/🔄-F3-04-donation-page.md) | Page donation Wikipedia | Must | Frontend Dev, UX/UI, DPO | 🔄 in-progress |
 | [F3-05](stories/phase-3/⬜-F3-05-hard-mode.md) | Mode difficile (articles sans liens évidents) | Should | Backend Dev, Frontend Dev, UX/UI | ⬜ pending |
 | [F3-06](stories/phase-3/⬜-F3-06-about-screen.md) | Écran "À propos" et crédits | Should | Frontend Dev, UX/UI, DPO | ⬜ pending |
 | [F3-07](stories/phase-3/⬜-F3-07-integration-tests.md) | Tests d'intégration — parcours de jeu complet | Should | QA | ⬜ pending |
@@ -170,4 +170,5 @@
 *v2.6 : Wave 4 démarrée — M-01, M-06 passées en in-progress (2026-03-02)*
 *v2.7 : Wave 4 clôturée — M-01, M-06 validées QA et passées en done (2026-03-02). MVP Phase 2 Must complet.*
 *v2.8 : M-18 créée — gate bloquant validation happy path device physique (2026-03-03)*
+*v2.9 : Sprint Phase 3 démarré — F3-02 et F3-04 passées en in-progress (2026-03-06)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*

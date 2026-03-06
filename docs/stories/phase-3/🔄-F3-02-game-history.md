@@ -4,7 +4,7 @@ title: Historique des parties (stockage local)
 phase: 3-Features
 priority: Must
 agents: [Frontend Dev, UX/UI]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---

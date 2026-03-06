@@ -4,7 +4,7 @@ title: Page donation Wikipedia
 phase: 3-Features
 priority: Must
 agents: [Frontend Dev, UX/UI, DPO]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---
