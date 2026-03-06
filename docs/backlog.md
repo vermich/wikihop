@@ -68,7 +68,7 @@
 | [M-15](stories/M-15-webview-css-injection.md) | WebView Wikipedia avec injection CSS mobile | Must | Frontend Dev | ✅ done |
 | [M-16](stories/M-16-popular-pages-strategy.md) | Pages populaires — stratégie hybride API + cache + fallback JSON | Must | Frontend Dev, Backend Dev | ✅ done |
 | [M-17](stories/M-17-change-objective.md) | Bouton "Changer l'objectif" pendant le jeu | Should | Frontend Dev, UX/UI | ⬜ pending |
-| [M-18](stories/M-18-happy-path-physical-device.md) | Validation happy path complet sur device physique | Must | QA | ⬜ pending |
+| [M-18](stories/M-18-happy-path-physical-device.md) | Validation happy path complet sur device physique | Must | QA | ✅ done |
 
 ---
 
