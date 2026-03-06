@@ -212,6 +212,32 @@ Ce gate s'applique **en plus** des critères existants (`tsc --noEmit`, lint, te
 
 ---
 
+## Protocole de débogage — règle obligatoire (rétro Phase 2, 2026-03-06)
+
+Voir `docs/debug-protocol.md` pour le détail complet.
+
+**Règle A — Diff V1 en premier sur toute régression**
+Avant de formuler une hypothèse sur un bug de régression, le Tech Lead consulte la V1 de référence (`V1/`) et documente les différences structurelles. Si aucune diff V1 n'est possible, l'indiquer explicitement dans la fiche hypothèse.
+
+**Règle B — Fiche hypothèse obligatoire avant chaque tentative**
+Avant toute correction, l'orchestrateur communique au Client une fiche structurée :
+```
+DIAGNOSTIC — [ID story] — Tentative N
+Symptôme : [ce qui a été observé]
+Hypothèse N-1 : [cause supposée] → Résultat : [infirmé / confirmé]
+Hypothèse N : [nouvelle cause suspectée + pourquoi]
+Action prévue : [modification ciblée]
+Critère de validation : [comment on saura que c'est résolu]
+```
+
+**Règle C — Seuil 2 tentatives → checkpoint obligatoire**
+Si une correction échoue 2 fois de suite sur le même critère d'acceptance :
+- L'orchestrateur envoie la fiche diagnostic au Client **avant** la 3e tentative
+- Le Tech Lead fait un checkpoint : revue de toutes les hypothèses testées, décision sur la stratégie suivante
+- Le Client n'est pas consulté pour un choix technique, mais doit avoir visibilité sur l'avancement
+
+---
+
 ## Code mort — règle bloquante
 
 Toute variable, fonction, import ou ref déclarée mais jamais lue/utilisée est du **code mort**.
