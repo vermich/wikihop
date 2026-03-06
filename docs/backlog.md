@@ -30,18 +30,18 @@
 
 | ID | Titre | Priorité | Agent(s) | Statut |
 |----|-------|----------|----------|--------|
-| [F-01](stories/phase-1/F-01-monorepo-init.md) | Initialisation du monorepo | Must | Tech Lead | ✅ done |
-| [F-02](stories/phase-1/F-02-typescript-strict.md) | Configuration TypeScript strict | Must | Tech Lead | ✅ done |
-| [F-03](stories/phase-1/F-03-eslint-prettier.md) | Configuration ESLint + Prettier | Must | Tech Lead | ✅ done |
-| [F-04](stories/phase-1/F-04-expo-app-init.md) | Initialisation de l'application Expo | Must | Tech Lead, Frontend Dev | ✅ done |
-| [F-05](stories/phase-1/F-05-fastify-backend-init.md) | Initialisation du backend Fastify | Must | Tech Lead, Backend Dev | ✅ done |
-| [F-06](stories/phase-1/F-06-postgresql-setup.md) | Configuration de la base de données PostgreSQL | Must | Tech Lead, Backend Dev | ✅ done |
-| [F-07](stories/phase-1/F-07-github-actions-ci.md) | Pipeline CI/CD GitHub Actions (lint + tests) | Must | Tech Lead | ✅ done |
-| [F-08](stories/phase-1/F-08-jest-config.md) | Configuration Jest (mobile + backend) | Must | Tech Lead, QA | ✅ done |
-| [F-09](stories/phase-1/F-09-adr-architecture.md) | ADR — Décisions d'architecture initiales | Must | Tech Lead | ✅ done |
-| [F-10](stories/phase-1/F-10-git-conventions.md) | Stratégie de branches et conventions de commits | Must | Tech Lead, Orchestrateur | ✅ done |
-| [F-11](stories/phase-1/F-11-docker-compose.md) | Docker Compose pour l'environnement local | Should | Tech Lead, Backend Dev | ✅ done |
-| [F-12](stories/phase-1/F-12-expo-eas-config.md) | Configuration Expo EAS (build cloud) | Should | Tech Lead, Frontend Dev | ✅ done |
+| [F-01](stories/phase-1/✅-F-01-monorepo-init.md) | Initialisation du monorepo | Must | Tech Lead | ✅ done |
+| [F-02](stories/phase-1/✅-F-02-typescript-strict.md) | Configuration TypeScript strict | Must | Tech Lead | ✅ done |
+| [F-03](stories/phase-1/✅-F-03-eslint-prettier.md) | Configuration ESLint + Prettier | Must | Tech Lead | ✅ done |
+| [F-04](stories/phase-1/✅-F-04-expo-app-init.md) | Initialisation de l'application Expo | Must | Tech Lead, Frontend Dev | ✅ done |
+| [F-05](stories/phase-1/✅-F-05-fastify-backend-init.md) | Initialisation du backend Fastify | Must | Tech Lead, Backend Dev | ✅ done |
+| [F-06](stories/phase-1/✅-F-06-postgresql-setup.md) | Configuration de la base de données PostgreSQL | Must | Tech Lead, Backend Dev | ✅ done |
+| [F-07](stories/phase-1/✅-F-07-github-actions-ci.md) | Pipeline CI/CD GitHub Actions (lint + tests) | Must | Tech Lead | ✅ done |
+| [F-08](stories/phase-1/✅-F-08-jest-config.md) | Configuration Jest (mobile + backend) | Must | Tech Lead, QA | ✅ done |
+| [F-09](stories/phase-1/✅-F-09-adr-architecture.md) | ADR — Décisions d'architecture initiales | Must | Tech Lead | ✅ done |
+| [F-10](stories/phase-1/✅-F-10-git-conventions.md) | Stratégie de branches et conventions de commits | Must | Tech Lead, Orchestrateur | ✅ done |
+| [F-11](stories/phase-1/✅-F-11-docker-compose.md) | Docker Compose pour l'environnement local | Should | Tech Lead, Backend Dev | ✅ done |
+| [F-12](stories/phase-1/✅-F-12-expo-eas-config.md) | Configuration Expo EAS (build cloud) | Should | Tech Lead, Frontend Dev | ✅ done |
 
 ---
 
@@ -51,24 +51,24 @@
 
 | ID | Titre | Priorité | Agent(s) | Statut |
 |----|-------|----------|----------|--------|
-| [M-01](stories/M-01-home-screen.md) | Écran d'accueil — affichage départ et destination | Must | Frontend Dev, UX/UI, Backend Dev | ✅ done |
-| [M-02](stories/M-02-random-pair-api.md) | Génération d'une paire d'articles aléatoires (backend) | Must | Backend Dev | ✅ done |
-| [M-03](stories/M-03-article-content-display.md) | Récupération et affichage du contenu d'un article Wikipedia | Must | Frontend Dev, Backend Dev | ✅ done |
-| [M-04](stories/M-04-article-navigation.md) | Navigation entre articles (tap sur un lien) | Must | Frontend Dev | ✅ done |
-| [M-05](stories/M-05-jumps-timer.md) | Compteur de sauts et timer en temps réel | Must | Frontend Dev | ✅ done |
-| [M-06](stories/M-06-victory-screen.md) | Détection de victoire et écran de résultat | Must | Frontend Dev, UX/UI | ✅ done |
-| [M-07](stories/M-07-game-session-model.md) | Modèle de données GameSession (local) | Must | Frontend Dev, Tech Lead | ✅ done |
-| [M-08](stories/M-08-wikipedia-service.md) | Service Wikipedia API (client mobile) | Must | Frontend Dev, Backend Dev | ✅ done |
-| [M-09](stories/M-09-unit-tests-game-logic.md) | Tests unitaires — logique de jeu | Must | QA, Frontend Dev, Backend Dev | ✅ done |
-| [M-10](stories/M-10-abandon-game.md) | Abandon de partie | Should | Frontend Dev, UX/UI | ✅ done |
-| [M-11](stories/M-11-offline-mode.md) | Gestion du mode hors-ligne | Should | Frontend Dev | ↪ Phase 4 |
-| [M-12](stories/M-12-language-support.md) | Support de la langue (français par défaut, configurable) | Should | Frontend Dev, Backend Dev | ✅ done |
-| [M-13](stories/M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | ↪ Phase 4 |
-| [M-14](stories/M-14-article-thumbnail.md) | Affichage de l'image de résumé de l'article | Could | Frontend Dev | 🚫 won't |
-| [M-15](stories/M-15-webview-css-injection.md) | WebView Wikipedia avec injection CSS mobile | Must | Frontend Dev | ✅ done |
-| [M-16](stories/M-16-popular-pages-strategy.md) | Pages populaires — stratégie hybride API + cache + fallback JSON | Must | Frontend Dev, Backend Dev | ✅ done |
-| [M-17](stories/M-17-change-objective.md) | Bouton "Changer l'objectif" pendant le jeu | Should | Frontend Dev, UX/UI | 🚫 won't |
-| [M-18](stories/M-18-happy-path-physical-device.md) | Validation happy path complet sur device physique | Must | QA | ✅ done |
+| [M-01](stories/phase-2/✅-M-01-home-screen.md) | Écran d'accueil — affichage départ et destination | Must | Frontend Dev, UX/UI, Backend Dev | ✅ done |
+| [M-02](stories/phase-2/✅-M-02-random-pair-api.md) | Génération d'une paire d'articles aléatoires (backend) | Must | Backend Dev | ✅ done |
+| [M-03](stories/phase-2/✅-M-03-article-content-display.md) | Récupération et affichage du contenu d'un article Wikipedia | Must | Frontend Dev, Backend Dev | ✅ done |
+| [M-04](stories/phase-2/✅-M-04-article-navigation.md) | Navigation entre articles (tap sur un lien) | Must | Frontend Dev | ✅ done |
+| [M-05](stories/phase-2/✅-M-05-jumps-timer.md) | Compteur de sauts et timer en temps réel | Must | Frontend Dev | ✅ done |
+| [M-06](stories/phase-2/✅-M-06-victory-screen.md) | Détection de victoire et écran de résultat | Must | Frontend Dev, UX/UI | ✅ done |
+| [M-07](stories/phase-2/✅-M-07-game-session-model.md) | Modèle de données GameSession (local) | Must | Frontend Dev, Tech Lead | ✅ done |
+| [M-08](stories/phase-2/✅-M-08-wikipedia-service.md) | Service Wikipedia API (client mobile) | Must | Frontend Dev, Backend Dev | ✅ done |
+| [M-09](stories/phase-2/✅-M-09-unit-tests-game-logic.md) | Tests unitaires — logique de jeu | Must | QA, Frontend Dev, Backend Dev | ✅ done |
+| [M-10](stories/phase-2/✅-M-10-abandon-game.md) | Abandon de partie | Should | Frontend Dev, UX/UI | ✅ done |
+| [M-11](stories/phase-4/⬜-M-11-offline-mode.md) | Gestion du mode hors-ligne | Should | Frontend Dev | ↪ Phase 4 |
+| [M-12](stories/phase-2/✅-M-12-language-support.md) | Support de la langue (français par défaut, configurable) | Should | Frontend Dev, Backend Dev | ✅ done |
+| [M-13](stories/phase-4/⬜-M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | ↪ Phase 4 |
+| [M-14](stories/wont/🚫-M-14-article-thumbnail.md) | Affichage de l'image de résumé de l'article | Could | Frontend Dev | 🚫 won't |
+| [M-15](stories/phase-2/✅-M-15-webview-css-injection.md) | WebView Wikipedia avec injection CSS mobile | Must | Frontend Dev | ✅ done |
+| [M-16](stories/phase-2/✅-M-16-popular-pages-strategy.md) | Pages populaires — stratégie hybride API + cache + fallback JSON | Must | Frontend Dev, Backend Dev | ✅ done |
+| [M-17](stories/wont/🚫-M-17-change-objective.md) | Bouton "Changer l'objectif" pendant le jeu | Should | Frontend Dev, UX/UI | 🚫 won't |
+| [M-18](stories/phase-2/✅-M-18-happy-path-physical-device.md) | Validation happy path complet sur device physique | Must | QA | ✅ done |
 
 ---
 
@@ -78,21 +78,21 @@
 
 | ID | Titre | Priorité | Agent(s) | Statut |
 |----|-------|----------|----------|--------|
-| [F3-01](stories/F3-01-daily-challenge.md) | Défi quotidien (même paire pour tous les joueurs) | Must | Backend Dev, Frontend Dev, UX/UI | ⬜ pending |
-| [F3-02](stories/F3-02-game-history.md) | Historique des parties (stockage local) | Must | Frontend Dev, UX/UI | ⬜ pending |
-| [F3-03](stories/F3-03-share-result.md) | Partage du résultat | Must | Frontend Dev | ⬜ pending |
-| [F3-04](stories/F3-04-donation-page.md) | Page donation Wikipedia | Must | Frontend Dev, UX/UI, DPO | ⬜ pending |
-| [F3-05](stories/F3-05-hard-mode.md) | Mode difficile (articles sans liens évidents) | Should | Backend Dev, Frontend Dev, UX/UI | ⬜ pending |
-| [F3-06](stories/F3-06-about-screen.md) | Écran "À propos" et crédits | Should | Frontend Dev, UX/UI, DPO | ⬜ pending |
-| [F3-07](stories/F3-07-integration-tests.md) | Tests d'intégration — parcours de jeu complet | Should | QA | ⬜ pending |
-| [F3-08](stories/F3-08-personal-stats.md) | Statistiques personnelles | Could | Frontend Dev, UX/UI | ⬜ pending |
-| [F3-09](stories/F3-09-animations-haptics.md) | Animations et feedback haptique | Could | Frontend Dev, UX/UI | ⬜ pending |
-| [F3-10](stories/F3-10-history-sort.md) | Tri multi-critères dans l'historique des parties | Should | Frontend Dev, UX/UI | ⬜ pending |
-| [F3-11](stories/F3-11-game-detail-screen.md) | Vue détail d'une partie — parcours, suppression et rejouer | Should | Frontend Dev, UX/UI | ⬜ pending |
-| [F3-12](stories/F3-12-local-multiplayer.md) | Multijoueur local hot-seat (passage du téléphone) | Should | Frontend Dev, UX/UI | ⬜ pending |
-| [F3-13](stories/F3-13-dev-mode.md) | Mode développeur — toggle affichage de l'article cible | Could | Frontend Dev | ⬜ pending |
-| [F3-14](stories/F3-14-contact-feedback.md) | Formulaire de feedback in-app (ContactScreen) | Could | Frontend Dev, UX/UI, DPO, Backend Dev | ⬜ pending |
-| [F3-15](stories/F3-15-firebase-analytics.md) | Firebase Analytics — intégration skeleton (événements de base) | Could | Frontend Dev, DPO | ⬜ pending |
+| [F3-01](stories/phase-3/⬜-F3-01-daily-challenge.md) | Défi quotidien (même paire pour tous les joueurs) | Must | Backend Dev, Frontend Dev, UX/UI | ⬜ pending |
+| [F3-02](stories/phase-3/⬜-F3-02-game-history.md) | Historique des parties (stockage local) | Must | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-03](stories/phase-3/⬜-F3-03-share-result.md) | Partage du résultat | Must | Frontend Dev | ⬜ pending |
+| [F3-04](stories/phase-3/⬜-F3-04-donation-page.md) | Page donation Wikipedia | Must | Frontend Dev, UX/UI, DPO | ⬜ pending |
+| [F3-05](stories/phase-3/⬜-F3-05-hard-mode.md) | Mode difficile (articles sans liens évidents) | Should | Backend Dev, Frontend Dev, UX/UI | ⬜ pending |
+| [F3-06](stories/phase-3/⬜-F3-06-about-screen.md) | Écran "À propos" et crédits | Should | Frontend Dev, UX/UI, DPO | ⬜ pending |
+| [F3-07](stories/phase-3/⬜-F3-07-integration-tests.md) | Tests d'intégration — parcours de jeu complet | Should | QA | ⬜ pending |
+| [F3-08](stories/phase-3/⬜-F3-08-personal-stats.md) | Statistiques personnelles | Could | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-09](stories/phase-3/⬜-F3-09-animations-haptics.md) | Animations et feedback haptique | Could | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-10](stories/phase-3/⬜-F3-10-history-sort.md) | Tri multi-critères dans l'historique des parties | Should | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-11](stories/phase-3/⬜-F3-11-game-detail-screen.md) | Vue détail d'une partie — parcours, suppression et rejouer | Should | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-12](stories/phase-3/⬜-F3-12-local-multiplayer.md) | Multijoueur local hot-seat (passage du téléphone) | Should | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-13](stories/phase-3/⬜-F3-13-dev-mode.md) | Mode développeur — toggle affichage de l'article cible | Could | Frontend Dev | ⬜ pending |
+| [F3-14](stories/phase-3/⬜-F3-14-contact-feedback.md) | Formulaire de feedback in-app (ContactScreen) | Could | Frontend Dev, UX/UI, DPO, Backend Dev | ⬜ pending |
+| [F3-15](stories/phase-3/⬜-F3-15-firebase-analytics.md) | Firebase Analytics — intégration skeleton (événements de base) | Could | Frontend Dev, DPO | ⬜ pending |
 
 ---
 
@@ -102,23 +102,23 @@
 
 | ID | Titre | Priorité | Agent(s) | Statut |
 |----|-------|----------|----------|--------|
-| [P-01](stories/P-01-privacy-policy.md) | Politique de confidentialité (RGPD) | Must | DPO, Frontend Dev | ⬜ pending |
-| [P-02](stories/P-02-owasp-audit.md) | Audit de sécurité — OWASP Mobile Top 10 | Must | Security | ⬜ pending |
-| [P-03](stories/P-03-backend-security.md) | Sécurisation du backend — Headers, CORS, Rate limiting | Must | Security, Backend Dev | ⬜ pending |
-| [P-04](stories/P-04-secrets-management.md) | Secrets et variables d'environnement (production) | Must | Security, Tech Lead | ⬜ pending |
-| [P-05](stories/P-05-performance-tests.md) | Tests de performance et de charge (backend) | Must | QA, Backend Dev | ⬜ pending |
-| [P-06](stories/P-06-cicd-deployment.md) | Pipeline CI/CD — Build et déploiement automatisé | Must | Tech Lead | ⬜ pending |
-| [P-07](stories/P-07-appstore-ios.md) | Soumission App Store (iOS) | Must | Tech Lead, Frontend Dev, DPO | ⬜ pending |
-| [P-08](stories/P-08-playstore-android.md) | Soumission Google Play Store (Android) | Must | Tech Lead, Frontend Dev, DPO | ⬜ pending |
-| [P-09](stories/P-09-monitoring-alerting.md) | Monitoring et alerting en production | Must | Tech Lead, Backend Dev | ⬜ pending |
-| [P-10](stories/P-10-rgpd-compliance.md) | Conformité RGPD complète — Registre de traitement | Should | DPO | ⬜ pending |
-| [P-11](stories/P-11-device-compatibility.md) | Tests de compatibilité appareils (iOS et Android) | Should | QA | ⬜ pending |
-| [M-11](stories/M-11-offline-mode.md) | Gestion du mode hors-ligne | Should | Frontend Dev | ⬜ pending |
-| [M-13](stories/M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | ⬜ pending |
-| [P-12](stories/P-12-ota-updates.md) | Stratégie de mise à jour OTA (Over The Air) | Should | Tech Lead, Frontend Dev | ⬜ pending |
-| [P-13](stories/P-13-legal-texts.md) | Textes légaux in-app (CGU simplifiées) | Should | DPO, Frontend Dev | ⬜ pending |
-| [P-14](stories/P-14-crash-reporting.md) | Traçabilité des erreurs côté mobile (crash reporting) | Could | Frontend Dev, DPO | ⬜ pending |
-| [P-15](stories/P-15-sast-security.md) | Tests de sécurité automatisés (SAST) | Could | Security | ⬜ pending |
+| [P-01](stories/phase-4/⬜-P-01-privacy-policy.md) | Politique de confidentialité (RGPD) | Must | DPO, Frontend Dev | ⬜ pending |
+| [P-02](stories/phase-4/⬜-P-02-owasp-audit.md) | Audit de sécurité — OWASP Mobile Top 10 | Must | Security | ⬜ pending |
+| [P-03](stories/phase-4/⬜-P-03-backend-security.md) | Sécurisation du backend — Headers, CORS, Rate limiting | Must | Security, Backend Dev | ⬜ pending |
+| [P-04](stories/phase-4/⬜-P-04-secrets-management.md) | Secrets et variables d'environnement (production) | Must | Security, Tech Lead | ⬜ pending |
+| [P-05](stories/phase-4/⬜-P-05-performance-tests.md) | Tests de performance et de charge (backend) | Must | QA, Backend Dev | ⬜ pending |
+| [P-06](stories/phase-4/⬜-P-06-cicd-deployment.md) | Pipeline CI/CD — Build et déploiement automatisé | Must | Tech Lead | ⬜ pending |
+| [P-07](stories/phase-4/⬜-P-07-appstore-ios.md) | Soumission App Store (iOS) | Must | Tech Lead, Frontend Dev, DPO | ⬜ pending |
+| [P-08](stories/phase-4/⬜-P-08-playstore-android.md) | Soumission Google Play Store (Android) | Must | Tech Lead, Frontend Dev, DPO | ⬜ pending |
+| [P-09](stories/phase-4/⬜-P-09-monitoring-alerting.md) | Monitoring et alerting en production | Must | Tech Lead, Backend Dev | ⬜ pending |
+| [P-10](stories/phase-4/⬜-P-10-rgpd-compliance.md) | Conformité RGPD complète — Registre de traitement | Should | DPO | ⬜ pending |
+| [P-11](stories/phase-4/⬜-P-11-device-compatibility.md) | Tests de compatibilité appareils (iOS et Android) | Should | QA | ⬜ pending |
+| [M-11](stories/phase-4/⬜-M-11-offline-mode.md) | Gestion du mode hors-ligne | Should | Frontend Dev | ⬜ pending |
+| [M-13](stories/phase-4/⬜-M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | ⬜ pending |
+| [P-12](stories/phase-4/⬜-P-12-ota-updates.md) | Stratégie de mise à jour OTA (Over The Air) | Should | Tech Lead, Frontend Dev | ⬜ pending |
+| [P-13](stories/phase-4/⬜-P-13-legal-texts.md) | Textes légaux in-app (CGU simplifiées) | Should | DPO, Frontend Dev | ⬜ pending |
+| [P-14](stories/phase-4/⬜-P-14-crash-reporting.md) | Traçabilité des erreurs côté mobile (crash reporting) | Could | Frontend Dev, DPO | ⬜ pending |
+| [P-15](stories/phase-4/⬜-P-15-sast-security.md) | Tests de sécurité automatisés (SAST) | Could | Security | ⬜ pending |
 
 ---
 
@@ -128,10 +128,10 @@
 
 | ID | Titre | Raison |
 |----|-------|--------|
-| [WNT-01](stories/WNT-01-user-account.md) | Compte utilisateur et authentification | Obligations RGPD incompatibles avec le positionnement |
-| [WNT-02](stories/WNT-02-in-app-ads.md) | Publicité in-app | Contraire aux valeurs du projet (sans pub, sans tracker) |
-| [WNT-03](stories/WNT-03-multiplayer.md) | Multijoueur en temps réel (race) | Complexité disproportionnée (WebSockets, matchmaking) |
-| [WNT-04](stories/WNT-04-push-notifications.md) | Notifications push | Valeur insuffisante vs complexité au lancement |
+| [WNT-01](stories/wont/🚫-WNT-01-user-account.md) | Compte utilisateur et authentification | Obligations RGPD incompatibles avec le positionnement |
+| [WNT-02](stories/wont/🚫-WNT-02-in-app-ads.md) | Publicité in-app | Contraire aux valeurs du projet (sans pub, sans tracker) |
+| [WNT-03](stories/wont/🚫-WNT-03-multiplayer.md) | Multijoueur en temps réel (race) | Complexité disproportionnée (WebSockets, matchmaking) |
+| [WNT-04](stories/wont/🚫-WNT-04-push-notifications.md) | Notifications push | Valeur insuffisante vs complexité au lancement |
 
 ---
 
