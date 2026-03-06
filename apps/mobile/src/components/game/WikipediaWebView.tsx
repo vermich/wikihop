@@ -79,7 +79,7 @@ const BLOCKED_URL_PREFIXES = [
  *   - .mw-editsection : boutons d'édition en ligne
  *   - .pre-content, #content : ajustement padding top après suppression header
  */
-const CSS_INJECTION_SCRIPT = `
+export const CSS_INJECTION_SCRIPT = `
 (function() {
   var css = [
     '.header-container { display: none !important; }',

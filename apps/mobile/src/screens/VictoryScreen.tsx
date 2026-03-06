@@ -41,8 +41,8 @@ import React, {
 import {
   AccessibilityInfo,
   Animated,
-  Linking,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -199,12 +199,11 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
     navigation.navigate('Home');
   }, [clearSession, navigation]);
 
-  // ── handleBack : retour sans reset de session ────────────────────────────
+  // ── handleBack : retour à l'article courant (Game screen) ───────────────
   const handleBack = useCallback((): void => {
-    // On ne clearSession pas — la session reste en mémoire (status: 'won')
-    // Le dialog de session résiduelle dans HomeScreen ne se déclenche que
-    // pour status 'in_progress', donc aucun dialog ne s'affichera
-    navigation.navigate('Home');
+    // goBack() revient à l'ArticleScreen (dernier article visité)
+    // La session reste en mémoire (status: 'won') — pas de clearSession
+    navigation.goBack();
   }, [navigation]);
 
   // ── handleReadArticle : ouvrir l'article destination en in-app ──────────
@@ -229,6 +228,7 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
 
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       {/* Header */}
       <View style={styles.header}>
         <Text
@@ -299,7 +299,7 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
               <View key={`${article.title}-${String(index)}`}>
                 <TouchableOpacity
                   style={styles.pathItem}
-                  onPress={() => { void Linking.openURL(article.url); }}
+                  onPress={() => { navigation.navigate('ArticleViewer', { url: article.url, title: article.title }); }}
                   accessibilityLabel={a11yLabel}
                   accessibilityRole="link"
                 >

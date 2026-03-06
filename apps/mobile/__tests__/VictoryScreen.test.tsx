@@ -32,11 +32,12 @@ import {
 
 const mockReplace = jest.fn();
 const mockNavigate = jest.fn();
+const mockGoBack = jest.fn();
 const mockNavigation = {
   replace: mockReplace,
   navigate: mockNavigate,
   push: jest.fn(),
-  goBack: jest.fn(),
+  goBack: mockGoBack,
   canGoBack: jest.fn(() => false),
 };
 
@@ -308,11 +309,11 @@ describe('VictoryScreen', () => {
   });
 
   describe('Bouton Retour', () => {
-    it('navigue vers Home sans clearSession', () => {
+    it('appelle goBack sans clearSession', () => {
       const { getByLabelText } = renderVictoryScreen();
       const backButton = getByLabelText("Retourner à l'accueil");
       fireEvent.press(backButton);
-      expect(mockNavigate).toHaveBeenCalledWith('Home');
+      expect(mockGoBack).toHaveBeenCalled();
       expect(mockClearSession).not.toHaveBeenCalled();
     });
   });

@@ -18,6 +18,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -26,6 +27,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 
+import { CSS_INJECTION_SCRIPT } from '../components/game/WikipediaWebView';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 
 type ArticleViewerScreenProps = NativeStackScreenProps<RootStackParamList, 'ArticleViewer'>;
@@ -36,6 +38,7 @@ export function ArticleViewerScreen({ route, navigation }: ArticleViewerScreenPr
 
   return (
     <View style={styles.screen}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <SafeAreaView edges={['top']} style={styles.headerSafeArea}>
         <View style={styles.header}>
           <Text style={styles.headerTitle} numberOfLines={1}>
@@ -55,6 +58,7 @@ export function ArticleViewerScreen({ route, navigation }: ArticleViewerScreenPr
       <WebView
         source={{ uri: url }}
         javaScriptEnabled={true}
+        injectedJavaScript={CSS_INJECTION_SCRIPT}
         onLoadStart={() => { setIsLoading(true); }}
         onLoadEnd={() => { setIsLoading(false); }}
       />
