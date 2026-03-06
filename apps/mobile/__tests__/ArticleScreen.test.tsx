@@ -269,7 +269,8 @@ describe('ArticleScreen', () => {
       });
     });
 
-    it('ne déclenche pas addJump quand onNavigationStateChange est en loading', async () => {
+    it('déclenche addJump même si loading === true (comportement Android)', async () => {
+      // Sur Android, la nouvelle URL n'apparaît parfois que dans loading=true.
       renderArticleScreen('Tour Eiffel');
       await act(async () => { await Promise.resolve(); });
 
@@ -279,12 +280,16 @@ describe('ArticleScreen', () => {
         onNavigationStateChange?.({
           url: 'https://fr.m.wikipedia.org/wiki/Paris',
           canGoBack: false,
-          loading: true, // en chargement → pas de saut
+          loading: true,
         });
         await Promise.resolve();
       });
 
-      expect(mockAddJump).not.toHaveBeenCalled();
+      await waitFor(() => {
+        expect(mockAddJump).toHaveBeenCalledWith(
+          expect.objectContaining({ title: 'Paris' }),
+        );
+      });
     });
 
     it('ne déclenche pas addJump si même titre (ancre)', async () => {

@@ -261,25 +261,27 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
   const lastReportedTitle = React.useRef<string>(currentTitle);
 
   /**
-   * Déclenché à chaque changement d'état de navigation (nouvelle page chargée).
+   * Déclenché à chaque changement d'état de navigation.
    * Approche V1 : seul mécanisme pour détecter les changements de page.
    *
    * - Notifie le parent de canGoBack (pour BackHandler Android)
-   * - Ignore les états "en cours de chargement"
-   * - Extrait le titre depuis l'URL
+   * - Extrait le titre depuis l'URL (null si URL non-Wikipedia → skip)
    * - Ignore si même titre que le dernier rapporté (ancre #section, rechargement)
    * - Met à jour lastReportedTitle AVANT d'appeler onPageChange (évite double-comptage)
    * - Appelle onPageChange pour que le parent comptabilise le saut et vérifie la victoire
+   *
+   * Note Android : on ne filtre PAS sur navState.loading.
+   * Sur Android WebView, l'URL cible n'apparaît parfois que dans l'événement
+   * loading=true (onPageStarted). L'événement loading=false (onPageFinished)
+   * peut arriver avec l'ancienne URL ou ne pas arriver du tout.
+   * La déduplication via lastReportedTitle.current empêche le double-comptage :
+   * le premier événement avec un nouveau titre déclenche onPageChange,
+   * les événements suivants avec le même titre sont ignorés.
    */
   function handleNavigationStateChange(navState: WebViewNavigation): void {
     // Notifier le parent du canGoBack courant (pour le BackHandler Android)
     if (props.onNavigationStateChange !== undefined) {
       props.onNavigationStateChange({ canGoBack: navState.canGoBack, url: navState.url });
-    }
-
-    // Ne traiter que les pages chargées (pas en cours)
-    if (navState.loading) {
-      return;
     }
 
     const title = extractTitleFromUrl(navState.url, lang);

@@ -460,7 +460,9 @@ describe('WikipediaWebView (composant)', () => {
       expect(onNavigationStateChange).toBeDefined();
     });
 
-    it('ne déclenche pas onPageChange si loading === true', () => {
+    it('déclenche onPageChange même si loading === true (comportement Android)', () => {
+      // Sur Android WebView, la nouvelle URL n'apparaît parfois que dans l'événement
+      // loading=true (onPageStarted). On ne filtre donc plus sur loading.
       const onPageChange = jest.fn();
       render(
         <WikipediaWebView
@@ -472,9 +474,9 @@ describe('WikipediaWebView (composant)', () => {
       onNavigationStateChange?.({
         url: 'https://fr.m.wikipedia.org/wiki/Paris',
         canGoBack: false,
-        loading: true, // en cours de chargement
+        loading: true,
       });
-      expect(onPageChange).not.toHaveBeenCalled();
+      expect(onPageChange).toHaveBeenCalledWith('Paris');
     });
 
     it('ne déclenche pas onPageChange si même titre que currentTitle', () => {
