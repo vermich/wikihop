@@ -1,7 +1,7 @@
 ---
 id: M-11
 title: Gestion du mode hors-ligne
-phase: 2-MVP
+phase: 4-Production
 priority: Should
 agents: [Frontend Dev]
 status: pending

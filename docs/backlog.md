@@ -61,9 +61,9 @@
 | [M-08](stories/M-08-wikipedia-service.md) | Service Wikipedia API (client mobile) | Must | Frontend Dev, Backend Dev | ✅ done |
 | [M-09](stories/M-09-unit-tests-game-logic.md) | Tests unitaires — logique de jeu | Must | QA, Frontend Dev, Backend Dev | ✅ done |
 | [M-10](stories/M-10-abandon-game.md) | Abandon de partie | Should | Frontend Dev, UX/UI | ✅ done |
-| [M-11](stories/M-11-offline-mode.md) | Gestion du mode hors-ligne | Should | Frontend Dev | ⬜ pending |
+| [M-11](stories/M-11-offline-mode.md) | Gestion du mode hors-ligne | Should | Frontend Dev | ↪ Phase 4 |
 | [M-12](stories/M-12-language-support.md) | Support de la langue (français par défaut, configurable) | Should | Frontend Dev, Backend Dev | ✅ done |
-| [M-13](stories/M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | ⬜ pending |
+| [M-13](stories/M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | ↪ Phase 4 |
 | [M-14](stories/M-14-article-thumbnail.md) | Affichage de l'image de résumé de l'article | Could | Frontend Dev | 🚫 won't |
 | [M-15](stories/M-15-webview-css-injection.md) | WebView Wikipedia avec injection CSS mobile | Must | Frontend Dev | ✅ done |
 | [M-16](stories/M-16-popular-pages-strategy.md) | Pages populaires — stratégie hybride API + cache + fallback JSON | Must | Frontend Dev, Backend Dev | ✅ done |
@@ -113,6 +113,8 @@
 | [P-09](stories/P-09-monitoring-alerting.md) | Monitoring et alerting en production | Must | Tech Lead, Backend Dev | ⬜ pending |
 | [P-10](stories/P-10-rgpd-compliance.md) | Conformité RGPD complète — Registre de traitement | Should | DPO | ⬜ pending |
 | [P-11](stories/P-11-device-compatibility.md) | Tests de compatibilité appareils (iOS et Android) | Should | QA | ⬜ pending |
+| [M-11](stories/M-11-offline-mode.md) | Gestion du mode hors-ligne | Should | Frontend Dev | ⬜ pending |
+| [M-13](stories/M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | ⬜ pending |
 | [P-12](stories/P-12-ota-updates.md) | Stratégie de mise à jour OTA (Over The Air) | Should | Tech Lead, Frontend Dev | ⬜ pending |
 | [P-13](stories/P-13-legal-texts.md) | Textes légaux in-app (CGU simplifiées) | Should | DPO, Frontend Dev | ⬜ pending |
 | [P-14](stories/P-14-crash-reporting.md) | Traçabilité des erreurs côté mobile (crash reporting) | Could | Frontend Dev, DPO | ⬜ pending |
