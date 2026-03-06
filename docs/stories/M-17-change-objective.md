@@ -4,7 +4,7 @@ title: Bouton "Changer l'objectif" pendant le jeu
 phase: 2-MVP
 priority: Should
 agents: [Frontend Dev, UX/UI]
-status: pending
+status: won't
 created: 2026-03-01
 completed:
 ---

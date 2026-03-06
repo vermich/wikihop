@@ -4,7 +4,7 @@ title: Affichage de l'image de résumé de l'article
 phase: 2-MVP
 priority: Could
 agents: [Frontend Dev]
-status: pending
+status: won't
 created: 2026-02-28
 completed:
 ---

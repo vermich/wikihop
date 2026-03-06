@@ -73,6 +73,7 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
   const currentSession = useGameStore((state) => state.currentSession);
   const addJump = useGameStore((state) => state.addJump);
   const completeSession = useGameStore((state) => state.completeSession);
+  const abandonSession = useGameStore((state) => state.abandonSession);
 
   const jumps = currentSession?.jumps ?? 0;
   const targetTitle = currentSession?.targetArticle.title ?? '';
@@ -133,6 +134,24 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
     [handlePageChange],
   );
 
+  // ── handleAbandon : confirmation abandon + navigate Home ─────────────────────
+  const handleAbandon = useCallback((): void => {
+    Alert.alert(
+      'Abandonner la partie ?',
+      'Votre progression sera perdue.',
+      [
+        { text: 'Reprendre', style: 'cancel' },
+        {
+          text: 'Confirmer',
+          style: 'destructive',
+          onPress: () => {
+            void abandonSession().then(() => { navigation.navigate('Home'); });
+          },
+        },
+      ],
+    );
+  }, [abandonSession, navigation]);
+
   // ── onNavigationStateChange pour suivre canGoBack ────────────────────────────
   const handleNavigationStateChange = useCallback(
     (navState: { canGoBack: boolean; url: string }): void => {
@@ -163,18 +182,7 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
           return false;
         }
         // Premier écran du stack → proposer abandon de la partie
-        Alert.alert(
-          'Quitter la partie ?',
-          'Votre progression sera perdue.',
-          [
-            { text: 'Continuer à jouer', style: 'cancel' },
-            {
-              text: 'Quitter',
-              style: 'destructive',
-              onPress: () => { navigation.navigate('Home'); },
-            },
-          ],
-        );
+        handleAbandon();
         return true;
       },
     );
@@ -182,7 +190,7 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
     return () => {
       subscription.remove();
     };
-  }, [isFocused, webViewCanGoBack, navigation]);
+  }, [isFocused, webViewCanGoBack, navigation, handleAbandon]);
 
   // ── Rendu ────────────────────────────────────────────────────────────────────
 
@@ -216,11 +224,11 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
           </Text>
           <TouchableOpacity
             style={styles.homeButton}
-            onPress={() => { navigation.navigate('Home'); }}
-            accessibilityLabel="Retour à l'accueil"
+            onPress={handleAbandon}
+            accessibilityLabel="Abandonner la partie"
             accessibilityRole="button"
           >
-            <Text style={styles.homeButtonText}>{'Accueil'}</Text>
+            <Text style={styles.homeButtonText}>{'Abandonner'}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

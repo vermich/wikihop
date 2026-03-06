@@ -24,7 +24,7 @@
  * ADR-003 : React Native Testing Library pour les tests de composants
  */
 
-import { render, act, waitFor } from '@testing-library/react-native';
+import { render, act, waitFor, fireEvent } from '@testing-library/react-native';
 import { Alert, BackHandler } from 'react-native';
 import React from 'react';
 
@@ -95,6 +95,7 @@ jest.mock('react-native-webview', () => {
 
 const mockAddJump = jest.fn().mockResolvedValue(undefined);
 const mockCompleteSession = jest.fn().mockResolvedValue(undefined);
+const mockAbandonSession = jest.fn().mockResolvedValue(undefined);
 
 const mockCurrentSession = {
   status: 'in_progress',
@@ -110,11 +111,13 @@ jest.mock('../src/store/game.store', () => ({
     currentSession: typeof mockCurrentSession;
     addJump: jest.Mock;
     completeSession: jest.Mock;
+    abandonSession: jest.Mock;
   }) => unknown) =>
     selector({
       currentSession: mockCurrentSession,
       addJump: mockAddJump,
       completeSession: mockCompleteSession,
+      abandonSession: mockAbandonSession,
     }),
   ),
 }));
@@ -181,6 +184,7 @@ describe('ArticleScreen', () => {
     mockWebViewInjectJavaScript.mockClear();
     mockAddJump.mockResolvedValue(undefined);
     mockCompleteSession.mockResolvedValue(undefined);
+    mockAbandonSession.mockResolvedValue(undefined);
   });
 
   // ── Rendu de base ────────────────────────────────────────────────────────────
@@ -490,7 +494,7 @@ describe('ArticleScreen', () => {
 
       expect(result).toBe(true); // bloque le back natif
       expect(alertSpy).toHaveBeenCalledWith(
-        'Quitter la partie ?',
+        'Abandonner la partie ?',
         expect.any(String),
         expect.any(Array),
       );
@@ -508,6 +512,51 @@ describe('ArticleScreen', () => {
       unmount();
 
       expect(mockRemove).toHaveBeenCalled();
+    });
+  });
+
+  // ── Bouton Abandonner ────────────────────────────────────────────────────────
+
+  describe('Bouton Abandonner', () => {
+    it('affiche le bouton Abandonner dans le header', () => {
+      const { getByText } = renderArticleScreen();
+      expect(getByText('Abandonner')).toBeTruthy();
+    });
+
+    it('affiche une Alert avec "Reprendre" et "Confirmer" au tap', () => {
+      const alertSpy = jest.spyOn(Alert, 'alert');
+      const { getByLabelText } = renderArticleScreen();
+
+      fireEvent.press(getByLabelText('Abandonner la partie'));
+
+      expect(alertSpy).toHaveBeenCalledWith(
+        'Abandonner la partie ?',
+        'Votre progression sera perdue.',
+        expect.arrayContaining([
+          expect.objectContaining({ text: 'Reprendre', style: 'cancel' }),
+          expect.objectContaining({ text: 'Confirmer', style: 'destructive' }),
+        ]),
+      );
+    });
+
+    it('appelle abandonSession puis navigate("Home") sur confirmation', async () => {
+      let confirmCallback: (() => void) | undefined;
+      jest.spyOn(Alert, 'alert').mockImplementation((_title, _msg, buttons) => {
+        const confirmBtn = (buttons as Array<{ text: string; onPress?: () => void }>)
+          .find((b) => b.text === 'Confirmer');
+        confirmCallback = confirmBtn?.onPress;
+      });
+
+      const { getByLabelText } = renderArticleScreen();
+      fireEvent.press(getByLabelText('Abandonner la partie'));
+
+      expect(confirmCallback).toBeDefined();
+      await act(async () => { confirmCallback?.(); await Promise.resolve(); });
+
+      await waitFor(() => {
+        expect(mockAbandonSession).toHaveBeenCalled();
+        expect(mockNavigate).toHaveBeenCalledWith('Home');
+      });
     });
   });
 
