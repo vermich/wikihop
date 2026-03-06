@@ -13,6 +13,7 @@ import { createNativeStackNavigator, type NativeStackNavigationProp } from '@rea
 import React from 'react';
 
 import { ArticleScreen } from '../screens/ArticleScreen';
+import { ArticleViewerScreen } from '../screens/ArticleViewerScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { VictoryScreen } from '../screens/VictoryScreen';
 
@@ -54,6 +55,13 @@ export type RootStackParamList = {
    * Aucun paramètre de navigation — les données viennent du store.
    */
   Victory: undefined;
+  /**
+   * Route ArticleViewer : lecture d'un article Wikipedia hors-jeu (depuis VictoryScreen).
+   */
+  ArticleViewer: {
+    url: string;
+    title: string;
+  };
 };
 
 /** Type NavigationProp pour le stack racine — exporté pour usage dans les écrans */
@@ -84,6 +92,11 @@ export function RootNavigator(): React.JSX.Element {
         <Stack.Screen
           name="Victory"
           component={VictoryScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ArticleViewer"
+          component={ArticleViewerScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

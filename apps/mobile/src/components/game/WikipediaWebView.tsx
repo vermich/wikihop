@@ -131,11 +131,8 @@ export function extractTitleFromUrl(url: string, _lang: Language): string | null
     return null;
   }
   // Extrait tout après /wiki/, ignore les ancres et les query params
-  const rawPath = url
-    .slice(wikiIndex + '/wiki/'.length)
-    .split('#')[0]
-    .split('?')[0];
-  if (rawPath === undefined || rawPath.length === 0) {
+  const rawPath = (url.slice(wikiIndex + '/wiki/'.length).split('#')[0] ?? '').split('?')[0] ?? '';
+  if (rawPath.length === 0) {
     return null;
   }
   try {

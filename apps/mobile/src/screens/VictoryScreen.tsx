@@ -207,11 +207,14 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
     navigation.navigate('Home');
   }, [navigation]);
 
-  // ── handleReadArticle : ouvrir l'article destination dans le navigateur ──
+  // ── handleReadArticle : ouvrir l'article destination en in-app ──────────
   const handleReadArticle = useCallback((): void => {
     if (currentSession === null) return;
-    void Linking.openURL(currentSession.targetArticle.url);
-  }, [currentSession]);
+    navigation.navigate('ArticleViewer', {
+      url: currentSession.targetArticle.url,
+      title: currentSession.targetArticle.title,
+    });
+  }, [currentSession, navigation]);
 
   // ── Si guard redirige (stats null) — ne rien afficher ───────────────────
   if (stats === null) {
@@ -318,15 +321,14 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
         {/* Séparateur */}
         <View style={styles.sectionSeparator} />
 
-        {/* Bouton "Lire [titre cible]" */}
+        {/* Bouton "Lire [titre cible]" — ouvre ArticleViewer en in-app */}
         <TouchableOpacity
           style={styles.readButton}
           onPress={handleReadArticle}
-          accessibilityLabel={`Lire l'article ${stats.targetTitle} sur Wikipedia`}
+          accessibilityLabel={`Lire l'article ${stats.targetTitle}`}
           accessibilityRole="button"
         >
           <Text style={styles.readButtonText}>{`Lire "${truncatedTargetTitle}"`}</Text>
-          <Text style={styles.readButtonIcon}>{'↗'}</Text>
         </TouchableOpacity>
       </ScrollView>
 
@@ -525,11 +527,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   readButtonText: {
-    fontSize: 16,
-    color: '#2563EB',
-    marginRight: 8,
-  },
-  readButtonIcon: {
     fontSize: 16,
     color: '#2563EB',
   },
