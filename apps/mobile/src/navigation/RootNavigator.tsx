@@ -14,6 +14,8 @@ import React from 'react';
 
 import { ArticleScreen } from '../screens/ArticleScreen';
 import { ArticleViewerScreen } from '../screens/ArticleViewerScreen';
+import { DonationScreen } from '../screens/DonationScreen';
+import { HistoryScreen } from '../screens/HistoryScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { VictoryScreen } from '../screens/VictoryScreen';
 
@@ -62,6 +64,16 @@ export type RootStackParamList = {
     url: string;
     title: string;
   };
+  /**
+   * Route History : historique des parties (F3-02).
+   * Accessible depuis HomeScreen et VictoryScreen.
+   */
+  History: undefined;
+  /**
+   * Route Donation : page de don Wikimedia (F3-04).
+   * Accessible depuis HomeScreen.
+   */
+  Donation: undefined;
 };
 
 /** Type NavigationProp pour le stack racine — exporté pour usage dans les écrans */
@@ -97,6 +109,16 @@ export function RootNavigator(): React.JSX.Element {
         <Stack.Screen
           name="ArticleViewer"
           component={ArticleViewerScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="History"
+          component={HistoryScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Donation"
+          component={DonationScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
