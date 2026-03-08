@@ -334,6 +334,22 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
                 </Animated.Text>
               </Animated.View>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.secondaryTextButton}
+              onPress={() => { navigation.navigate('History'); }}
+              accessibilityLabel="Voir mon historique de parties"
+              accessibilityRole="button"
+            >
+              <Text style={styles.secondaryTextButtonText}>{'Historique'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.secondaryTextButton}
+              onPress={() => { navigation.navigate('Donation'); }}
+              accessibilityLabel="Soutenir Wikipedia — faire un don à Wikimedia"
+              accessibilityRole="button"
+            >
+              <Text style={styles.secondaryTextButtonText}>{'Soutenir Wikipedia'}</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       );
@@ -397,6 +413,22 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
               <Text style={styles.refreshButtonText}>{'Nouveaux articles'}</Text>
               <Text style={styles.refreshIcon}>{'↺'}</Text>
             </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.secondaryTextButton}
+            onPress={() => { navigation.navigate('History'); }}
+            accessibilityLabel="Voir mon historique de parties"
+            accessibilityRole="button"
+          >
+            <Text style={styles.secondaryTextButtonText}>{'Historique'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.secondaryTextButton}
+            onPress={() => { navigation.navigate('Donation'); }}
+            accessibilityLabel="Soutenir Wikipedia — faire un don à Wikimedia"
+            accessibilityRole="button"
+          >
+            <Text style={styles.secondaryTextButtonText}>{'Soutenir Wikipedia'}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -563,6 +595,16 @@ const styles = StyleSheet.create({
   refreshIcon: {
     fontSize: 16,
     color: '#2563EB',
+  },
+  secondaryTextButton: {
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 4,
+  },
+  secondaryTextButtonText: {
+    fontSize: 16,
+    color: '#64748B',
   },
   errorContainer: {
     flex: 1,
