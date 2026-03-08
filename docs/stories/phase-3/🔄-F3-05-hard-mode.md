@@ -4,7 +4,7 @@ title: Mode difficile (articles sans liens évidents)
 phase: 3-Features
 priority: Should
 agents: [Backend Dev, Frontend Dev, UX/UI]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---
