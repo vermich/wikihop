@@ -343,6 +343,110 @@ Informer le joueur du lien entre WikiHop et Wikipedia, et lui permettre d'ouvrir
 
 ---
 
+## Validation DPO — Maïté
+
+**Date de validation :** 2026-03-08
+**Statut RGPD :** Conforme
+
+---
+
+### Avis RGPD — F3-04 Page donation Wikipedia
+
+**Statut :** Conforme
+**Date :** 2026-03-08
+
+#### Analyse
+
+**Données identifiées :**
+Ce composant est purement stateless et n'implique aucun traitement de données personnelles de la part de WikiHop. L'app se contente d'ouvrir une URL externe via `Linking.openURL`. Le flux de données est le suivant :
+
+- WikiHop → ouvre `https://donate.wikimedia.org` dans le navigateur système de l'utilisateur
+- Dès lors, l'utilisateur interagit exclusivement avec la Fondation Wikimedia, sous leur politique de confidentialité propre
+- WikiHop ne transmet aucune donnée à Wikimedia, ne reçoit aucun retour, ne trackent aucun clic ni aucune conversion
+
+**Base légale :** Sans objet — aucune donnée personnelle traitée par WikiHop dans ce flux.
+
+**Durée de conservation :** Sans objet.
+
+**Minimisation :** Atteinte au maximum — zéro donnée collectée.
+
+**Droits des utilisateurs :** Sans objet pour cette fonctionnalité.
+
+**Sous-traitants :** La Fondation Wikimedia n'est pas un sous-traitant de WikiHop au sens du RGPD. C'est un responsable de traitement indépendant, qui gère les dons sous sa propre politique de confidentialité. WikiHop ne lui confie aucune donnée et n'a aucun contrôle sur le traitement.
+
+#### Conclusion RGPD
+
+Un simple appel `Linking.openURL` vers un site tiers ne constitue pas une collecte de données personnelles par WikiHop. C'est l'équivalent d'un lien hypertexte dans un navigateur — WikiHop n'est pas impliqué dans ce qui se passe après l'ouverture. Aucun consentement supplémentaire n'est requis côté WikiHop.
+
+L'utilisateur est par ailleurs clairement informé qu'il quitte l'app et interagit avec Wikimedia directement, ce que le label d'accessibilité `"Faire un don à Wikimedia. Ouvre le navigateur."` confirme également.
+
+---
+
+### Texte définitif approuvé
+
+Le texte placeholder proposé par le Tech Lead est solide dans sa structure. J'apporte des ajustements mineurs pour renforcer la clarté sur la non-affiliation et la transparence sur le flux de données.
+
+**Titre de l'écran (header) :**
+```
+Soutenir Wikipedia
+```
+
+**Titre de section :**
+```
+WikiHop et Wikipedia
+```
+
+**Paragraphe 1 :**
+```
+WikiHop est un jeu de navigation qui utilise l'API publique et gratuite
+de Wikipedia pour afficher les articles. WikiHop n'est pas affilié à
+la Fondation Wikimedia et n'agit pas en son nom.
+```
+
+**Paragraphe 2 :**
+```
+Wikipedia existe grâce aux dons de millions de personnes dans le monde.
+Si vous appréciez Wikipedia, vous pouvez soutenir la Fondation Wikimedia
+directement depuis votre navigateur.
+```
+
+**Bloc mention légale (fond distinct #F8FAFC) :**
+```
+Votre don est géré exclusivement par la Fondation Wikimedia, sous leur
+propre politique de confidentialité. WikiHop n'intervient pas dans ce
+processus, ne collecte aucune information sur votre don et ne perçoit
+aucune commission.
+```
+
+**Libellé du bouton CTA :**
+```
+Faire un don à Wikipedia
+```
+
+**Label d'accessibilité du CTA :**
+```
+Faire un don à Wikimedia. Ouvre le navigateur.
+```
+
+**URL de référence (caption sous le bouton) :**
+```
+donate.wikimedia.org
+```
+
+---
+
+### Points de vigilance pour la suite
+
+**Si un système de tracking des clics sur ce bouton est ajouté à l'avenir** (analytics, event Firebase, etc.) : m'en informer avant implémentation. Comptabiliser les taps sur un bouton de don peut constituer un traitement de données comportementales et requiert une réévaluation de la base légale.
+
+**Si une WebView remplace le lien externe :** la situation changerait radicalement — WikiHop deviendrait potentiellement en mesure de lire les données de navigation sur le site de don, ce qui serait non conforme. Le choix `Linking.openURL` (navigateur externe) est donc non seulement une bonne pratique sécuritaire (confirmée par le Tech Lead) mais aussi le seul choix RGPD acceptable.
+
+---
+
+*Maïté — DPO WikiHop — 2026-03-08*
+
+---
+
 ## Validation QA — Halim
 <!-- Rempli par QA après les tests -->
 
