@@ -4,7 +4,7 @@ title: Mode développeur — toggle affichage de l'article cible
 phase: 3-Features
 priority: Could
 agents: [Frontend Dev]
-status: pending
+status: in-progress
 created: 2026-03-01
 completed:
 ---

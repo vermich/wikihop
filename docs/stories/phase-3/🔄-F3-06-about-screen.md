@@ -4,7 +4,7 @@ title: Écran "À propos" et crédits
 phase: 3-Features
 priority: Should
 agents: [Frontend Dev, UX/UI, DPO]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---

@@ -4,7 +4,7 @@ title: Défi quotidien (même paire pour tous les joueurs)
 phase: 3-Features
 priority: Must
 agents: [Backend Dev, Frontend Dev, UX/UI]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---
