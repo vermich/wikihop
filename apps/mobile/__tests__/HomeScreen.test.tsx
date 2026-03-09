@@ -209,6 +209,7 @@ describe('HomeScreen', () => {
         expect(mockStartSession).toHaveBeenCalledWith(
           expect.objectContaining({ title: 'Tour Eiffel' }),
           expect.objectContaining({ title: 'Louvre' }),
+          expect.objectContaining({ difficulty: 'normal' }),
         );
       });
 

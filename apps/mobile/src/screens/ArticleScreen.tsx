@@ -244,7 +244,11 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
       )}
 
       {/* HUD fixe */}
-      <GameHUD jumps={jumps} targetTitle={targetTitle} />
+      <GameHUD
+        jumps={jumps}
+        targetTitle={targetTitle}
+        isHardMode={currentSession?.difficulty === 'hard'}
+      />
 
       {/* Contenu WebView */}
       <View style={styles.contentArea}>

@@ -15,7 +15,7 @@
  *   - La langue courante est lue depuis useLanguageStore
  */
 
-import type { ArticleSummary } from '@wikihop/shared';
+import type { ArticleSummary, GameDifficulty } from '@wikihop/shared';
 import { useCallback, useEffect, useState } from 'react';
 
 import { useLanguageStore } from '../store/language.store';
@@ -61,8 +61,11 @@ interface RandomPairApiResponse {
  * 5. Autre erreur (réseau, timeout) → status 'error' avec message générique.
  * 6. refresh() repasse à 'loading' et relance le fetch.
  * 7. Démontage pendant fetch → AbortController annule le fetch, setState ignoré.
+ *
+ * @param difficulty - Niveau de difficulté pour la sélection des articles (F3-05)
+ *                     'normal' = pool complet, 'hard' = dernier tiers du pool
  */
-export function useRandomPair(): UseRandomPairReturn {
+export function useRandomPair(difficulty: GameDifficulty = 'normal'): UseRandomPairReturn {
   const language = useLanguageStore((state) => state.language);
   const [state, setState] = useState<RandomPairState>({ status: 'loading' });
 
@@ -79,7 +82,7 @@ export function useRandomPair(): UseRandomPairReturn {
 
     void (async () => {
       try {
-        const url = `http://192.168.1.30:3000/api/game/random-pair?lang=${language}`;
+        const url = `http://192.168.1.30:3000/api/game/random-pair?lang=${language}&difficulty=${difficulty}`;
         const response = await fetch(url, {
           signal: controller.signal,
         });
@@ -127,7 +130,8 @@ export function useRandomPair(): UseRandomPairReturn {
       controller.abort();
     };
   // trigger change quand refresh() est appelé — relance le fetch
-  }, [language, trigger]);
+  // difficulty ajouté en dep : un changement de mode relance le fetch
+  }, [language, trigger, difficulty]);
 
   return { state, refresh };
 }

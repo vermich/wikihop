@@ -173,4 +173,5 @@
 *v2.9 : Sprint Phase 3 démarré — F3-02 et F3-04 passées en in-progress (2026-03-06)*
 *v3.0 : Vagues 1 et 3 activées — F3-01, F3-03, F3-05, F3-06, F3-13 passées en in-progress (2026-03-08)*
 *v3.1 : F3-04 done — page donation Wikipedia validée QA (2026-03-09)*
+*v3.2 : F3-02, F3-03, F3-06, F3-13 done — historique, partage, à propos, mode dev validés QA (2026-03-10)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*

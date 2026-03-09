@@ -112,5 +112,11 @@ export function buildGameRecord(session: GameSession): GameRecord | null {
     startedAt: session.startedAt.toISOString(),
     completedAt: completedAt.toISOString(),
     status: session.status,
+    // Champs optionnels F3-01/F3-05 : spread conditionnel (exactOptionalPropertyTypes)
+    ...(session.difficulty !== undefined ? { difficulty: session.difficulty } : {}),
+    ...(session.isDailyChallenge === true ? { isDailyChallenge: true as const } : {}),
+    ...(session.dailyChallengeDate !== undefined
+      ? { dailyChallengeDate: session.dailyChallengeDate }
+      : {}),
   };
 }

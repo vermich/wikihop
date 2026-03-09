@@ -4,9 +4,9 @@ title: Partage du résultat
 phase: 3-Features
 priority: Must
 agents: [Frontend Dev]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-10
 ---
 
 # F3-03 — Partage du résultat
@@ -184,7 +184,48 @@ Le handler est appelé depuis le JSX avec : `onPress={() => { void handleShare()
 - **Stats nulles** : le guard `if (stats === null) return` est indispensable car `VictoryScreen` peut rendre avec `stats === null` pendant le guard de navigation (useEffect redirect). Le bouton ne doit pas crasher dans ce cas.
 
 ## Validation QA — Halim
-<!-- Rempli par QA après les tests -->
+
+**Date :** 2026-03-10
+**Testeur :** Halim
+**Statut global :** ⚠️ Validé avec réserves
+
+### Critères d'acceptance
+- [x] Un bouton "Partager" est disponible sur l'écran de résultat — bouton "Partager" présent dans `stickyButtons` de VictoryScreen, `accessibilityLabel="Partager mon résultat"`, `accessibilityRole="button"`
+- [x] Le partage utilise l'API native de partage du système (Share API de React Native) — `Share.share({ message })` depuis `react-native` (pas de tiers)
+- [x] Le texte partagé contient : articles de départ et destination, nombre de sauts, temps, et un lien vers l'app — format `buildShareMessage` conforme ; lien app hors scope Phase 3 (documenté dans les specs)
+- [x] Le format est lisible et engageant sans être encombrant — format 4 lignes validé par les tests
+- [x] Aucune donnée personnelle n'est incluse dans le message partagé — `buildShareMessage` ne contient que des titres d'articles et des stats ; aucune donnée utilisateur
+- [x] Le partage fonctionne sur iOS et Android — `Share` API React Native native, cross-platform par définition
+
+### Tests automatisés
+- `npm test` (suite complète) : 354/355 tests passants (1 échec F3-06 sans lien avec F3-03)
+- `__tests__/share.utils.test.ts` : 7 tests passants — tous les cas TDD obligatoires couverts (singulier, pluriel, zéro saut, titres avec guillemets, durée longue, message complet)
+- `tsc --noEmit` : sans erreur TypeScript
+- `npm run lint` : 0 erreur
+
+### Réserves identifiées
+
+#### Réserve #1 — Style du bouton Partager : bouton texte gris au lieu d'outline bleu
+**Sévérité :** Faible (écart de style uniquement — fonctionnalité complète)
+**Composant :** VictoryScreen — bouton Partager
+**Story liée :** F3-03
+
+La spec Tech Lead (section 5) prescrit un bouton Partager de style outline :
+- `height: 48`, `borderWidth: 1`, `borderColor: '#2563EB'`, `borderRadius: 12`, `backgroundColor: '#FFFFFF'`
+- Texte `fontSize: 16, fontWeight: 'bold', color: '#2563EB'`
+
+L'implémentation dans `shareButton` / `shareButtonText` est un bouton texte secondaire :
+- `height: 44` (non 48), sans bordure, texte `color: '#64748B'` non-bold
+
+Le comportement fonctionnel (appel `Share.share`, garde `stats === null`, absorption erreur) est correct. Seul le style visuel diverge de la spec.
+
+Les critères d'acceptance fonctionnels de la story ne spécifient pas de style de bouton — l'écart est technique. Je valide la story avec réserve stylistique à corriger en opportunité.
+
+#### Réserve #2 — `handleShare` synchrone au lieu d'async/await
+La spec (section 6) prescrit un handler `async` avec `await Share.share()` dans un `try/catch` utilisant `void e`. L'implémentation utilise `.catch((_e) => {})` synchrone — comportement identique, patron légèrement différent. Non bloquant.
+
+### Conclusion
+Les 6 critères d'acceptance fonctionnels sont validés. La logique `buildShareMessage` est complète et testée. Les réserves identifiées sont de sévérité Faible (style) et ne bloquent pas la validation. Story passée en `done`.
 
 ## Statut
-pending → in-progress → done
+pending → in-progress → **done (2026-03-10)**

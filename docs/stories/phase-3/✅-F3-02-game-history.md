@@ -4,9 +4,9 @@ title: Historique des parties (stockage local)
 phase: 3-Features
 priority: Must
 agents: [Frontend Dev, UX/UI]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-10
 ---
 
 # F3-02 — Historique des parties (stockage local)
@@ -602,9 +602,9 @@ Le Tech Lead délègue la position du bouton à Benjamin.
 
 ## Validation QA — Halim
 
-**Date :** 2026-03-09
+**Date :** 2026-03-10
 **Testeur :** Halim
-**Statut global :** ❌ Rejeté
+**Statut global :** ✅ Validé
 
 ### Critères d'acceptance
 - [x] L'historique affiche les 50 dernières parties (terminées ou abandonnées) — logique `slice(0, MAX_ENTRIES)` dans `ScoreStorage.save()` conforme
@@ -615,45 +615,30 @@ Le Tech Lead délègue la position du bouton à Benjamin.
 - [x] L'écran de victoire (M-06) propose d'aller voir l'historique — bouton "Voir l'historique" dans `stickyButtons` de VictoryScreen
 
 ### Tests automatisés
-- `npm test` (suite complète) : 319 tests passants, 0 échec, 16 suites
-- `history.utils.test.ts` : 19 tests passants — `formatDuration`, `formatRecordDate`, `buildGameRecord` couverts à 100%
+- `npm test` (suite complète) : 354 tests passants (les 355 tests incluant 1 échec F3-06 non imputable à F3-02), 19 suites
+- `__tests__/services/score-storage.service.test.ts` : 11 tests passants (save, getAll, deleteRecord, deleteAll + gestion erreurs)
+- `__tests__/hooks/useGameHistory.test.ts` : 11 tests passants (chargement initial, deleteAll, deleteRecord, refresh)
+- `history.utils.test.ts` : 19 tests passants — `formatDuration`, `formatRecordDate`, `buildGameRecord` couverts
 - `tsc --noEmit` : sans erreur TypeScript
-- `npm run lint` : 0 erreur (10 warnings `no-console` préexistants, non bloquants)
+- `npm run lint` : 0 erreur (11 warnings `no-console` préexistants, non bloquants)
 
 ### Gate device physique
-N/A — cette story ne touche pas la WebView ni le flux Home→Game→Victory. Les tests AsyncStorage sont mockés (comportement normal pour ce type de service de persistance).
+N/A — cette story ne touche pas la WebView ni le flux Home→Game→Victory principal.
 
-### Cas limites testés (statiques via lecture de code)
-- 51 entrées → tronquées à 50 (logique `.slice(0, MAX_ENTRIES)` vérifiée)
-- JSON corrompu dans AsyncStorage → `getAll()` retourne `[]` sans lever d'exception
-- `deleteRecord(id)` avec id inexistant → no-op silencieux
-- Session `in_progress` passée à `buildGameRecord` → retourne `null`
-- Session `won` sans `completedAt` → retourne `null`
-- `formatDuration(0)` → "0 s", `formatDuration(999)` → "0 s", `formatDuration(3665000)` → "61 min 05 s"
-- `useFocusEffect` dans `HistoryScreen` pour le rafraîchissement au focus — présent
+### Cas limites testés
+- 51 entrées → tronquées à 50 — test automatisé présent et passant
+- JSON corrompu dans AsyncStorage → `getAll()` retourne `[]` — test présent et passant
+- `deleteRecord(id)` avec id inexistant → no-op silencieux — test présent et passant
+- Session `in_progress` passée à `buildGameRecord` → retourne `null` — test présent et passant
+- Session `won` sans `completedAt` → retourne `null` — test présent et passant
+- `useFocusEffect` dans `HistoryScreen` pour le rafraîchissement au focus — présent dans le code
 - `FlatList` utilisée (pas `ScrollView`) — conforme
-- Bouton "Effacer l'historique" masqué quand `records.length === 0` — conforme (`renderFooter` retourne `null`)
 
 ### Bugs identifiés
-
-#### Bug #1 — Absence de tests pour `score-storage.service.ts` et `useGameHistory.ts`
-**Sévérité :** Moyenne
-**Composant :** Tests automatisés — services/hooks F3-02
-**Story liée :** F3-02
-
-La spec (section 8) exige un coverage >= 70% sur `score-storage.service.ts` et `useGameHistory.ts`, avec des cas de test explicites listés (save en liste vide, 51 entrées → 50, deleteAll, JSON corrompu). Aucun fichier de test n'existe pour ces deux modules (`__tests__/services/score-storage.service.test.ts` et `__tests__/useGameHistory.test.ts` absents).
-
-Comportement observé : 0% coverage sur `score-storage.service.ts` (lignes 29-120 non couvertes) et 0% fonctions sur `useGameHistory.ts`.
-
-Comportement attendu selon spec : coverage >= 70% sur ces deux fichiers, avec au minimum les 5 cas de test AsyncStorage listés en section 8.
-
-**Bug Moyenne — à corriger par Frontend Dev (Laurent)**
-
-#### Bug #2 — Date DPO incorrecte dans le commentaire de `DonationScreen.tsx` (mineur, non bloquant)
-Signalé en section F3-04 — voir rapport F3-04.
+Aucun bug — les tests manquants signalés lors de la session précédente (Bug #1) ont été corrigés.
 
 ### Conclusion
-Les 6 critères d'acceptance fonctionnels sont validés. L'implémentation est conforme à la spec (ScoreStorage, useGameHistory, HistoryScreen, HistoryItem, intégration HomeScreen + VictoryScreen, game.store). Cependant la story ne peut pas passer en `done` faute de tests automatisés pour `score-storage.service.ts` et `useGameHistory.ts` (Bug #1 — sévérité Moyenne, bloquant pour la DoD).
+Story validée. Tous les critères d'acceptance sont cochés, tests automatisés complets (score-storage + useGameHistory ajoutés), tsc et lint sans erreur.
 
 ## Statut
-pending → in-progress → **rejeté (Bug #1 — tests manquants)**
+pending → in-progress → **done (2026-03-10)**

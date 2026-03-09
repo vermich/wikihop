@@ -4,9 +4,9 @@ title: Mode développeur — toggle affichage de l'article cible
 phase: 3-Features
 priority: Could
 agents: [Frontend Dev]
-status: in-progress
+status: done
 created: 2026-03-01
-completed:
+completed: 2026-03-10
 ---
 
 # F3-13 — Mode développeur — toggle affichage de l'article cible
@@ -15,12 +15,12 @@ completed:
 En tant que développeur ou testeur de l'application, je veux pouvoir activer un mode développeur depuis l'écran d'accueil, afin de voir l'article cible en permanence pendant le jeu et tester des parcours spécifiques plus facilement.
 
 ## Critères d'acceptance
-- [ ] Un toggle "Mode développeur" est accessible depuis la HomeScreen (discret, non proéminent pour les utilisateurs normaux)
-- [ ] Quand le mode développeur est activé, un indicateur visuel persistant apparaît pendant le jeu (ex : bandeau ou badge) affichant le titre de l'article cible
-- [ ] L'état du mode développeur (activé/désactivé) est mémorisé en AsyncStorage et restauré au prochain lancement
-- [ ] Le mode développeur n'affecte pas les règles du jeu ni le calcul du score
-- [ ] En mode développeur, un indicateur visible dans la HomeScreen signale que le mode est actif (ex : libellé coloré sous le toggle)
-- [ ] Le toggle est désactivé par défaut à l'installation
+- [x] Un toggle "Mode développeur" est accessible depuis la HomeScreen (discret, non proéminent pour les utilisateurs normaux)
+- [x] Quand le mode développeur est activé, un indicateur visuel persistant apparaît pendant le jeu (ex : bandeau ou badge) affichant le titre de l'article cible
+- [x] L'état du mode développeur (activé/désactivé) est mémorisé en AsyncStorage et restauré au prochain lancement
+- [x] Le mode développeur n'affecte pas les règles du jeu ni le calcul du score
+- [x] En mode développeur, un indicateur visible dans la HomeScreen signale que le mode est actif (ex : libellé coloré sous le toggle)
+- [x] Le toggle est désactivé par défaut à l'installation
 
 ## Notes de réalisation
 
@@ -246,7 +246,44 @@ La logique est triviale (`!get().isDevMode`). L'unique test utile serait de vér
 - **Comportement du bandeau si la session est null :** Le guard `currentSession !== null` dans ArticleScreen est obligatoire — l'ArticleScreen peut être montée brièvement sans session (cas edge du guard de navigation).
 
 ## Validation QA — Halim
-<!-- Rempli par QA après les tests -->
+
+**Date :** 2026-03-10
+**Testeur :** Halim
+**Statut global :** ✅ Validé
+
+### Critères d'acceptance
+- [x] Toggle "Mode développeur" accessible depuis HomeScreen — `Switch` natif avec `{__DEV__ && ...}` dans les deux états (loading + success) de `renderContent()`
+- [x] Indicateur visuel bandeau dans ArticleScreen — `{__DEV__ && isDevMode && currentSession !== null}` affiche `View devBanner` jaune pâle `#FEF9C3` avec titre cible
+- [x] État mémorisé en AsyncStorage et restauré — clé `@wikihop/dev_mode`, `toggleDevMode()` écrit en AsyncStorage, `hydrate()` lit avec guard `__DEV__ && parsed === true`
+- [x] Pas d'impact sur les règles du jeu ni le score — `isDevMode` est un flag purement UI, aucun appel aux actions `addJump`/`completeSession` conditionné par ce flag
+- [x] Indicateur visible "MODE DEV ACTIF" dans HomeScreen — texte rouge `#DC2626` Bold 11px affiché si `__DEV__ && isDevMode`
+- [x] Désactivé par défaut — `isDevMode: false` dans le state initial du store
+
+### Tests automatisés
+- `npm test` (suite complète) : 354/355 tests passants (1 échec F3-06 sans lien avec F3-13)
+- Pas de tests dédiés à `toggleDevMode` (le Tech Lead a noté en section 5 que les tests sont optionnels/non bloquants pour cette story)
+- `tsc --noEmit` : sans erreur TypeScript
+- `npm run lint` : 0 erreur
+
+### Vérifications de conformité spec (lecture de code)
+- [x] Guard `if (!__DEV__) return` en première ligne de `toggleDevMode` — conforme
+- [x] Hydratation dans `hydrate()` avec guard `__DEV__ && parsedDevMode === true` — conforme
+- [x] `Switch` importé depuis `react-native` — conforme
+- [x] Sélecteur `isDevMode` lu via `useGameStore((s) => s.isDevMode)` dans HomeScreen et ArticleScreen — pas de prop drilling
+- [x] `__DEV__` présent sur chaque condition d'affichage du toggle et du bandeau — pas de chemin vers le code dev en production
+- [x] `currentSession !== null` guard sur le bandeau dans ArticleScreen — conforme
+
+### Cas limites testés (statiques via lecture de code)
+- `isDevMode` initialisé à `false` — valeur par défaut correcte
+- Guard `!__DEV__` dans `toggleDevMode` empêche l'activation en production
+- Guard `currentSession !== null` dans ArticleScreen — bandeau ne crashe pas si session absente
+- Hydratation en erreur AsyncStorage → silencieuse (bloc `catch {}` vide intentionnel)
+
+### Bugs identifiés
+Aucun.
+
+### Conclusion
+Story validée. Les 6 critères d'acceptance sont satisfaits. L'implémentation est strictement conforme aux specs du Tech Lead (guards `__DEV__`, persistance AsyncStorage, hydratation sécurisée). Aucun test dédié requis selon les specs — la logique triviale ne justifie pas de tests automatisés supplémentaires.
 
 ## Statut
-pending → in-progress → done
+pending → in-progress → **done (2026-03-10)**

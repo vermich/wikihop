@@ -53,6 +53,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { clearSummaryCache } from '../services/wikipedia.service';
 import { useGameStore } from '../store/game.store';
+import { formatDailyChallengeDate } from '../utils/daily-challenge.utils';
 import { buildShareMessage } from '../utils/share.utils';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -260,6 +261,32 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
           accessible={true}
           accessibilityLabel={`${String(stats.jumps)} saut${stats.jumps <= 1 ? '' : 's'} effectué${stats.jumps <= 1 ? '' : 's'} en ${formatElapsed(stats.elapsedSeconds)}. De ${stats.startTitle} vers ${stats.targetTitle}.`}
         >
+          {/* Badge Défi du jour (F3-01) */}
+          {currentSession?.isDailyChallenge === true && currentSession.dailyChallengeDate !== undefined && (
+            <View
+              style={[styles.badgePill, styles.badgePillDaily]}
+              accessible={true}
+              accessibilityLabel={`Partie jouée dans le cadre du défi du jour du ${formatDailyChallengeDate(currentSession.dailyChallengeDate)}`}
+            >
+              <Text style={[styles.badgePillText, styles.badgePillTextDaily]} accessible={false}>
+                {`Défi du jour — ${formatDailyChallengeDate(currentSession.dailyChallengeDate)}`}
+              </Text>
+            </View>
+          )}
+
+          {/* Badge Mode difficile (F3-05) */}
+          {currentSession?.difficulty === 'hard' && (
+            <View
+              style={[styles.badgePill, styles.badgePillHard]}
+              accessible={true}
+              accessibilityLabel="Partie jouée en mode difficile"
+            >
+              <Text style={[styles.badgePillText, styles.badgePillTextHard]} accessible={false}>
+                {'Mode difficile'}
+              </Text>
+            </View>
+          )}
+
           {/* Sous-éléments accessibles={false} pour éviter la double lecture */}
           <View style={styles.congratsRow} accessible={false}>
             <Text style={styles.checkIcon}>{'✓'}</Text>
@@ -602,5 +629,32 @@ const styles = StyleSheet.create({
   historyButtonText: {
     fontSize: 16,
     color: '#64748B',
+  },
+  // Badges F3-01 / F3-05 — composant BadgePill (réutilisable)
+  badgePill: {
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    alignSelf: 'center',
+    marginBottom: 8,
+  },
+  badgePillText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+  },
+  // Badge Défi du jour (F3-01) : fond #FEF3C7, texte #92400E
+  badgePillDaily: {
+    backgroundColor: '#FEF3C7',
+  },
+  badgePillTextDaily: {
+    color: '#92400E',
+  },
+  // Badge Mode difficile (F3-05) : fond #FEE2E2, texte #991B1B, marginBottom:12
+  badgePillHard: {
+    backgroundColor: '#FEE2E2',
+    marginBottom: 12,
+  },
+  badgePillTextHard: {
+    color: '#991B1B',
   },
 });
