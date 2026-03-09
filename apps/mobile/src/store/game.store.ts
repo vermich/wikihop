@@ -1,5 +1,5 @@
 /**
- * Game Store — WikiHop Mobile — Phase 2
+ * Game Store — WikiHop Mobile — Phase 2 + F3-13
  *
  * Store Zustand pour la gestion de la session de jeu courante.
  * Remplace l'implémentation minimale Phase 1 (startGame/endGame/abandonGame).
@@ -8,6 +8,7 @@
  *   ADR-005 : Persistance locale via AsyncStorage (clé @wikihop/game_session)
  *   ADR-007 : Architecture store Zustand — slices, persistance explicite
  *   Story   : docs/stories/M-07-game-session-model.md
+ *   Story   : docs/stories/phase-3/F3-13-dev-mode.md (isDevMode, toggleDevMode)
  *
  * Conventions :
  *   - Export nommé : useGameStore
@@ -47,6 +48,9 @@ function generateUUID(): string {
 /** Clé AsyncStorage de la session courante (ADR-005) */
 const STORAGE_KEY = '@wikihop/game_session';
 
+/** Clé AsyncStorage du mode développeur (F3-13) */
+const DEV_MODE_STORAGE_KEY = '@wikihop/dev_mode';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Interface du slice gameSession
 // ─────────────────────────────────────────────────────────────────────────────
@@ -60,6 +64,10 @@ interface GameSessionSlice {
    * Les écrans doivent afficher un indicateur de chargement tant que isHydrated === false.
    */
   isHydrated: boolean;
+
+  // ── État mode développeur ────────────────────────────────────────────────────
+  /** Actif uniquement pendant les sessions de développement/test. */
+  isDevMode: boolean;
 
   // ── Actions ─────────────────────────────────────────────────────────────────
   /**
@@ -114,8 +122,15 @@ interface GameSessionSlice {
    * - En cas de JSON malformé : appelle clearSession() pour repartir propre.
    * - Toujours termine par set({ isHydrated: true }), même en cas d'erreur.
    * - N'écrit jamais dans AsyncStorage (éco-conception : 1 seule lecture au boot).
+   * - Lit aussi DEV_MODE_STORAGE_KEY avec guard __DEV__ && parsed === true (F3-13).
    */
   hydrate: () => Promise<void>;
+
+  /**
+   * Bascule le mode développeur et persiste l'état dans AsyncStorage.
+   * Ne fait rien si __DEV__ est false (build de production).
+   */
+  toggleDevMode: () => Promise<void>;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -141,6 +156,7 @@ async function persistSession(session: GameSession): Promise<void> {
 export const useGameStore = create<GameSessionSlice>()((set, get) => ({
   currentSession: null,
   isHydrated: false,
+  isDevMode: false,
 
   startSession: async (startArticle: Article, targetArticle: Article): Promise<void> => {
     const session: GameSession = {
@@ -281,9 +297,36 @@ export const useGameStore = create<GameSessionSlice>()((set, get) => ({
       console.error('[game.store] Erreur lors de la réhydratation :', e);
       // JSON malformé ou lecture impossible : on repart propre
       await get().clearSession();
-    } finally {
-      // isHydrated passe à true dans tous les cas (succès, vide, erreur)
-      set({ isHydrated: true });
+    }
+
+    // Lecture du mode dev (best-effort — ne bloque pas l'hydratation)
+    try {
+      const rawDevMode = await AsyncStorage.getItem(DEV_MODE_STORAGE_KEY);
+      if (rawDevMode !== null) {
+        const parsedDevMode = JSON.parse(rawDevMode) as boolean;
+        if (__DEV__ && parsedDevMode === true) {
+          set({ isDevMode: true });
+        }
+      }
+    } catch {
+      // Ignoré silencieusement — le mode dev n'est pas critique
+    }
+
+    // isHydrated passe à true dans tous les cas (succès, vide, erreur)
+    set({ isHydrated: true });
+  },
+
+  toggleDevMode: async (): Promise<void> => {
+    // Guard production : ne jamais activer en build release
+    if (!__DEV__) return;
+
+    const next = !get().isDevMode;
+    set({ isDevMode: next });
+
+    try {
+      await AsyncStorage.setItem(DEV_MODE_STORAGE_KEY, JSON.stringify(next));
+    } catch (e: unknown) {
+      console.error('[game.store] Erreur persistance dev_mode :', e);
     }
   },
 }));
