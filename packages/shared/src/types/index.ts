@@ -81,6 +81,39 @@ export interface GameSession {
 }
 
 // ─────────────────────────────────────────────
+// Historique des parties
+// ─────────────────────────────────────────────
+
+/**
+ * Enregistrement d'une partie terminée dans l'historique local.
+ * Sous-ensemble de GameSession — ne contient pas le chemin complet
+ * pour limiter la taille de stockage AsyncStorage.
+ *
+ * Les dates sont stockées en string ISO 8601 (pas Date) car AsyncStorage
+ * sérialise en JSON — pas de désérialisation nécessaire à la lecture.
+ *
+ * Story : F3-02
+ */
+export interface GameRecord {
+  /** Identifiant unique de la partie (UUID v4, issu de GameSession.id) */
+  id: string;
+  /** Article de départ */
+  startArticle: Article;
+  /** Article destination */
+  targetArticle: Article;
+  /** Nombre de sauts effectués */
+  jumps: number;
+  /** Durée de la partie en millisecondes (calculée : completedAt - startedAt) */
+  durationMs: number;
+  /** Date de début ISO 8601 (string) */
+  startedAt: string;
+  /** Date de fin ISO 8601 (toujours présente car la partie est terminée) */
+  completedAt: string;
+  /** Statut final : 'won' ou 'abandoned' */
+  status: 'won' | 'abandoned';
+}
+
+// ─────────────────────────────────────────────
 // Défi quotidien
 // ─────────────────────────────────────────────
 
@@ -89,6 +122,25 @@ export interface GameSession {
  * Identique pour tous les joueurs à une date donnée.
  * Utilisé par Phase 3 (F3-01).
  */
+export interface GameRecord {
+  /** Identifiant unique de la partie (UUID v4, issu de GameSession.id) */
+  id: string;
+  /** Article de départ */
+  startArticle: Article;
+  /** Article destination */
+  targetArticle: Article;
+  /** Nombre de sauts effectués */
+  jumps: number;
+  /** Durée de la partie en millisecondes (calculée : completedAt - startedAt) */
+  durationMs: number;
+  /** Date de début ISO 8601 (string) */
+  startedAt: string;
+  /** Date de fin ISO 8601 (toujours présente car la partie est terminée) */
+  completedAt: string;
+  /** Statut final : 'won' ou 'abandoned' */
+  status: 'won' | 'abandoned';
+}
+
 export interface DailyChallenge {
   /** Date du défi (format YYYY-MM-DD) */
   date: string;

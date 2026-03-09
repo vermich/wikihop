@@ -12,8 +12,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator, type NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 
+import { AboutScreen } from '../screens/AboutScreen';
 import { ArticleScreen } from '../screens/ArticleScreen';
 import { ArticleViewerScreen } from '../screens/ArticleViewerScreen';
+import { DonationScreen } from '../screens/DonationScreen';
+import { HistoryScreen } from '../screens/HistoryScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { VictoryScreen } from '../screens/VictoryScreen';
 
@@ -26,6 +29,9 @@ import { VictoryScreen } from '../screens/VictoryScreen';
  * Wave 4 :
  *   - Victory : écran de résultat après victoire (M-06)
  *   - Home : route explicitement déclarée pour navigation.navigate('Home') (M-01)
+ *
+ * Phase 3 :
+ *   - About : écran crédits et informations légales (F3-06)
  *
  * Note sur detachInactiveScreens (M-04) :
  *   La navigation inter-articles utilise navigation.push('Game', ...) qui empile
@@ -62,6 +68,21 @@ export type RootStackParamList = {
     url: string;
     title: string;
   };
+  /**
+   * Route About : écran crédits et informations légales (F3-06).
+   * Accessible depuis HomeScreen.
+   */
+  About: undefined;
+  /**
+   * Route History : historique des parties (F3-02).
+   * Accessible depuis HomeScreen et VictoryScreen.
+   */
+  History: undefined;
+  /**
+   * Route Donation : page de soutien Wikipedia (F3-04).
+   * Accessible depuis HomeScreen.
+   */
+  Donation: undefined;
 };
 
 /** Type NavigationProp pour le stack racine — exporté pour usage dans les écrans */
@@ -97,6 +118,21 @@ export function RootNavigator(): React.JSX.Element {
         <Stack.Screen
           name="ArticleViewer"
           component={ArticleViewerScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="About"
+          component={AboutScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="History"
+          component={HistoryScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Donation"
+          component={DonationScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
