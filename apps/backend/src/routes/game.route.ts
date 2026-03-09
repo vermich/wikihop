@@ -1,18 +1,21 @@
 /**
- * game.route.ts — Route GET /api/game/random-pair
+ * game.route.ts — Routes du jeu WikiHop
  *
- * Sélectionne deux articles Wikipedia aléatoires et distincts depuis le pool
- * des pages populaires (service M-16), valide qu'ils sont non-ébauche
- * (extract > 200 chars), et retourne la paire au client mobile.
+ * Routes :
+ * - GET /api/game/random-pair  — Paire aléatoire (normal ou hard mode)
+ * - GET /api/game/daily        — Défi quotidien (même paire pour tous les joueurs)
  *
- * Logique de retry : max 5 tentatives. Si toutes échouent → 503.
+ * Logique de retry : max 5 tentatives par route. Si toutes échouent → 503.
  * Chaque appel Wikipedia est soumis à un timeout de 3 secondes.
  *
  * Les deux appels Wikipedia d'une tentative sont lancés en parallèle (Promise.all)
  * pour respecter le critère p95 < 2s (voir notes M-02, point 5).
  *
  * ADR-002 : Schema Zod obligatoire sur entrée et sortie.
- * Référence : docs/stories/M-02-random-pair-api.md
+ * Références :
+ * - docs/stories/phase-2/M-02-random-pair-api.md
+ * - docs/stories/phase-3/F3-01-daily-challenge.md
+ * - docs/stories/phase-3/F3-05-hard-mode.md
  */
 
 import type { FastifyInstance } from 'fastify';
@@ -20,6 +23,8 @@ import type { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { z } from 'zod/v4';
 
 import { getPopularPages } from '../services/popular-pages.service';
+import { computeDailyIndices, djb2Hash, getTodayUTC } from '../utils/daily-challenge.utils';
+import { getHardModePool } from '../utils/hard-mode.utils';
 
 // ---------------------------------------------------------------------------
 // Constantes
@@ -59,8 +64,15 @@ function isWikipediaSummaryResponse(value: unknown): value is WikipediaSummaryRe
 // Schemas Zod
 // ---------------------------------------------------------------------------
 
+const langSchema = z.enum(['fr', 'en']).default('fr');
+
 const randomPairQuerySchema = z.object({
-  lang: z.enum(['fr', 'en']).default('fr'),
+  lang: langSchema,
+  difficulty: z.enum(['normal', 'hard']).default('normal'),
+});
+
+const dailyQuerySchema = z.object({
+  lang: langSchema,
 });
 
 const articleSummarySchema = z.object({
@@ -77,16 +89,23 @@ const randomPairResponseSchema = z.object({
   target: articleSummarySchema,
 });
 
+const dailyResponseSchema = z.object({
+  date: z.string(),
+  start: articleSummarySchema,
+  target: articleSummarySchema,
+});
+
 const serviceUnavailableSchema = z.object({
   success: z.literal(false),
   error: z.object({
-    code: z.literal('RANDOM_PAIR_UNAVAILABLE'),
+    code: z.string(),
     message: z.string(),
   }),
 });
 
 export type ArticleSummaryResponse = z.infer<typeof articleSummarySchema>;
 export type RandomPairResponse = z.infer<typeof randomPairResponseSchema>;
+export type DailyResponse = z.infer<typeof dailyResponseSchema>;
 
 // ---------------------------------------------------------------------------
 // Logique métier — fetching d'un article Wikipedia
@@ -185,11 +204,15 @@ function pickTwoDistinctIndices(length: number): [number, number] {
 // ---------------------------------------------------------------------------
 
 /**
- * Plugin Fastify pour la route /api/game/random-pair.
+ * Plugin Fastify pour les routes /api/game/*.
  * Enregistré dans routes/index.ts.
  */
 export async function gameRoutes(instance: FastifyInstance): Promise<void> {
   const app = instance.withTypeProvider<ZodTypeProvider>();
+
+  // ─────────────────────────────────────────────
+  // GET /api/game/random-pair
+  // ─────────────────────────────────────────────
 
   app.get(
     '/api/game/random-pair',
@@ -205,15 +228,40 @@ export async function gameRoutes(instance: FastifyInstance): Promise<void> {
       },
     },
     async (request, reply) => {
-      const { lang } = request.query;
+      const { lang, difficulty } = request.query;
 
       const popularPages = await getPopularPages(lang);
-      const articles = popularPages.articles;
+      let articles = popularPages.articles;
+
+      // Mode difficile : restreindre le pool au dernier tiers (F3-05)
+      if (difficulty === 'hard') {
+        const hardPool = getHardModePool(articles);
+
+        // Guard : pool hard insuffisant → 503 immédiat, pas de retry inutile
+        if (hardPool.length < 2) {
+          request.log.warn(
+            { lang, reason: 'pool hard insuffisant', poolSize: articles.length },
+            'random-pair: pool hard mode < 2 articles',
+          );
+          return reply.code(503).send({
+            success: false,
+            error: {
+              code: 'hard_pool_insufficient',
+              message: 'Le pool du mode difficile est insuffisant (moins de 2 articles)',
+            },
+          });
+        }
+
+        articles = hardPool;
+      }
 
       for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
         // Besoin d'au moins 2 articles pour sélectionner une paire distincte
         if (articles.length < 2) {
-          request.log.warn({ attempt, lang, reason: 'pool trop petit' }, 'random-pair: tentative invalide');
+          request.log.warn(
+            { attempt, lang, difficulty, reason: 'pool trop petit' },
+            'random-pair: tentative invalide',
+          );
           break;
         }
 
@@ -223,7 +271,10 @@ export async function gameRoutes(instance: FastifyInstance): Promise<void> {
 
         // noUncheckedIndexedAccess : vérification explicite après sélection
         if (titleStart === undefined || titleTarget === undefined) {
-          request.log.warn({ attempt, lang, reason: 'index hors limites' }, 'random-pair: tentative invalide');
+          request.log.warn(
+            { attempt, lang, difficulty, reason: 'index hors limites' },
+            'random-pair: tentative invalide',
+          );
           continue;
         }
 
@@ -238,6 +289,7 @@ export async function gameRoutes(instance: FastifyInstance): Promise<void> {
             {
               attempt,
               lang,
+              difficulty,
               reason: start === null ? 'start invalide ou ébauche' : 'target invalide ou ébauche',
               titleStart,
               titleTarget,
@@ -252,7 +304,7 @@ export async function gameRoutes(instance: FastifyInstance): Promise<void> {
 
       // Toutes les tentatives ont échoué
       request.log.error(
-        { lang, maxAttempts: MAX_ATTEMPTS },
+        { lang, difficulty, maxAttempts: MAX_ATTEMPTS },
         'random-pair: impossible de générer une paire valide après toutes les tentatives',
       );
 
@@ -261,6 +313,103 @@ export async function gameRoutes(instance: FastifyInstance): Promise<void> {
         error: {
           code: 'RANDOM_PAIR_UNAVAILABLE',
           message: `Impossible de générer une paire valide après ${String(MAX_ATTEMPTS)} tentatives`,
+        },
+      });
+    },
+  );
+
+  // ─────────────────────────────────────────────
+  // GET /api/game/daily
+  // ─────────────────────────────────────────────
+
+  app.get(
+    '/api/game/daily',
+    {
+      schema: {
+        description: 'Retourne le défi quotidien — même paire pour tous les joueurs ce jour',
+        tags: ['game'],
+        querystring: dailyQuerySchema,
+        response: {
+          200: dailyResponseSchema,
+          503: serviceUnavailableSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      const { lang } = request.query;
+
+      // Date du jour en UTC — garantit le changement à minuit UTC
+      const date = getTodayUTC();
+
+      // Hash déterministe de la date + langue pour varier selon la langue
+      const hashInput = `${date}:${lang}`;
+      const hash = djb2Hash(hashInput);
+
+      const popularPages = await getPopularPages(lang);
+      const articles = popularPages.articles;
+
+      if (articles.length < 2) {
+        request.log.error(
+          { lang, date, reason: 'pool insuffisant' },
+          'daily: pool trop petit pour générer un défi quotidien',
+        );
+        return reply.code(503).send({
+          success: false,
+          error: {
+            code: 'DAILY_POOL_INSUFFICIENT',
+            message: 'Le pool est insuffisant pour générer le défi quotidien',
+          },
+        });
+      }
+
+      // Indices déterministes basés sur la date — idempotent
+      const [idxStart, idxTarget] = computeDailyIndices(hash, articles.length);
+      const titleStart = articles[idxStart];
+      const titleTarget = articles[idxTarget];
+
+      // noUncheckedIndexedAccess : vérification explicite
+      if (titleStart === undefined || titleTarget === undefined) {
+        request.log.error(
+          { lang, date, idxStart, idxTarget, poolSize: articles.length },
+          'daily: indices hors limites — erreur algorithmique',
+        );
+        return reply.code(503).send({
+          success: false,
+          error: {
+            code: 'DAILY_UNAVAILABLE',
+            message: 'Erreur interne lors du calcul du défi quotidien',
+          },
+        });
+      }
+
+      // Retry : même paire cible à chaque tentative (déterminisme)
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        const [start, target] = await Promise.all([
+          fetchArticleSummary(titleStart, lang),
+          fetchArticleSummary(titleTarget, lang),
+        ]);
+
+        if (start !== null && target !== null) {
+          return reply.code(200).send({ date, start, target });
+        }
+
+        request.log.warn(
+          { attempt, lang, date, reason: 'échec Wikipedia' },
+          'daily: tentative de fetching échouée',
+        );
+      }
+
+      // Toutes les tentatives ont échoué
+      request.log.error(
+        { lang, date, maxAttempts: MAX_ATTEMPTS },
+        'daily: impossible de récupérer les articles du défi quotidien',
+      );
+
+      return reply.code(503).send({
+        success: false,
+        error: {
+          code: 'DAILY_UNAVAILABLE',
+          message: `Impossible de récupérer le défi quotidien après ${String(MAX_ATTEMPTS)} tentatives`,
         },
       });
     },

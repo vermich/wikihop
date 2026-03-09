@@ -4,7 +4,7 @@ title: Partage du résultat
 phase: 3-Features
 priority: Must
 agents: [Frontend Dev]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---

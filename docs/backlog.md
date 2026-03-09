@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-06 | **Version** : 2.9
+**PM** : Gauderic | **Mis à jour** : 2026-03-08 | **Version** : 3.0
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -78,19 +78,19 @@
 
 | ID | Titre | Priorité | Agent(s) | Statut |
 |----|-------|----------|----------|--------|
-| [F3-01](stories/phase-3/⬜-F3-01-daily-challenge.md) | Défi quotidien (même paire pour tous les joueurs) | Must | Backend Dev, Frontend Dev, UX/UI | ⬜ pending |
+| [F3-01](stories/phase-3/🔄-F3-01-daily-challenge.md) | Défi quotidien (même paire pour tous les joueurs) | Must | Backend Dev, Frontend Dev, UX/UI | 🔄 in-progress |
 | [F3-02](stories/phase-3/🔄-F3-02-game-history.md) | Historique des parties (stockage local) | Must | Frontend Dev, UX/UI | 🔄 in-progress |
-| [F3-03](stories/phase-3/⬜-F3-03-share-result.md) | Partage du résultat | Must | Frontend Dev | ⬜ pending |
-| [F3-04](stories/phase-3/🔄-F3-04-donation-page.md) | Page donation Wikipedia | Must | Frontend Dev, UX/UI, DPO | 🔄 in-progress |
-| [F3-05](stories/phase-3/⬜-F3-05-hard-mode.md) | Mode difficile (articles sans liens évidents) | Should | Backend Dev, Frontend Dev, UX/UI | ⬜ pending |
-| [F3-06](stories/phase-3/⬜-F3-06-about-screen.md) | Écran "À propos" et crédits | Should | Frontend Dev, UX/UI, DPO | ⬜ pending |
+| [F3-03](stories/phase-3/🔄-F3-03-share-result.md) | Partage du résultat | Must | Frontend Dev | 🔄 in-progress |
+| [F3-04](stories/phase-3/✅-F3-04-donation-page.md) | Page donation Wikipedia | Must | Frontend Dev, UX/UI, DPO | ✅ done |
+| [F3-05](stories/phase-3/🔄-F3-05-hard-mode.md) | Mode difficile (articles sans liens évidents) | Should | Backend Dev, Frontend Dev, UX/UI | 🔄 in-progress |
+| [F3-06](stories/phase-3/🔄-F3-06-about-screen.md) | Écran "À propos" et crédits | Should | Frontend Dev, UX/UI, DPO | 🔄 in-progress |
 | [F3-07](stories/phase-3/⬜-F3-07-integration-tests.md) | Tests d'intégration — parcours de jeu complet | Should | QA | ⬜ pending |
 | [F3-08](stories/phase-3/⬜-F3-08-personal-stats.md) | Statistiques personnelles | Could | Frontend Dev, UX/UI | ⬜ pending |
 | [F3-09](stories/phase-3/⬜-F3-09-animations-haptics.md) | Animations et feedback haptique | Could | Frontend Dev, UX/UI | ⬜ pending |
 | [F3-10](stories/phase-3/⬜-F3-10-history-sort.md) | Tri multi-critères dans l'historique des parties | Should | Frontend Dev, UX/UI | ⬜ pending |
 | [F3-11](stories/phase-3/⬜-F3-11-game-detail-screen.md) | Vue détail d'une partie — parcours, suppression et rejouer | Should | Frontend Dev, UX/UI | ⬜ pending |
 | [F3-12](stories/phase-3/⬜-F3-12-local-multiplayer.md) | Multijoueur local hot-seat (passage du téléphone) | Should | Frontend Dev, UX/UI | ⬜ pending |
-| [F3-13](stories/phase-3/⬜-F3-13-dev-mode.md) | Mode développeur — toggle affichage de l'article cible | Could | Frontend Dev | ⬜ pending |
+| [F3-13](stories/phase-3/🔄-F3-13-dev-mode.md) | Mode développeur — toggle affichage de l'article cible | Could | Frontend Dev | 🔄 in-progress |
 | [F3-14](stories/phase-3/⬜-F3-14-contact-feedback.md) | Formulaire de feedback in-app (ContactScreen) | Could | Frontend Dev, UX/UI, DPO, Backend Dev | ⬜ pending |
 | [F3-15](stories/phase-3/⬜-F3-15-firebase-analytics.md) | Firebase Analytics — intégration skeleton (événements de base) | Could | Frontend Dev, DPO | ⬜ pending |
 
@@ -171,4 +171,6 @@
 *v2.7 : Wave 4 clôturée — M-01, M-06 validées QA et passées en done (2026-03-02). MVP Phase 2 Must complet.*
 *v2.8 : M-18 créée — gate bloquant validation happy path device physique (2026-03-03)*
 *v2.9 : Sprint Phase 3 démarré — F3-02 et F3-04 passées en in-progress (2026-03-06)*
+*v3.0 : Vagues 1 et 3 activées — F3-01, F3-03, F3-05, F3-06, F3-13 passées en in-progress (2026-03-08)*
+*v3.1 : F3-04 done — page donation Wikipedia validée QA (2026-03-09)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*

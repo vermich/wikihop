@@ -26,6 +26,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Article, GameSession } from '@wikihop/shared';
 import { create } from 'zustand';
 
+import * as ScoreStorage from '../services/score-storage.service';
+import { buildGameRecord } from '../utils/history.utils';
+
 /**
  * Génère un UUID v4 conforme RFC 4122 sans dépendance sur l'API Web Crypto.
  *
@@ -215,6 +218,13 @@ export const useGameStore = create<GameSessionSlice>()((set, get) => ({
 
     set({ currentSession: updatedSession });
     await persistSession(updatedSession);
+
+    // Historique best-effort : fire-and-forget intentionnel (void).
+    // Une erreur AsyncStorage ne doit jamais bloquer la navigation vers VictoryScreen.
+    const record = buildGameRecord(updatedSession);
+    if (record !== null) {
+      void ScoreStorage.save(record);
+    }
   },
 
   abandonSession: async (): Promise<void> => {
@@ -232,6 +242,13 @@ export const useGameStore = create<GameSessionSlice>()((set, get) => ({
 
     set({ currentSession: updatedSession });
     await persistSession(updatedSession);
+
+    // Historique best-effort : fire-and-forget intentionnel (void).
+    // Une erreur AsyncStorage ne doit jamais bloquer le retour à HomeScreen.
+    const record = buildGameRecord(updatedSession);
+    if (record !== null) {
+      void ScoreStorage.save(record);
+    }
   },
 
   restoreSession: (session: GameSession): void => {

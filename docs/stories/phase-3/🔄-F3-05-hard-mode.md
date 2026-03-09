@@ -4,7 +4,7 @@ title: Mode difficile (articles sans liens évidents)
 phase: 3-Features
 priority: Should
 agents: [Backend Dev, Frontend Dev, UX/UI]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---
@@ -315,6 +315,209 @@ difficulty: parsed.difficulty ?? 'normal'
 4. **Badge dans ArticleScreen** : consulter le `GameHUD` existant avant de modifier le header — ne pas casser le layout sur petits écrans.
 5. **F3-01 et F3-05 en parallèle** : si Laurent travaille les deux features simultanément, la signature `startSession(options)` doit être définie une seule fois avec tous les champs optionnels. Éviter deux PRs qui modifient la même signature — coordonner avec l'orchestrateur.
 6. **`noUncheckedIndexedAccess`** : `articles.slice(startIdx)` est sûr (retourne [] si startIdx >= length). Le caller doit vérifier `pool.length >= 2` avant `pickTwoDistinctIndices`.
+
+## Spécifications visuelles — Benjamin (UX/UI)
+
+---
+
+## Écran : Toggle "Mode difficile" — HomeScreen
+
+### Objectif
+Permettre au joueur d'activer ou désactiver le mode difficile depuis l'accueil, avec un retour visuel immédiat avant de démarrer la partie.
+
+### Layout (ASCII)
+
+```
+┌─────────────────────────────────────┐
+│  [ArticleCard départ]               │  (ScrollView)
+│            ↓                        │
+│  [ArticleCard destination]          │
+│                                     │
+│ ┌─────────────────────────────────┐ │  buttonsContainer — marginTop:24
+│ │  📅  Défi du jour — 8 mars      │ │  ← F3-01 (si présent) h:52pt fond #D97706
+│ └─────────────────────────────────┘ │    marginBottom:12
+│ ┌─────────────────────────────────┐ │
+│ │           Jouer                 │ │  ← h:52pt fond #2563EB (inchangé)
+│ └─────────────────────────────────┘ │
+│                                     │
+│        ↺  Nouveaux articles         │  ← h:44pt marginTop:12
+│                                     │
+│ ┌─────────────────────────────────┐ │  ← DifficultyToggleRow — minHeight:44pt
+│ │  Mode difficile    [  ●  ]      │ │    marginTop:8  fond transparent
+│ └─────────────────────────────────┘ │    Label gauche · Switch droit
+│        Historique                   │  ← h:44pt secondaryTextButton
+│     Soutenir Wikipedia              │  ← h:44pt secondaryTextButton
+│          À propos                   │  ← h:44pt secondaryTextButton (F3-06)
+└─────────────────────────────────────┘
+```
+
+### Composants
+
+- **DifficultyToggleRow** — `View` `flexDirection: 'row'` `alignItems: 'center'` `justifyContent: 'space-between'`, `minHeight: 44`, `paddingHorizontal: 16`, `marginTop: 8`. Fond transparent.
+  - Gauche : `Text` Regular 16px `#1E293B` libellé `"Mode difficile"`.
+  - Droite : `Switch` RN natif.
+    - ON : `trackColor={{ false: '#E2E8F0', true: '#FECACA' }}`, thumb iOS blanc natif, Android `thumbColor={{ false: '#FFFFFF', true: '#EF4444' }}`.
+    - OFF : fond de piste `#E2E8F0`, thumb blanc — état par défaut.
+  - Zone tactile : la `View` entière fait `minHeight: 44` — le `Switch` natif occupe la droite et sa zone de tap est >= 44×44pt.
+
+### États
+
+- **Default (OFF)** : label `#1E293B`, Switch piste `#E2E8F0`. Bouton "Jouer" bleu `#2563EB` — partie normale.
+- **Activé (ON)** : label `#1E293B` (inchangé), Switch piste `#FECACA` (rose pâle), thumb `#EF4444` Android. Bouton "Jouer" inchangé visuellement.
+- **Loading** : `DifficultyToggleRow` présente et fonctionnelle pendant le chargement des articles. Le toggle n'est pas désactivé.
+- **Error** : l'état erreur de `renderContent()` ne montre pas `buttonsContainer` — le toggle n'est pas visible.
+- **Empty** : non applicable.
+
+### Accessibilité
+
+- [ ] `accessibilityLabel` sur le `Switch` : dynamique — `"Mode difficile activé"` ou `"Mode difficile désactivé"` selon l'état
+- [ ] `accessibilityRole` : le `Switch` RN natif expose `role="switch"` automatiquement — ne pas surcharger
+- [ ] `accessibilityState={{ checked: isDifficultyHard }}` sur le `Switch`
+- [ ] Contraste label `#1E293B` sur fond blanc `#FFFFFF` : 16.1:1 — très conforme
+- [ ] Zone tactile : `minHeight: 44` sur `DifficultyToggleRow` — conforme
+- [ ] L'information "mode difficile actif" n'est pas transmise uniquement par la couleur : le `Switch` est visuel ON et son `accessibilityLabel` l'annonce
+- [ ] Ordre VoiceOver : DifficultyToggleRow lu après "Nouveaux articles", avant "Historique"
+- [ ] Animations du `Switch` respectent `reduceMotion` : géré nativement par RN
+
+### Notes pour Laurent
+
+- Styles dédiés : `difficultyToggleRow`, `difficultyToggleLabel`. Ne pas réutiliser `secondaryTextButton`.
+- Le `DifficultyToggleRow` apparaît dans les **deux branches** de `renderContent()` affichant `buttonsContainer` (loading et success). Même règle que le bouton "À propos" (F3-06).
+- La couleur de piste ON `#FECACA` est associée à `true` dans `trackColor={{ false: '#E2E8F0', true: '#FECACA' }}` — les clés correspondent à l'état du Switch (false = OFF, true = ON).
+
+---
+
+## Écran : Badge "Mode difficile" — VictoryScreen
+
+### Objectif
+Signaler que la partie terminée était jouée en mode difficile, pour valoriser l'accomplissement du joueur.
+
+### Layout (ASCII)
+
+```
+┌─────────────────────────────────────┐
+│  [Header "Victoire !" #16A34A]      │  [FIXED h:64pt]
+├─────────────────────────────────────┤
+│                                     │  [SCROLL]
+│ ┌─────────────────────────────────┐ │  statsBlock (Animated.View)
+│ │  ┌─────────────────────────┐   │ │  Badge quotidien (F3-01) si isDailyChallenge
+│ │  │  📅  Défi du jour ...   │   │ │    fond #FEF3C7  marginBottom:8
+│ │  └─────────────────────────┘   │ │
+│ │  ┌─────────────────────────┐   │ │  ← NOUVEAU HardModeBadge
+│ │  │  Mode difficile         │   │ │    fond #FEE2E2  texte #991B1B Bold 13px
+│ │  └─────────────────────────┘   │ │    borderRadius:8  alignSelf:center
+│ │                                 │ │    marginBottom:12
+│ │  ✓  Félicitations !             │ │  ← congratsRow existant
+│ │   [N sauts]  |  [durée]         │ │
+│ │  [Départ  →  Destination]       │ │
+│ └─────────────────────────────────┘ │
+│  [Chemin parcouru ...]              │
+└─────────────────────────────────────┘
+│  [Nouvelle partie]  [Rejouer]       │  [FIXED stickyButtons]
+└─────────────────────────────────────┘
+```
+
+### Composants
+
+- **HardModeBadge** — `View` pill, `borderRadius: 8`, `paddingHorizontal: 12`, `paddingVertical: 4`, fond `#FEE2E2`, `alignSelf: 'center'`, `marginBottom: 12`.
+  - Texte : `"Mode difficile"`. Font : Bold 13px. Couleur : `#991B1B`.
+  - Conditionnel : `currentSession?.difficulty === 'hard'`.
+  - Pas de bordure. Pas d'icône — le texte seul est suffisant.
+  - Géométrie identique au `DailyChallengeBadge` (F3-01) — créer un composant `BadgePill` réutilisable si les deux features sont dans la même PR.
+
+### Ordre des badges dans le bloc stats (F3-01 + F3-05 combinés)
+
+```
+Animated.View (statsBlock)
+├── DailyChallengeBadge   fond #FEF3C7  marginBottom:8   si isDailyChallenge
+├── HardModeBadge         fond #FEE2E2  marginBottom:12  si difficulty === 'hard'
+├── congratsRow  (✓ Félicitations !)
+├── statsRow     (sauts | durée)
+└── pathSummary  (Départ → Destination)
+```
+
+### États
+
+- **Affiché** : `difficulty === 'hard'` — badge visible.
+- **Masqué** : `difficulty` absent ou `'normal'` — rien rendu, aucun espace vide.
+
+### Accessibilité
+
+- [ ] `accessibilityLabel` sur le `View` badge : `"Partie jouée en mode difficile"`
+- [ ] `accessible={true}` sur la `View` badge, enfants `accessible={false}` (éviter double lecture)
+- [ ] Pas de role interactif — élément informatif uniquement
+- [ ] Contraste `#991B1B` sur `#FEE2E2` : ratio 5.9:1 — conforme WCAG AA pour texte 13px Bold
+- [ ] L'information n'est pas transmise uniquement par la couleur : le texte "Mode difficile" est toujours présent
+- [ ] Ordre VoiceOver : badge lu après `DailyChallengeBadge` (si présent) et avant `congratsRow`
+
+### Notes pour Laurent
+
+- Si `difficulty === 'hard'` et `isDailyChallenge === true`, les deux badges sont affichés en séquence (quotidien en premier, difficile en second).
+- Si aucun badge n'est actif, `congratsRow` est le premier enfant — rendu identique à l'existant avant ces features.
+
+---
+
+## Composant : Indicateur "Mode difficile" — GameHUD (ArticleScreen)
+
+### Objectif
+Rappeler discrètement au joueur qu'il est en mode difficile pendant toute la durée de la partie, sans perturber la lisibilité du HUD.
+
+### Layout (ASCII)
+
+Mode normal — rendu inchangé :
+```
+┌──────────────────────────────────────────────────┐ h:40pt fond #F8FAFC
+│  ↗ N sauts  │  ⏱ mm:ss  │  → Cible : titre      │
+└──────────────────────────────────────────────────┘
+```
+
+Mode difficile — pill compacte à gauche :
+```
+┌──────────────────────────────────────────────────┐ h:40pt fond #F8FAFC
+│ [DIFF] │  ↗ N sauts  │  ⏱ mm:ss  │  → Cible :   │
+└──────────────────────────────────────────────────┘
+```
+
+### Composants
+
+- **HardModeIndicator** dans `GameHUD` — pill compacte en premier dans le `container`, avant le bloc sauts.
+  - Visible uniquement si prop `isHardMode === true`.
+  - Contenu texte : `"DIFF"` (intentionnellement court pour préserver `targetBlock flex:1`).
+  - Style : fond `#FEE2E2`, `borderRadius: 4`, `paddingHorizontal: 6`, `paddingVertical: 2`, `marginLeft: 8`.
+  - Texte : Bold 10px, couleur `#991B1B`.
+  - Hauteur de la pill ~20pt — centré verticalement dans les 40pt du container via `alignItems: 'center'` déjà sur le container.
+  - Séparateur vertical `#E2E8F0` entre la pill et le bloc sauts (cohérence avec les séparateurs existants).
+
+### Modification de la prop GameHUD
+
+```
+GameHUDProps avant : { jumps: number; targetTitle: string }
+GameHUDProps après : { jumps: number; targetTitle: string; isHardMode?: boolean }
+```
+
+La prop est optionnelle — rétrocompatibilité garantie, aucun appel existant à modifier.
+
+Dans `ArticleScreen`, l'appel devient :
+`<GameHUD jumps={jumps} targetTitle={targetTitle} isHardMode={currentSession?.difficulty === 'hard'} />`
+
+### États
+
+- **isHardMode false / undefined** : aucun élément supplémentaire — rendu HUD strictement identique à l'existant.
+- **isHardMode true** : pill `[DIFF]` visible à gauche. Fond HUD `#F8FAFC` inchangé.
+
+### Accessibilité
+
+- [ ] `containerAccessibilityLabel` mis à jour quand `isHardMode === true` : préfixer avec `"Mode difficile. "` — ex : `"Mode difficile. Progression : 3 sauts, 1 minute 20 secondes écoulés, cible Darwin"`
+- [ ] La pill `[DIFF]` est `accessible={false}` — l'information est portée par le label du conteneur
+- [ ] L'information "mode difficile" n'est pas transmise uniquement par la couleur : le texte "DIFF" est visible dans la pill
+- [ ] Contraste `#991B1B` sur `#FEE2E2` : ratio 5.9:1 — conforme
+
+### Notes pour Laurent
+
+- Alternative si la pill "DIFF" compresse trop le `targetBlock` sur petits écrans (320pt) : un cercle plein `●` de 8pt de diamètre couleur `#EF4444` sans texte visible. Dans ce cas, l'accessibilité repose entièrement sur le `containerAccessibilityLabel` mis à jour.
+- Mettre à jour `containerAccessibilityLabel` dans le composant `GameHUD` pour intégrer conditionnellement le préfixe "Mode difficile."
+
+---
 
 ## Validation QA — Halim
 <!-- Rempli par QA après les tests -->
