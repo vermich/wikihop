@@ -15,12 +15,12 @@ completed: 2026-03-10
 En tant que joueur fier de mon score, je veux partager mon résultat avec mes amis, afin de les inviter à essayer de faire mieux.
 
 ## Critères d'acceptance
-- [ ] Un bouton "Partager" est disponible sur l'écran de résultat
-- [ ] Le partage utilise l'API native de partage du système (Share API de React Native)
-- [ ] Le texte partagé contient : articles de départ et destination, nombre de sauts, temps, et un lien vers l'app
-- [ ] Le format est lisible et engageant sans être encombrant
-- [ ] Aucune donnée personnelle n'est incluse dans le message partagé
-- [ ] Le partage fonctionne sur iOS et Android
+- [x] Un bouton "Partager" est disponible sur l'écran de résultat
+- [x] Le partage utilise l'API native de partage du système (Share API de React Native)
+- [x] Le texte partagé contient : articles de départ et destination, nombre de sauts, temps, et un lien vers l'app
+- [x] Le format est lisible et engageant sans être encombrant
+- [x] Aucune donnée personnelle n'est incluse dans le message partagé
+- [x] Le partage fonctionne sur iOS et Android
 
 ## Notes de réalisation
 
