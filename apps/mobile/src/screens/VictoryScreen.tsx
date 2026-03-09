@@ -343,6 +343,14 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
             <Text style={styles.replayButtonText}>{'Rejouer'}</Text>
           </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          style={styles.historyButton}
+          onPress={() => { navigation.navigate('History'); }}
+          accessibilityLabel="Voir l'historique de mes parties"
+          accessibilityRole="button"
+        >
+          <Text style={styles.historyButtonText}>{"Voir l'historique"}</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -551,5 +559,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#2563EB',
+  },
+  historyButton: {
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  historyButtonText: {
+    fontSize: 16,
+    color: '#64748B',
   },
 });
