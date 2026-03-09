@@ -25,6 +25,9 @@ Les deux candidats principaux sont :
 | `@wikihop/game_session` | `GameSession \| null` (JSON) | Aucun | Session en cours ou dernière session abandonnée |
 | `@wikihop/popular_pages` | `{ data: Article[], fetchedAt: string }` (JSON ISO 8601) | 24 h | Cache du endpoint `/popular-pages`, invalidé si `fetchedAt + 24h < now` |
 | `@wikihop/language` | `'fr' \| 'en'` (JSON) | Aucun | Préférence de langue persistée |
+| `@wikihop/game_history` | `GameRecord[]` (JSON, max 50 entrées) | Aucun | Historique local des parties terminées (F3-02) — insertion en tête, troncature à 50 |
+| `@wikihop/dev_mode` | `boolean` (JSON) | Aucun | Préférence mode développeur — uniquement chargée si `__DEV__ === true` (F3-13) |
+| `@wikihop/difficulty_preference` | `'normal' \| 'hard'` (JSON) | Aucun | Préférence mode difficile — rechargée au démarrage, valeur par défaut `'normal'` (F3-05) |
 
 Convention des clés : préfixe `@wikihop/` suivi d'un identifiant en `snake_case`.
 
