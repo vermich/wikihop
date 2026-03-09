@@ -507,4 +507,108 @@ describe('GET /api/game/random-pair', () => {
 
     expect(response.headers['content-type']).toMatch(/application\/json/);
   });
+
+  // ─────────────────────────────────────────────
+  // Mode difficile (F3-05)
+  // ─────────────────────────────────────────────
+
+  it("retourne 200 avec difficulty=hard et deux articles distincts", async () => {
+    // Pool de 10 articles → getHardModePool → Math.floor(10/3)=3, début à l'indice 7
+    // Pool hard : articles[7], articles[8], articles[9] = Max Planck, Ada Lovelace, Alan Turing
+    mockPopularPagesFr();
+
+    fetchSpy
+      .mockResolvedValueOnce(
+        new Response(
+          buildWikipediaSummary({ pageid: 8, title: 'Ada Lovelace' }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          buildWikipediaSummary({ pageid: 9, title: 'Alan Turing' }),
+          { status: 200 },
+        ),
+      );
+
+    const response = await supertest(app.server).get('/api/game/random-pair?lang=fr&difficulty=hard');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('start');
+    expect(response.body).toHaveProperty('target');
+    const { start, target } = response.body as {
+      start: Record<string, unknown>;
+      target: Record<string, unknown>;
+    };
+    expect(start['title']).not.toBe(target['title']);
+  });
+
+  it("retourne 200 avec difficulty=normal (comportement existant non-régressif)", async () => {
+    mockPopularPagesFr();
+
+    fetchSpy
+      .mockResolvedValueOnce(
+        new Response(
+          buildWikipediaSummary({ pageid: 1, title: 'Albert Einstein' }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          buildWikipediaSummary({ pageid: 2, title: 'Marie Curie' }),
+          { status: 200 },
+        ),
+      );
+
+    const response = await supertest(app.server).get('/api/game/random-pair?lang=fr&difficulty=normal');
+
+    expect(response.status).toBe(200);
+  });
+
+  it("retourne 200 sans paramètre difficulty (défaut normal)", async () => {
+    mockPopularPagesFr();
+
+    fetchSpy
+      .mockResolvedValueOnce(
+        new Response(
+          buildWikipediaSummary({ pageid: 1, title: 'Albert Einstein' }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          buildWikipediaSummary({ pageid: 2, title: 'Marie Curie' }),
+          { status: 200 },
+        ),
+      );
+
+    const response = await supertest(app.server).get('/api/game/random-pair?lang=fr');
+
+    expect(response.status).toBe(200);
+  });
+
+  it("retourne 400 pour difficulty invalide (extreme)", async () => {
+    const response = await supertest(app.server).get('/api/game/random-pair?lang=fr&difficulty=extreme');
+
+    expect(response.status).toBe(400);
+  });
+
+  it("retourne 503 avec code hard_pool_insufficient si le pool hard est trop petit", async () => {
+    // Pool de 2 articles → Math.floor(2/3) = 0 thirdSize < 2 → retourne []
+    mockGetPopularPages.mockResolvedValue({
+      articles: ['Article A', 'Article B'],
+      language: 'fr',
+      source: 'fallback',
+    });
+
+    const response = await supertest(app.server).get('/api/game/random-pair?lang=fr&difficulty=hard');
+
+    expect(response.status).toBe(503);
+    expect(response.body).toMatchObject({
+      success: false,
+      error: {
+        code: 'hard_pool_insufficient',
+      },
+    });
+  });
 });
