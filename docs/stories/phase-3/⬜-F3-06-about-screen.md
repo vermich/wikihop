@@ -190,6 +190,96 @@ Ce bouton doit apparaître dans **les deux branches** de `renderContent()` qui a
 - **`Linking.openURL` ne retourne pas d'erreur fiable** sur toutes les plateformes si l'URL est invalide — le `void` est intentionnel, pas de `.catch()` nécessaire pour les URLs statiques connues.
 - **Double occurrence du bouton** : la fonction `renderContent()` dans HomeScreen contient deux blocs de boutons (états `loading` et `success`). Les deux doivent inclure le bouton "À propos" pour cohérence visuelle.
 
+## Validation DPO — Maïté — 2026-03-08
+
+### Avis RGPD — F3-06 Écran "À propos"
+
+**Statut : Conforme — aucun consentement requis**
+
+---
+
+### Analyse
+
+**1. Données identifiées**
+
+Aucune donnée personnelle n'est collectée, lue, modifiée ou supprimée par cet écran. Il s'agit d'un composant purement déclaratif qui affiche du texte statique et lit une constante de build (`Constants.expoConfig?.version`). Cette constante est une donnée technique de l'application, non une donnée personnelle au sens du RGPD.
+
+**2. Base légale**
+
+Sans objet — aucun traitement de données personnelles.
+
+**3. Durée de conservation**
+
+Sans objet.
+
+**4. Minimisation des données**
+
+Le principe est respecté par nature : l'écran n'interroge aucune API externe, ne consigne rien, ne génère aucun log applicatif propre.
+
+**5. Droits des utilisateurs**
+
+L'écran contribue positivement à la transparence (article 13 RGPD) en exposant la politique de confidentialité via un lien dédié. C'est une bonne pratique.
+
+**6. Sous-traitants**
+
+Les liens externes (`mediawiki.org`, `github.com`, `wikihop.app/privacy`) sont ouverts par le système d'exploitation de l'appareil via `Linking.openURL`. WikiHop ne transmet aucune donnée à ces tiers à l'occasion de l'ouverture du lien depuis l'écran.
+
+**7. Mention Wikipedia**
+
+L'API MediaWiki est une API publique sous licence ouverte. La mention d'usage ne constitue pas un traitement de données personnelles. La formulation proposée ci-dessous est claire, honnête et non trompeuse quant à l'absence d'affiliation officielle.
+
+---
+
+### Texte approuvé pour l'écran "À propos"
+
+Les éléments ci-dessous sont les textes définitifs à intégrer tels quels dans `AboutScreen.tsx`.
+
+**Description du jeu (section principale)**
+
+> WikiHop est un jeu de navigation : partez d'un article Wikipedia et rejoignez l'article destination en cliquant uniquement sur les liens internes. Combien de sauts vous faudra-t-il ?
+
+**Section "Sources" — texte + libellé du lien**
+
+Texte : `Ce jeu utilise l'API Wikipedia (contenu sous licence CC BY-SA 4.0). WikiHop n'est pas affilié à la Wikimedia Foundation.`
+
+Libellé du lien : `Conditions d'utilisation de l'API MediaWiki`
+
+URL : `https://www.mediawiki.org/wiki/API:Main_page`
+
+**Section "Légal" — libellé du lien**
+
+Libellé du lien : `Politique de confidentialité`
+
+URL : `https://wikihop.app/privacy` (placeholder — à remplacer par l'URL réelle avant publication sur les stores)
+
+**Section "Code source" — libellé du lien**
+
+Libellé du lien : `Code source sur GitHub`
+
+URL : `https://github.com/wikihop/wikihop` (placeholder)
+
+---
+
+### Points de vigilance pour les évolutions futures
+
+- Si un système de compte utilisateur est ajouté, l'écran "À propos" devra être mis à jour pour référencer les droits exercables (accès, suppression) et un contact DPO réel.
+- L'URL `https://wikihop.app/privacy` doit pointer vers la politique de confidentialité publiée avant toute soumission aux stores. Informer Maïté quand l'URL est réelle pour validation finale.
+- La mention CC BY-SA 4.0 est correcte pour le contenu Wikipedia. Ne pas omettre le numéro de version de la licence.
+
+---
+
+### Conclusion
+
+L'écran "À propos" dans sa version décrite par la story F3-06 est conforme au RGPD sans restriction. Aucun consentement n'est requis. Aucun registre de traitement ne nécessite de mise à jour pour cet écran.
+
+Le critère d'acceptance "Validé par le DPO pour la conformité RGPD" est coché.
+
+**Maïté — DPO WikiHop — 2026-03-08**
+
+- [x] Validé par le DPO pour la conformité RGPD
+
+---
+
 ## Validation QA — Halim
 <!-- Rempli par QA après les tests -->
 
