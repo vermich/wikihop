@@ -74,7 +74,6 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
   const addJump = useGameStore((state) => state.addJump);
   const completeSession = useGameStore((state) => state.completeSession);
   const abandonSession = useGameStore((state) => state.abandonSession);
-  const isDevMode = useGameStore((state) => state.isDevMode);
 
   const jumps = currentSession?.jumps ?? 0;
   const targetTitle = currentSession?.targetArticle.title ?? '';
@@ -234,15 +233,6 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
         </View>
       </SafeAreaView>
 
-      {/* Bandeau mode développeur — visible uniquement en dev et si isDevMode */}
-      {__DEV__ && isDevMode && currentSession !== null && (
-        <View style={styles.devBanner}>
-          <Text style={styles.devBannerText} numberOfLines={1}>
-            {`CIBLE : ${currentSession.targetArticle.title}`}
-          </Text>
-        </View>
-      )}
-
       {/* HUD fixe */}
       <GameHUD
         jumps={jumps}
@@ -373,18 +363,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#FFFFFF',
-  },
-  devBanner: {
-    backgroundColor: '#FEF9C3',
-    borderBottomWidth: 1,
-    borderBottomColor: '#FDE047',
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-  },
-  devBannerText: {
-    fontSize: 12,
-    color: '#92400E',
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
   },
 });
