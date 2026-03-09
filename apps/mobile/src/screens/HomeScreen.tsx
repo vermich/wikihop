@@ -45,8 +45,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useDailyChallenge } from '../hooks/useDailyChallenge';
 import { useRandomPair } from '../hooks/useRandomPair';
 import type { RootStackParamList } from '../navigation/RootNavigator';
+import * as DifficultyStorage from '../services/difficulty-storage.service';
 import { useGameStore } from '../store/game.store';
 import { useLanguageStore } from '../store/language.store';
 
@@ -142,7 +144,22 @@ function SkeletonCard({ shimmerAnim }: SkeletonCardProps): React.JSX.Element {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
-  const { state, refresh } = useRandomPair();
+  // ── État mode difficile (F3-05) — état local, non persisté dans le store ──
+  const [isDifficultyHard, setIsDifficultyHard] = useState(false);
+
+  // ── Lecture préférence difficulté au montage ──────────────────────────────
+  // Intentionnellement limité à [] — lecture unique au montage
+  useEffect(() => {
+    void DifficultyStorage.getDifficultyPreference().then((pref) => {
+      setIsDifficultyHard(pref === 'hard');
+    });
+  // Lecture unique au montage — pas de dep nécessaire
+  }, []);
+
+  const { state, refresh } = useRandomPair(isDifficultyHard ? 'hard' : 'normal');
+
+  // ── Défi quotidien (F3-01) ───────────────────────────────────────────────
+  const { state: dailyChallengeState } = useDailyChallenge();
 
   const language = useLanguageStore((state) => state.language);
   const setLanguage = useLanguageStore((state) => state.setLanguage);
@@ -253,6 +270,51 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
   // Intentionnellement limité à [isHydrated] pour ne déclencher le dialog qu'une seule fois au montage
   }, [isHydrated]);
 
+  // ── handleDifficultyToggle : bascule mode difficile et persiste ─────────
+  const handleDifficultyToggle = useCallback((value: boolean): void => {
+    setIsDifficultyHard(value);
+    void DifficultyStorage.setDifficultyPreference(value ? 'hard' : 'normal');
+    // refresh() appelé après setIsDifficultyHard — React batche les setState
+    // donc useRandomPair reçoit la nouvelle valeur au prochain render
+    refresh();
+  }, [refresh]);
+
+  // ── handlePlayDaily : démarre le défi quotidien ──────────────────────────
+  const handlePlayDaily = useCallback(async (): Promise<void> => {
+    if (dailyChallengeState.status !== 'success') return;
+    const { data } = dailyChallengeState;
+
+    try {
+      await clearSession();
+
+      // Construction explicite Article depuis ArticleSummary
+      // (extract et thumbnailUrl ne font pas partie du type Article)
+      const startArticle = {
+        id: data.start.id,
+        title: data.start.title,
+        url: data.start.url,
+        language: data.start.language,
+      };
+      const targetArticle = {
+        id: data.target.id,
+        title: data.target.title,
+        url: data.target.url,
+        language: data.target.language,
+      };
+
+      await startSession(startArticle, targetArticle, {
+        isDailyChallenge: true,
+        dailyChallengeDate: data.date,
+      });
+
+      navigation.navigate('Game', { articleTitle: startArticle.title });
+    } catch (e: unknown) {
+      // eslint-disable-next-line no-console
+      console.error('[HomeScreen] handlePlayDaily — erreur inattendue :', e);
+      Alert.alert('Indisponible', 'Le défi du jour est momentanément indisponible.');
+    }
+  }, [dailyChallengeState, clearSession, startSession, navigation]);
+
   // ── handlePlay : démarre la partie ──────────────────────────────────────
   const handlePlay = useCallback(async (): Promise<void> => {
     if (state.status !== 'success') return;
@@ -276,7 +338,9 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
         language: state.target.language,
       };
 
-      await startSession(startArticle, targetArticle);
+      await startSession(startArticle, targetArticle, {
+        difficulty: isDifficultyHard ? 'hard' : 'normal',
+      });
 
       // Home est la racine du stack — navigate (pas push)
       navigation.navigate('Game', { articleTitle: startArticle.title });
@@ -288,7 +352,7 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
         'Impossible de démarrer la partie. Réessayez.',
       );
     }
-  }, [state, clearSession, startSession, navigation]);
+  }, [state, clearSession, startSession, navigation, isDifficultyHard]);
 
   // ── Calcul de la rotation ────────────────────────────────────────────────
   const rotateInterpolated = rotateAnim.interpolate({
@@ -312,6 +376,21 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
           </View>
           <SkeletonCard shimmerAnim={shimmerAnim} />
           <View style={styles.buttonsContainer}>
+            {/* Bouton Défi du jour (F3-01) — au-dessus du bouton Jouer */}
+            <TouchableOpacity
+              style={[
+                styles.dailyButton,
+                dailyChallengeState.status !== 'success' && styles.dailyButtonDisabled,
+              ]}
+              disabled={true}
+              accessibilityLabel="Défi du jour"
+              accessibilityRole="button"
+              accessibilityState={{ disabled: true }}
+            >
+              <Text style={[styles.dailyButtonText, dailyChallengeState.status !== 'success' && styles.dailyButtonTextDisabled]}>
+                {'Défi du jour'}
+              </Text>
+            </TouchableOpacity>
             <TouchableOpacity
               style={[styles.playButton, styles.playButtonDisabled]}
               disabled={true}
@@ -337,6 +416,18 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
                 </Animated.Text>
               </Animated.View>
             </TouchableOpacity>
+            {/* Toggle Mode difficile (F3-05) — visible même en loading */}
+            <View style={styles.difficultyToggleRow}>
+              <Text style={styles.difficultyToggleLabel}>{'Mode difficile'}</Text>
+              <Switch
+                value={isDifficultyHard}
+                onValueChange={handleDifficultyToggle}
+                accessibilityLabel={isDifficultyHard ? 'Mode difficile activé' : 'Mode difficile désactivé'}
+                accessibilityState={{ checked: isDifficultyHard }}
+                trackColor={{ false: '#E2E8F0', true: '#FECACA' }}
+                thumbColor={isDifficultyHard ? '#EF4444' : '#FFFFFF'}
+              />
+            </View>
             <TouchableOpacity
               style={styles.secondaryTextButton}
               onPress={() => { navigation.navigate('History'); }}
@@ -419,6 +510,25 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
           {...(state.target.thumbnailUrl !== undefined ? { thumbnailUrl: state.target.thumbnailUrl } : {})}
         />
         <View style={styles.buttonsContainer}>
+          {/* Bouton Défi du jour (F3-01) — au-dessus du bouton Jouer */}
+          <TouchableOpacity
+            style={[
+              styles.dailyButton,
+              dailyChallengeState.status !== 'success' && styles.dailyButtonDisabled,
+            ]}
+            onPress={() => { void handlePlayDaily(); }}
+            disabled={dailyChallengeState.status !== 'success'}
+            accessibilityLabel="Défi du jour"
+            accessibilityRole="button"
+            accessibilityState={{ disabled: dailyChallengeState.status !== 'success' }}
+          >
+            <Text style={[
+              styles.dailyButtonText,
+              dailyChallengeState.status !== 'success' && styles.dailyButtonTextDisabled,
+            ]}>
+              {'Défi du jour'}
+            </Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.playButton}
             onPress={() => { void handlePlay(); }}
@@ -439,6 +549,18 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
               <Text style={styles.refreshIcon}>{'↺'}</Text>
             </View>
           </TouchableOpacity>
+          {/* Toggle Mode difficile (F3-05) — visible en loading et en success */}
+          <View style={styles.difficultyToggleRow}>
+            <Text style={styles.difficultyToggleLabel}>{'Mode difficile'}</Text>
+            <Switch
+              value={isDifficultyHard}
+              onValueChange={handleDifficultyToggle}
+              accessibilityLabel={isDifficultyHard ? 'Mode difficile activé' : 'Mode difficile désactivé'}
+              accessibilityState={{ checked: isDifficultyHard }}
+              trackColor={{ false: '#E2E8F0', true: '#FECACA' }}
+              thumbColor={isDifficultyHard ? '#EF4444' : '#FFFFFF'}
+            />
+          </View>
           <TouchableOpacity
             style={styles.secondaryTextButton}
             onPress={() => { navigation.navigate('History'); }}
@@ -602,6 +724,39 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     marginTop: 24,
+  },
+  // Bouton Défi du jour (F3-01) — fond ambre #D97706, au-dessus du bouton Jouer
+  dailyButton: {
+    height: 52,
+    backgroundColor: '#D97706',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  dailyButtonDisabled: {
+    backgroundColor: '#E2E8F0',
+  },
+  dailyButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  dailyButtonTextDisabled: {
+    color: '#94A3B8',
+  },
+  // Toggle Mode difficile (F3-05)
+  difficultyToggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: 44,
+    paddingHorizontal: 16,
+    marginTop: 8,
+  },
+  difficultyToggleLabel: {
+    fontSize: 16,
+    color: '#1E293B',
   },
   playButton: {
     height: 52,

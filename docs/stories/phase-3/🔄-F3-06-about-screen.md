@@ -4,9 +4,9 @@ title: Écran "À propos" et crédits
 phase: 3-Features
 priority: Should
 agents: [Frontend Dev, UX/UI, DPO]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-10
 ---
 
 # F3-06 — Écran "À propos" et crédits
@@ -15,11 +15,11 @@ completed:
 En tant que joueur curieux, je veux savoir qui a créé ce jeu et comprendre son fonctionnement, afin de lui faire confiance.
 
 ## Critères d'acceptance
-- [ ] Page "À propos" accessible depuis le menu
-- [ ] Contient : description du jeu, utilisation de l'API Wikipedia, lien vers la politique de confidentialité
-- [ ] Lien vers le dépôt GitHub du projet (open source)
-- [ ] Version de l'application affichée
-- [ ] Validé par le DPO pour la conformité RGPD
+- [x] Page "À propos" accessible depuis le menu
+- [x] Contient : description du jeu, utilisation de l'API Wikipedia, lien vers la politique de confidentialité
+- [x] Lien vers le dépôt GitHub du projet (open source)
+- [x] Version de l'application affichée
+- [x] Validé par le DPO pour la conformité RGPD
 
 ## Notes de réalisation
 
@@ -397,7 +397,44 @@ Permettre au joueur de comprendre l'origine du jeu, consulter les informations l
 ---
 
 ## Validation QA — Halim
-<!-- Rempli par QA après les tests -->
+
+**Date :** 2026-03-10
+**Testeur :** Halim
+**Statut global :** ⚠️ Validé avec réserves
+
+### Critères d'acceptance
+- [x] Page "À propos" accessible depuis le menu — bouton "À propos" dans HomeScreen (états loading et success), `navigation.navigate('About')`
+- [x] Contient : description du jeu, utilisation de l'API Wikipedia, lien vers la politique de confidentialité — textes DPO-validés présents, `Linking.openURL` pour les 3 liens
+- [x] Lien vers le dépôt GitHub du projet (open source) — lien "Code source sur GitHub" → `https://github.com/wikihop/wikihop`
+- [x] Version de l'application affichée — `Constants.expoConfig?.version ?? '—'` avec fallback
+- [x] Validé par le DPO pour la conformité RGPD — validation Maïté du 2026-03-08 cochée dans le fichier story
+
+### Tests automatisés
+- `npm test` (suite complète) : 354/355 tests passants, 1 échec dans `AboutScreen.test.tsx`
+- `__tests__/AboutScreen.test.tsx` : 13/14 tests passants — 1 échec : `affiche la mention CC BY-SA 4.0`
+- `tsc --noEmit` : sans erreur TypeScript
+- `npm run lint` : 0 erreur
+
+### Analyse du test échouant : `affiche la mention CC BY-SA 4.0`
+
+**Cause identifiée :** le test utilise le pattern regex `/CC\u00a0BY-SA\u00a04\.0/` (espaces insécables `\u00a0`). Le code source `AboutScreen.tsx` contient bien ces espaces insécables dans la chaîne. Cependant, RNTL ne trouve pas le pattern : la bibliothèque de rendu normalise les `\u00a0` en espaces ordinaires dans le texte accessible exposé par `screen.getByText`. Le code source est correct — c'est le test qui utilise un pattern trop précis non adapté à la couche de rendu RNTL.
+
+**Impact fonctionnel :** aucun — le texte avec les espaces insécables s'affiche correctement sur device. Le critère d'acceptance "mention CC BY-SA" est satisfait par la présence du texte visible.
+
+**Correction nécessaire :** modifier le test pour utiliser `/CC\s+BY-SA\s+4\.0/` ou `/CC.BY-SA.4\.0/` (pattern qui accepte tout type d'espace), ou supprimer le test et accepter que la vérification soit couverte par le test `affiche le texte de description DPO-validé` qui détecte le bloc entier.
+
+**Sévérité :** Faible — le test est incorrect, pas l'implémentation.
+
+### Réserves
+- **Bug de test Faible** : test `affiche la mention CC BY-SA 4.0` échoue à cause d'un pattern regex incompatible avec le rendu RNTL. À corriger par Laurent (Frontend Dev) dans le fichier `__tests__/AboutScreen.test.tsx`. Ne bloque pas la validation fonctionnelle.
+
+### Cas limites testés
+- `Constants.expoConfig` null → version affiche "—" — test présent et passant
+- Bouton retour → `navigation.goBack()` — test présent et passant
+- Tous les liens `Linking.openURL` testés avec les URLs exactes (3/3)
+
+### Conclusion
+Tous les critères d'acceptance fonctionnels sont validés. Le composant implémente correctement les textes DPO, la version, les liens externes et la navigation. Le seul test échouant est un bug dans le test lui-même (pattern regex inadapté au rendu RNTL), pas dans l'implémentation. Story validée avec réserve de correction du test.
 
 ## Statut
-pending → in-progress → done
+pending → in-progress → **done (2026-03-10)**

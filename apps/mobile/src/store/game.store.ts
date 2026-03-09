@@ -23,7 +23,7 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { Article, GameSession } from '@wikihop/shared';
+import type { Article, GameDifficulty, GameSession } from '@wikihop/shared';
 import { create } from 'zustand';
 
 import * as ScoreStorage from '../services/score-storage.service';
@@ -77,8 +77,20 @@ interface GameSessionSlice {
    * Démarre une nouvelle session avec les deux articles fournis.
    * Génère un UUID v4 via crypto.randomUUID() (disponible Hermes / RN 0.74+).
    * Persiste immédiatement dans AsyncStorage.
+   *
+   * @param options.isDailyChallenge - true si c'est un défi quotidien (F3-01)
+   * @param options.dailyChallengeDate - Date YYYY-MM-DD du défi (F3-01)
+   * @param options.difficulty - Niveau de difficulté (F3-05), défaut 'normal'
    */
-  startSession: (startArticle: Article, targetArticle: Article) => Promise<void>;
+  startSession: (
+    startArticle: Article,
+    targetArticle: Article,
+    options?: {
+      isDailyChallenge?: boolean;
+      dailyChallengeDate?: string;
+      difficulty?: GameDifficulty;
+    },
+  ) => Promise<void>;
 
   /**
    * Alias sémantique de addJump — conservé pour que les composants
@@ -161,16 +173,42 @@ export const useGameStore = create<GameSessionSlice>()((set, get) => ({
   isHydrated: false,
   isDevMode: false,
 
-  startSession: async (startArticle: Article, targetArticle: Article): Promise<void> => {
-    const session: GameSession = {
+  startSession: async (
+    startArticle: Article,
+    targetArticle: Article,
+    options?: {
+      isDailyChallenge?: boolean;
+      dailyChallengeDate?: string;
+      difficulty?: GameDifficulty;
+    },
+  ): Promise<void> => {
+    // Construction de la session — exactOptionalPropertyTypes :
+    // les champs optionnels ne sont jamais affectés à undefined explicitement.
+    // On construit le socle commun puis on enrichit selon les options.
+    const baseSession = {
       id: generateUUID(),
       startArticle,
       targetArticle,
       path: [startArticle],
       jumps: 0,
       startedAt: new Date(),
-      status: 'in_progress',
+      status: 'in_progress' as const,
+      // difficulty est toujours présent (valeur par défaut 'normal')
+      // pour garantir que les sessions créées avec options ont toujours le champ
+      difficulty: options?.difficulty ?? 'normal' as GameDifficulty,
     };
+
+    // Ajout conditionnel des champs isDailyChallenge et dailyChallengeDate
+    // via spread conditionnel (conforme exactOptionalPropertyTypes)
+    const session: GameSession =
+      options?.isDailyChallenge === true && options.dailyChallengeDate !== undefined
+        ? {
+            ...baseSession,
+            isDailyChallenge: true,
+            dailyChallengeDate: options.dailyChallengeDate,
+          }
+        : baseSession;
+
     set({ currentSession: session });
     await persistSession(session);
   },
@@ -282,10 +320,29 @@ export const useGameStore = create<GameSessionSlice>()((set, get) => ({
           startedAt: string;
           completedAt?: string;
           status: GameSession['status'];
+          isDailyChallenge?: boolean;
+          dailyChallengeDate?: string;
+          difficulty?: GameDifficulty;
         };
 
         // Construction explicite sans spread du type intermédiaire,
-        // pour que exactOptionalPropertyTypes soit satisfait dans les deux branches.
+        // pour que exactOptionalPropertyTypes soit satisfait dans toutes les branches.
+        //
+        // Les champs optionnels (isDailyChallenge, dailyChallengeDate, difficulty)
+        // sont propagés via spread conditionnel conforme à exactOptionalPropertyTypes.
+        // difficulty utilise ?? 'normal' pour la rétrocompatibilité des sessions
+        // persistées avant F3-05 (champ absent → traité comme 'normal').
+
+        const optionalFields = {
+          // difficulty : toujours présent après désérialisation (default 'normal')
+          difficulty: parsed.difficulty ?? ('normal' as GameDifficulty),
+          // Champs défi quotidien : spread conditionnel
+          ...(parsed.isDailyChallenge === true ? { isDailyChallenge: true as const } : {}),
+          ...(parsed.dailyChallengeDate !== undefined
+            ? { dailyChallengeDate: parsed.dailyChallengeDate }
+            : {}),
+        };
+
         const session: GameSession =
           parsed.completedAt !== undefined
             ? {
@@ -297,6 +354,7 @@ export const useGameStore = create<GameSessionSlice>()((set, get) => ({
                 startedAt: new Date(parsed.startedAt),
                 completedAt: new Date(parsed.completedAt),
                 status: parsed.status,
+                ...optionalFields,
               }
             : {
                 id: parsed.id,
@@ -306,6 +364,7 @@ export const useGameStore = create<GameSessionSlice>()((set, get) => ({
                 jumps: parsed.jumps,
                 startedAt: new Date(parsed.startedAt),
                 status: parsed.status,
+                ...optionalFields,
               };
 
         get().restoreSession(session);

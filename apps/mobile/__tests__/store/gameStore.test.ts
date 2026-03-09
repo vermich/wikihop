@@ -255,6 +255,7 @@ describe('abandonSession', () => {
     const parsed = JSON.parse(raw as string) as Record<string, unknown>;
 
     // Champs attendus par l'interface GameSession
+    // difficulty est toujours présent depuis F3-05 (valeur par défaut 'normal')
     const expectedKeys = new Set([
       'id',
       'startArticle',
@@ -264,6 +265,7 @@ describe('abandonSession', () => {
       'startedAt',
       'completedAt',
       'status',
+      'difficulty',
     ]);
 
     const actualKeys = new Set(Object.keys(parsed));

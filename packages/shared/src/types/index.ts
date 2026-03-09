@@ -83,7 +83,7 @@ export interface GameSession {
   status: GameStatus;
   /** Indique si la partie est un défi quotidien (F3-01). Absent si partie normale. */
   isDailyChallenge?: boolean;
-  /** Date du défi YYYY-MM-DD (présente si isDailyChallenge === true). */
+  /** Date du défi YYYY-MM-DD (présente si isDailyChallenge === true, F3-01). */
   dailyChallengeDate?: string;
   /** Difficulté de la partie (F3-05). Absent = 'normal' pour rétrocompatibilité. */
   difficulty?: GameDifficulty;
