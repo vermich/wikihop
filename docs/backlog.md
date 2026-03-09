@@ -90,7 +90,7 @@
 | [F3-10](stories/phase-3/⬜-F3-10-history-sort.md) | Tri multi-critères dans l'historique des parties | Should | Frontend Dev, UX/UI | ⬜ pending |
 | [F3-11](stories/phase-3/⬜-F3-11-game-detail-screen.md) | Vue détail d'une partie — parcours, suppression et rejouer | Should | Frontend Dev, UX/UI | ⬜ pending |
 | [F3-12](stories/phase-3/⬜-F3-12-local-multiplayer.md) | Multijoueur local hot-seat (passage du téléphone) | Should | Frontend Dev, UX/UI | ⬜ pending |
-| [F3-13](stories/phase-3/✅-F3-13-dev-mode.md) | Mode développeur — toggle affichage de l'article cible | Could | Frontend Dev | ✅ done |
+| [F3-13](stories/phase-3/🚫-F3-13-dev-mode.md) | Mode développeur — toggle affichage de l'article cible | Could | Frontend Dev | 🚫 won't |
 | [F3-14](stories/phase-3/⬜-F3-14-contact-feedback.md) | Formulaire de feedback in-app (ContactScreen) | Could | Frontend Dev, UX/UI, DPO, Backend Dev | ⬜ pending |
 | [F3-15](stories/phase-3/⬜-F3-15-firebase-analytics.md) | Firebase Analytics — intégration skeleton (événements de base) | Could | Frontend Dev, DPO | ⬜ pending |
 
