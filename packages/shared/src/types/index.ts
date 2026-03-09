@@ -122,25 +122,6 @@ export interface GameRecord {
  * Identique pour tous les joueurs à une date donnée.
  * Utilisé par Phase 3 (F3-01).
  */
-export interface GameRecord {
-  /** Identifiant unique de la partie (UUID v4, issu de GameSession.id) */
-  id: string;
-  /** Article de départ */
-  startArticle: Article;
-  /** Article destination */
-  targetArticle: Article;
-  /** Nombre de sauts effectués */
-  jumps: number;
-  /** Durée de la partie en millisecondes (calculée : completedAt - startedAt) */
-  durationMs: number;
-  /** Date de début ISO 8601 (string) */
-  startedAt: string;
-  /** Date de fin ISO 8601 (toujours présente car la partie est terminée) */
-  completedAt: string;
-  /** Statut final : 'won' ou 'abandoned' */
-  status: 'won' | 'abandoned';
-}
-
 export interface DailyChallenge {
   /** Date du défi (format YYYY-MM-DD) */
   date: string;
