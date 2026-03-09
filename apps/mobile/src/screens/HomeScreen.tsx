@@ -353,6 +353,14 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
             >
               <Text style={styles.secondaryTextButtonText}>{'Soutenir Wikipedia'}</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.secondaryTextButton}
+              onPress={() => { navigation.navigate('About'); }}
+              accessibilityLabel="À propos de WikiHop"
+              accessibilityRole="button"
+            >
+              <Text style={styles.secondaryTextButtonText}>{'À propos'}</Text>
+            </TouchableOpacity>
           </View>
           {__DEV__ && (
             <View style={styles.devModeRow}>
@@ -446,6 +454,14 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
             accessibilityRole="button"
           >
             <Text style={styles.secondaryTextButtonText}>{'Soutenir Wikipedia'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.secondaryTextButton}
+            onPress={() => { navigation.navigate('About'); }}
+            accessibilityLabel="À propos de WikiHop"
+            accessibilityRole="button"
+          >
+            <Text style={styles.secondaryTextButtonText}>{'À propos'}</Text>
           </TouchableOpacity>
         </View>
         {__DEV__ && (
