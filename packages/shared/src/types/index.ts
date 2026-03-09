@@ -53,6 +53,9 @@ export interface ArticleSummary extends Article {
 /** États possibles d'une session de jeu */
 export type GameStatus = 'in_progress' | 'won' | 'abandoned';
 
+/** Niveau de difficulté d'une partie (F3-05) */
+export type GameDifficulty = 'normal' | 'hard';
+
 /**
  * Représente une session de jeu complète.
  *
@@ -78,6 +81,12 @@ export interface GameSession {
   completedAt?: Date;
   /** Statut courant de la session */
   status: GameStatus;
+  /** Indique si la partie est un défi quotidien (F3-01). Absent si partie normale. */
+  isDailyChallenge?: boolean;
+  /** Date du défi YYYY-MM-DD (présente si isDailyChallenge === true). */
+  dailyChallengeDate?: string;
+  /** Difficulté de la partie (F3-05). Absent = 'normal' pour rétrocompatibilité. */
+  difficulty?: GameDifficulty;
 }
 
 // ─────────────────────────────────────────────
@@ -111,6 +120,12 @@ export interface GameRecord {
   completedAt: string;
   /** Statut final : 'won' ou 'abandoned' */
   status: 'won' | 'abandoned';
+  /** Indique si la partie était un défi quotidien (F3-01). Absent si partie normale. */
+  isDailyChallenge?: boolean;
+  /** Date du défi YYYY-MM-DD (F3-01). */
+  dailyChallengeDate?: string;
+  /** Difficulté de la partie (F3-05). Absent = 'normal' pour rétrocompatibilité. */
+  difficulty?: GameDifficulty;
 }
 
 // ─────────────────────────────────────────────
