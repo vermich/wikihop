@@ -38,6 +38,7 @@ import {
   Animated,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -151,6 +152,8 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
   const clearSession = useGameStore((s) => s.clearSession);
   const currentSession = useGameStore((s) => s.currentSession);
   const isHydrated = useGameStore((s) => s.isHydrated);
+  const isDevMode = useGameStore((s) => s.isDevMode);
+  const toggleDevMode = useGameStore((s) => s.toggleDevMode);
 
   // Animation shimmer pour le skeleton
   const shimmerAnim = useRef(new Animated.Value(0.4)).current;
@@ -351,6 +354,20 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
               <Text style={styles.secondaryTextButtonText}>{'Soutenir Wikipedia'}</Text>
             </TouchableOpacity>
           </View>
+          {__DEV__ && (
+            <View style={styles.devModeRow}>
+              <Text style={styles.devModeLabel}>{'Mode dev'}</Text>
+              <Switch
+                value={isDevMode}
+                onValueChange={() => { void toggleDevMode(); }}
+                accessibilityLabel={isDevMode ? 'Mode développeur activé' : 'Mode développeur désactivé'}
+                trackColor={{ false: '#CBD5E1', true: '#2563EB' }}
+              />
+            </View>
+          )}
+          {__DEV__ && isDevMode && (
+            <Text style={styles.devModeActive}>{'MODE DEV ACTIF'}</Text>
+          )}
         </ScrollView>
       );
     }
@@ -431,6 +448,20 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
             <Text style={styles.secondaryTextButtonText}>{'Soutenir Wikipedia'}</Text>
           </TouchableOpacity>
         </View>
+        {__DEV__ && (
+          <View style={styles.devModeRow}>
+            <Text style={styles.devModeLabel}>{'Mode dev'}</Text>
+            <Switch
+              value={isDevMode}
+              onValueChange={() => { void toggleDevMode(); }}
+              accessibilityLabel={isDevMode ? 'Mode développeur activé' : 'Mode développeur désactivé'}
+              trackColor={{ false: '#CBD5E1', true: '#2563EB' }}
+            />
+          </View>
+        )}
+        {__DEV__ && isDevMode && (
+          <Text style={styles.devModeActive}>{'MODE DEV ACTIF'}</Text>
+        )}
       </ScrollView>
     );
   }
@@ -636,6 +667,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#FFFFFF',
+  },
+  devModeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#F1F5F9',
+  },
+  devModeLabel: {
+    fontSize: 13,
+    color: '#94A3B8',
+  },
+  devModeActive: {
+    fontSize: 11,
+    color: '#DC2626',
+    textAlign: 'center',
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    marginBottom: 4,
   },
 });
 

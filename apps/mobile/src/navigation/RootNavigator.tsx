@@ -70,7 +70,7 @@ export type RootStackParamList = {
    */
   History: undefined;
   /**
-   * Route Donation : page de don Wikimedia (F3-04).
+   * Route Donation : page de soutien Wikipedia (F3-04).
    * Accessible depuis HomeScreen.
    */
   Donation: undefined;

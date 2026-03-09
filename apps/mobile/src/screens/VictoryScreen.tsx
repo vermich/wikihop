@@ -42,6 +42,7 @@ import {
   AccessibilityInfo,
   Animated,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -52,6 +53,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { clearSummaryCache } from '../services/wikipedia.service';
 import { useGameStore } from '../store/game.store';
+import { buildShareMessage } from '../utils/share.utils';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -207,6 +209,21 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
     });
   }, [currentSession, navigation]);
 
+  // ── handleShare : partager le résultat via l'API native ──────────────────
+  const handleShare = useCallback((): void => {
+    if (stats === null) return;
+    void Share.share({
+      message: buildShareMessage(
+        stats.startTitle,
+        stats.targetTitle,
+        stats.jumps,
+        stats.elapsedSeconds,
+      ),
+    }).catch((_e) => {
+      // Catch silencieux — l'utilisateur peut annuler
+    });
+  }, [stats]);
+
   // ── Si guard redirige (stats null) — ne rien afficher ───────────────────
   if (stats === null) {
     return <View style={styles.screen} />;
@@ -343,6 +360,14 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
             <Text style={styles.replayButtonText}>{'Rejouer'}</Text>
           </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          style={styles.shareButton}
+          onPress={handleShare}
+          accessibilityLabel="Partager mon résultat"
+          accessibilityRole="button"
+        >
+          <Text style={styles.shareButtonText}>{'Partager'}</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.historyButton}
           onPress={() => { navigation.navigate('History'); }}
@@ -559,6 +584,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#2563EB',
+  },
+  shareButton: {
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shareButtonText: {
+    fontSize: 16,
+    color: '#64748B',
   },
   historyButton: {
     height: 44,
