@@ -280,6 +280,122 @@ Le critère d'acceptance "Validé par le DPO pour la conformité RGPD" est coch�
 
 ---
 
+## Spécifications visuelles — Benjamin (UX/UI)
+
+---
+
+## Écran : AboutScreen — "À propos"
+
+### Objectif
+Permettre au joueur de comprendre l'origine du jeu, consulter les informations légales et accéder aux liens externes, depuis un écran dédié accessible via un bouton texte en bas de l'accueil.
+
+### Layout (ASCII)
+
+```
+┌─────────────────────────────────────┐  [FIXED — Header — h:52pt]
+│  ←  À propos                        │  SafeAreaView edges top
+├─────────────────────────────────────┤  bordure bas #E2E8F0 1pt
+│                                     │  [SCROLL]
+│  ┌─────────────────────────────┐    │
+│  │  WikiHop                    │    │  Nom app — Bold 24px #1E293B
+│  │  Version 1.0.0              │    │  Version — Regular 16px #64748B
+│  └─────────────────────────────┘    │  paddingTop:32 paddingHorizontal:16
+│                                     │
+│  ─────────────────────────────────  │  Séparateur #E2E8F0 1pt marginV:24
+│                                     │
+│  WikiHop est un jeu de navigation   │  Description — Regular 16px #1E293B
+│  : partez d'un article Wikipedia    │  lineHeight:24 paddingH:16
+│  et rejoignez l'article destination │
+│  en cliquant uniquement sur les     │
+│  liens internes. Combien de sauts   │
+│  vous faudra-t-il ?                 │
+│                                     │
+│  ─────────────────────────────────  │  Séparateur #E2E8F0 1pt marginV:24
+│                                     │
+│  SOURCES                            │  Titre section — Bold 13px #64748B
+│                                     │  letterSpacing:1 uppercase marginB:12
+│  Ce jeu utilise l'API Wikipedia     │  Regular 14px #64748B lineHeight:21
+│  (contenu sous licence CC BY-SA     │
+│  4.0). WikiHop n'est pas affilié    │
+│  à la Wikimedia Foundation.         │
+│                                     │
+│  Conditions d'utilisation de        │  Lien — Regular 16px #2563EB
+│  l'API MediaWiki  ↗                 │  paddingV:12 min-height:44pt
+│                                     │
+│  ─────────────────────────────────  │  Séparateur #E2E8F0 1pt marginV:24
+│                                     │
+│  LÉGAL                              │  Titre section — Bold 13px #64748B
+│                                     │
+│  Politique de confidentialité  ↗    │  Lien — Regular 16px #2563EB
+│                                     │  paddingV:12 min-height:44pt
+│                                     │
+│  ─────────────────────────────────  │  Séparateur #E2E8F0 1pt marginV:24
+│                                     │
+│  CODE SOURCE                        │  Titre section — Bold 13px #64748B
+│                                     │
+│  Code source sur GitHub  ↗          │  Lien — Regular 16px #2563EB
+│                                     │  paddingV:12 min-height:44pt
+│                                     │
+│  [paddingBottom:48]                 │
+└─────────────────────────────────────┘
+```
+
+### Composants
+
+- **Header** — `SafeAreaView edges={['top']}`, fond `#FFFFFF`, hauteur 52pt, `flexDirection: 'row'` `alignItems: 'center'` `paddingHorizontal: 8`. Bordure bas `#E2E8F0` 1pt.
+  - Bouton retour : `TouchableOpacity` `minWidth: 44` `minHeight: 44`, libellé `"← Retour"`, texte Regular 16px `#2563EB`. Appelle `navigation.goBack()`.
+  - Titre `"À propos"` : `Text` Bold 17px `#1E293B`, centré (`position: 'absolute'` + `left: 0` `right: 0` `textAlign: 'center'`), `pointerEvents: 'none'` pour laisser le retour cliquable.
+
+- **Section app** — `paddingTop: 32` `paddingHorizontal: 16`.
+  - Nom : `Text` Bold 24px `#1E293B`. Libellé : `"WikiHop"`.
+  - Version : `Text` Regular 16px `#64748B` `marginTop: 4`. Libellé : `"Version X.Y.Z"` (valeur lue depuis `Constants.expoConfig?.version ?? '—'`).
+
+- **Description** — `Text` Regular 16px `#1E293B` `lineHeight: 24` `paddingHorizontal: 16`. Texte validé par le DPO.
+
+- **Titre de section** — `Text` Bold 13px `#64748B` `letterSpacing: 1` `textTransform: 'uppercase'` `marginBottom: 12` `paddingHorizontal: 16`.
+
+- **Texte de section** — `Text` Regular 14px `#64748B` `lineHeight: 21` `paddingHorizontal: 16` `marginBottom: 8`.
+
+- **Lien externe** — `TouchableOpacity` `minHeight: 44` `paddingVertical: 12` `paddingHorizontal: 16` `flexDirection: 'row'` `alignItems: 'center'`.
+  - Texte du lien : Regular 16px `#2563EB`.
+  - Icône `"↗"` : Regular 14px `#2563EB` `marginLeft: 6`.
+  - Appelle `Linking.openURL(url)` au tap.
+
+- **Séparateur** — `View` hauteur 1pt fond `#E2E8F0` `marginVertical: 24` `marginHorizontal: 16`.
+
+### États
+
+- **Default** : tout le contenu affiché, version lue depuis `Constants.expoConfig`.
+- **Loading** : non applicable — composant stateless, aucun appel réseau, rendu immédiat.
+- **Error** : si `Constants.expoConfig?.version` est `undefined`, afficher `"—"` (fallback). Aucun autre état d'erreur possible.
+- **Empty** : non applicable.
+
+### Accessibilité
+
+- [ ] `accessibilityRole="header"` sur le titre `"À propos"` dans le header
+- [ ] `accessibilityRole="button"` sur le bouton retour avec `accessibilityLabel="Retour à l'accueil"`
+- [ ] `accessibilityRole="link"` sur chaque `TouchableOpacity` de lien externe
+- [ ] `accessibilityLabel` explicite sur chaque lien : `"Conditions d'utilisation de l'API MediaWiki, ouvre une page externe"` / `"Politique de confidentialité de WikiHop, ouvre une page externe"` / `"Code source sur GitHub, ouvre une page externe"`
+- [ ] Contraste texte principal `#1E293B` sur `#FFFFFF` : 16.1:1 — conforme
+- [ ] Contraste texte secondaire `#64748B` sur `#FFFFFF` : 4.6:1 — conforme (texte normal)
+- [ ] Contraste liens `#2563EB` sur `#FFFFFF` : 4.6:1 — conforme
+- [ ] Contraste titres de section `#64748B` sur `#FFFFFF` : 4.6:1 — conforme pour Bold 13px (seuil texte large >= 3:1 — ici Bold 13px est borderline texte large ; appliquer seuil 4.5:1 texte normal — valeur 4.6:1 conforme)
+- [ ] Zones tactiles liens >= 44pt de hauteur via `minHeight: 44` — conforme
+- [ ] Zone tactile bouton retour : `minWidth: 44` `minHeight: 44` — conforme
+- [ ] Ordre VoiceOver logique : header → nom app → version → description → section Sources → lien API → section Légal → lien Confidentialité → section Code Source → lien GitHub
+- [ ] Icônes `"↗"` décoratives : `accessible={false}` (incluses dans le `accessibilityLabel` du lien parent)
+- [ ] Aucune animation sur cet écran
+
+### Notes pour Laurent
+
+- Le titre du header est centré absolument pour éviter l'effet de décalage dû à la largeur du bouton retour. Utiliser `position: 'absolute'` + `alignSelf: 'center'` + `pointerEvents: 'none'` pour laisser le bouton retour intercepter les taps.
+- Les `paddingHorizontal: 16` sur les composants texte et lien sont cohérents avec les marges globales du projet — ne pas utiliser de `paddingHorizontal` sur la `ScrollView` elle-même, car les séparateurs sont à 16pt du bord (ils doivent avoir leur propre `marginHorizontal: 16`).
+- `paddingBottom: 48` en bas du `contentContainerStyle` du `ScrollView` pour que le dernier lien ne soit pas collé au bas de l'écran.
+- L'icône `"↗"` après les liens signale visuellement qu'il s'agit d'un lien externe — cohérence avec la convention déjà utilisée dans `VictoryScreen` (même icône sur les items du chemin parcouru).
+- Ne pas afficher de page de chargement ou de spinner — le composant est 100% stateless.
+
+---
+
 ## Validation QA — Halim
 <!-- Rempli par QA après les tests -->
 
