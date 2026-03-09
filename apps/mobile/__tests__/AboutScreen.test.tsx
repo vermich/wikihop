@@ -172,6 +172,6 @@ describe('AboutScreen', () => {
 
   it('affiche la mention CC BY-SA 4.0', () => {
     renderAboutScreen();
-    expect(screen.getByText(/CC\u00a0BY-SA\u00a04\.0/)).toBeTruthy();
+    expect(screen.getByText(/CC\s+BY-SA\s+4\.0/)).toBeTruthy();
   });
 });
