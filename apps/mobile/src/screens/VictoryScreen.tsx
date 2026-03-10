@@ -51,6 +51,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { RootStackParamList } from '../navigation/RootNavigator';
+import { saveDailyCompletionDate } from '../services/daily-completion.service';
 import { clearSummaryCache } from '../services/wikipedia.service';
 import { useGameStore } from '../store/game.store';
 import { formatDailyChallengeDate } from '../utils/daily-challenge.utils';
@@ -112,6 +113,26 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
       navigation.replace('Home');
     }
   // Intentionnellement vide : vérifie l'état de la session une seule fois au montage
+  }, []);
+
+  // ── Persistance de la complétion du défi quotidien (F3-16) ───────────────
+  // Écrit la date de complétion au montage si c'est un défi quotidien gagné.
+  // deps [] intentionnels : currentSession est stable à ce stade (status 'won'
+  // garanti par le guard ci-dessus). Ajouter currentSession comme dépendance
+  // provoquerait une double écriture si le store est mis à jour entre-temps.
+  useEffect(() => {
+    if (
+      currentSession === null
+      || currentSession.status !== 'won'
+      || currentSession.isDailyChallenge !== true
+      || currentSession.dailyChallengeDate === undefined
+    ) {
+      return;
+    }
+
+    void saveDailyCompletionDate(currentSession.dailyChallengeDate);
+    // Best-effort : une erreur AsyncStorage ne doit pas affecter VictoryScreen
+  // Intentionnellement vide : deps [] — lecture unique au montage, session stable
   }, []);
 
   // ── Animation scale spring ───────────────────────────────────────────────
