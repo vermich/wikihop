@@ -94,6 +94,9 @@
 | [F3-14](stories/phase-3/⬜-F3-14-contact-feedback.md) | Formulaire de feedback in-app (ContactScreen) | Could | Frontend Dev, UX/UI, DPO, Backend Dev | ⬜ pending |
 | [F3-15](stories/phase-3/⬜-F3-15-firebase-analytics.md) | Firebase Analytics — intégration skeleton (événements de base) | Could | Frontend Dev, DPO | ⬜ pending |
 | [F3-16](stories/phase-3/✅-F3-16-daily-challenge-completion-indicator.md) | Indicateur de complétion du défi quotidien | Should | Frontend Dev, UX/UI | ✅ done |
+| [F3-17](stories/phase-3/⬜-F3-17-daily-challenge-once-only.md) | Défi quotidien — une seule tentative par jour | Should | Frontend Dev | ⬜ pending |
+| [F3-18](stories/phase-3/⬜-F3-18-daily-challenge-leaderboard.md) | Tableau des scores du défi quotidien | Should | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-19](stories/phase-3/⬜-F3-19-daily-challenge-new-badge.md) | Badge « New » sur le défi non encore réalisé | Could | Frontend Dev, UX/UI | ⬜ pending |
 
 ---
 
@@ -142,10 +145,10 @@
 |-------|------|--------|-------|-------|
 | 1-Fondations | 10 | 2 | 0 | 12 |
 | 2-MVP | 12 | 5 | 1 | 18 |
-| 3-Features | 4 | 7 | 5 | 16 |
+| 3-Features | 4 | 9 | 6 | 19 |
 | 4-Production | 9 | 4 | 2 | 15 |
 | Won't | — | — | — | 4 |
-| **Total** | **35** | **18** | **8** | **65** |
+| **Total** | **35** | **20** | **9** | **68** |
 
 ---
 

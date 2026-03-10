@@ -6,3 +6,4 @@ Un bug n'est investigué qu'une fois reproductible plusieurs fois ou avec contex
 | ID | Titre | Statut | Reproductions | Priorité |
 |----|-------|--------|---------------|----------|
 | [BUG-01](BUG-01-jump-counter-rapid-increment.md) | Compteur de sauts s'incrémente rapidement sans navigation | En attente | 1 | À confirmer |
+| [BUG-02](BUG-02-daily-button-display-after-completion.md) | Bouton défi : encadré gris + texte blanc après complétion | Confirmé | 1 | High |
