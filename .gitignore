@@ -44,6 +44,10 @@ yarn-error.log*
 
 # Tests
 coverage/
+coverage-review/
+
+# V1 reference (local only — used for debug protocol diff, not tracked in git)
+V1/
 
 # TypeScript
 *.tsbuildinfo
