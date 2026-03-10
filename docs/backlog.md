@@ -91,11 +91,10 @@
 | [F3-11](stories/phase-3/⬜-F3-11-game-detail-screen.md) | Vue détail d'une partie — parcours, suppression et rejouer | Should | Frontend Dev, UX/UI | ⬜ pending |
 | [F3-12](stories/phase-3/⬜-F3-12-local-multiplayer.md) | Multijoueur local hot-seat (passage du téléphone) | Should | Frontend Dev, UX/UI | ⬜ pending |
 | [F3-13](stories/phase-3/🚫-F3-13-dev-mode.md) | Mode développeur — toggle affichage de l'article cible | Could | Frontend Dev | 🚫 won't |
-| [F3-14](stories/phase-3/⬜-F3-14-contact-feedback.md) | Formulaire de feedback in-app (ContactScreen) | Could | Frontend Dev, UX/UI, DPO, Backend Dev | ⬜ pending |
-| [F3-15](stories/phase-3/⬜-F3-15-firebase-analytics.md) | Firebase Analytics — intégration skeleton (événements de base) | Could | Frontend Dev, DPO | ⬜ pending |
+| [F3-14](stories/wont/🚫-F3-14-contact-feedback.md) | Formulaire de feedback in-app (ContactScreen) | Could | Frontend Dev, UX/UI, DPO, Backend Dev | 🚫 won't |
+| [F3-15](stories/wont/🚫-F3-15-firebase-analytics.md) | Firebase Analytics — intégration skeleton (événements de base) | Could | Frontend Dev, DPO | 🚫 won't |
 | [F3-16](stories/phase-3/✅-F3-16-daily-challenge-completion-indicator.md) | Indicateur de complétion du défi quotidien | Should | Frontend Dev, UX/UI | ✅ done |
 | [F3-17](stories/phase-3/⬜-F3-17-daily-challenge-once-only.md) | Défi quotidien — une seule tentative par jour | Should | Frontend Dev | ⬜ pending |
-| [F3-18](stories/phase-3/⬜-F3-18-daily-challenge-leaderboard.md) | Tableau des scores du défi quotidien — classement multijoueur | Should | Backend Dev, Frontend Dev, UX/UI, Tech Lead | ⬜ pending |
 | [F3-19](stories/phase-3/⬜-F3-19-daily-challenge-new-badge.md) | Badge « New » sur le défi non encore réalisé | Could | Frontend Dev, UX/UI | ⬜ pending |
 
 ---
@@ -126,6 +125,16 @@
 
 ---
 
+## Phase 5 — Services managés (décision différée)
+
+> Fonctionnalités nécessitant des services backend en mode RUN (hébergement, base de données, maintenance continue). Mises de côté jusqu'à décision explicite du PO.
+
+| ID | Titre | Priorité | Agent(s) | Statut |
+|----|-------|----------|----------|--------|
+| [P5-01](stories/phase-5/⬜-P5-01-daily-challenge-leaderboard.md) | Tableau des scores du défi quotidien — classement multijoueur | Should | Backend Dev, Frontend Dev, UX/UI, Tech Lead | ⬜ pending |
+
+---
+
 ## Won't — Hors scope (documenté)
 
 > Ces fonctionnalités sont délibérément hors scope. Elles sont documentées pour éviter les dérives futures.
@@ -145,10 +154,13 @@
 |-------|------|--------|-------|-------|
 | 1-Fondations | 10 | 2 | 0 | 12 |
 | 2-MVP | 12 | 5 | 1 | 18 |
-| 3-Features | 4 | 9 | 6 | 19 |
+| 3-Features | 4 | 8 | 5 | 17 |
+| 5-Services managés | 0 | 1 | 0 | 1 |
 | 4-Production | 9 | 4 | 2 | 15 |
 | Won't | — | — | — | 4 |
 | **Total** | **35** | **20** | **9** | **68** |
+
+> Phase 5 non incluse dans le total — décision différée.
 
 ---
 
