@@ -95,7 +95,7 @@
 | [F3-15](stories/phase-3/⬜-F3-15-firebase-analytics.md) | Firebase Analytics — intégration skeleton (événements de base) | Could | Frontend Dev, DPO | ⬜ pending |
 | [F3-16](stories/phase-3/✅-F3-16-daily-challenge-completion-indicator.md) | Indicateur de complétion du défi quotidien | Should | Frontend Dev, UX/UI | ✅ done |
 | [F3-17](stories/phase-3/⬜-F3-17-daily-challenge-once-only.md) | Défi quotidien — une seule tentative par jour | Should | Frontend Dev | ⬜ pending |
-| [F3-18](stories/phase-3/⬜-F3-18-daily-challenge-leaderboard.md) | Tableau des scores du défi quotidien | Should | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-18](stories/phase-3/⬜-F3-18-daily-challenge-leaderboard.md) | Tableau des scores du défi quotidien — classement multijoueur | Should | Backend Dev, Frontend Dev, UX/UI, Tech Lead | ⬜ pending |
 | [F3-19](stories/phase-3/⬜-F3-19-daily-challenge-new-badge.md) | Badge « New » sur le défi non encore réalisé | Could | Frontend Dev, UX/UI | ⬜ pending |
 
 ---
