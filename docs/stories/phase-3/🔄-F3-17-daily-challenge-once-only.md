@@ -4,7 +4,7 @@ title: "Défi quotidien — une seule tentative par jour"
 phase: 3
 priority: Should
 agents: [Frontend Dev, UX/UI]
-status: pending
+status: in-progress
 created: 2026-03-10
 completed: ~
 depends_on: [F3-16]
