@@ -374,7 +374,17 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
           </View>
           <SkeletonCard shimmerAnim={shimmerAnim} />
           <View style={styles.buttonsContainer}>
-            {/* Bouton Défi du jour (F3-01) — au-dessus du bouton Jouer */}
+            {/* Bouton Jouer (CTA principal) — paire affichée sur l'écran */}
+            <TouchableOpacity
+              style={[styles.playButton, styles.playButtonDisabled]}
+              disabled={true}
+              accessibilityLabel="Jouer"
+              accessibilityRole="button"
+              accessibilityState={{ disabled: true }}
+            >
+              <Text style={[styles.playButtonText, styles.playButtonTextDisabled]}>{'Jouer'}</Text>
+            </TouchableOpacity>
+            {/* Bouton Défi du jour (F3-01) — en dessous du bouton Jouer */}
             <TouchableOpacity
               style={[
                 styles.dailyButton,
@@ -388,15 +398,6 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
               <Text style={[styles.dailyButtonText, dailyChallengeState.status !== 'success' && styles.dailyButtonTextDisabled]}>
                 {'Défi du jour'}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.playButton, styles.playButtonDisabled]}
-              disabled={true}
-              accessibilityLabel="Jouer"
-              accessibilityRole="button"
-              accessibilityState={{ disabled: true }}
-            >
-              <Text style={[styles.playButtonText, styles.playButtonTextDisabled]}>{'Jouer'}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.refreshButton}
@@ -494,7 +495,17 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
           {...(state.target.thumbnailUrl !== undefined ? { thumbnailUrl: state.target.thumbnailUrl } : {})}
         />
         <View style={styles.buttonsContainer}>
-          {/* Bouton Défi du jour (F3-01) — au-dessus du bouton Jouer */}
+          {/* Bouton Jouer (CTA principal) — paire affichée sur l'écran */}
+          <TouchableOpacity
+            style={styles.playButton}
+            onPress={() => { void handlePlay(); }}
+            accessibilityLabel="Jouer"
+            accessibilityRole="button"
+            accessibilityState={{ disabled: false }}
+          >
+            <Text style={styles.playButtonText}>{'Jouer'}</Text>
+          </TouchableOpacity>
+          {/* Bouton Défi du jour (F3-01) — en dessous du bouton Jouer */}
           <TouchableOpacity
             style={[
               styles.dailyButton,
@@ -512,15 +523,6 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
             ]}>
               {'Défi du jour'}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.playButton}
-            onPress={() => { void handlePlay(); }}
-            accessibilityLabel="Jouer"
-            accessibilityRole="button"
-            accessibilityState={{ disabled: false }}
-          >
-            <Text style={styles.playButtonText}>{'Jouer'}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.refreshButton}
@@ -695,14 +697,14 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     marginTop: 24,
   },
-  // Bouton Défi du jour (F3-01) — fond ambre #D97706, au-dessus du bouton Jouer
+  // Bouton Défi du jour (F3-01) — fond ambre #D97706, en dessous du bouton Jouer
   dailyButton: {
     height: 52,
     backgroundColor: '#D97706',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginTop: 12,
   },
   dailyButtonDisabled: {
     backgroundColor: '#E2E8F0',
@@ -734,6 +736,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 0,
   },
   playButtonDisabled: {
     backgroundColor: '#E2E8F0',

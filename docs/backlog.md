@@ -93,6 +93,7 @@
 | [F3-13](stories/phase-3/🚫-F3-13-dev-mode.md) | Mode développeur — toggle affichage de l'article cible | Could | Frontend Dev | 🚫 won't |
 | [F3-14](stories/phase-3/⬜-F3-14-contact-feedback.md) | Formulaire de feedback in-app (ContactScreen) | Could | Frontend Dev, UX/UI, DPO, Backend Dev | ⬜ pending |
 | [F3-15](stories/phase-3/⬜-F3-15-firebase-analytics.md) | Firebase Analytics — intégration skeleton (événements de base) | Could | Frontend Dev, DPO | ⬜ pending |
+| [F3-16](stories/phase-3/🔄-F3-16-daily-challenge-completion-indicator.md) | Indicateur de complétion du défi quotidien | Should | Frontend Dev, UX/UI | 🔄 in-progress |
 
 ---
 
@@ -141,10 +142,10 @@
 |-------|------|--------|-------|-------|
 | 1-Fondations | 10 | 2 | 0 | 12 |
 | 2-MVP | 12 | 5 | 1 | 18 |
-| 3-Features | 4 | 6 | 5 | 15 |
+| 3-Features | 4 | 7 | 5 | 16 |
 | 4-Production | 9 | 4 | 2 | 15 |
 | Won't | — | — | — | 4 |
-| **Total** | **35** | **17** | **8** | **64** |
+| **Total** | **35** | **18** | **8** | **65** |
 
 ---
 
@@ -155,7 +156,7 @@
 | Tech Lead | F-01, F-02, F-03, F-04, F-05, F-06, F-07, F-08, F-09, F-10, F-12, P-06, P-12 |
 | Frontend Dev | F-04, M-01, M-03, M-04, M-05, M-06, M-07, M-08, M-10, M-11, M-12, M-13, M-14, M-15, M-16, M-17, F3-02, F3-03, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-13, F3-14, F3-15, P-07, P-08, P-12, P-13, P-14 |
 | Backend Dev | F-05, F-06, F-11, M-02, M-08, M-12, M-16, F3-01, F3-05, F3-14, P-03, P-05, P-06, P-09 |
-| UX/UI | M-01, M-06, M-13, M-14, M-17, F3-01, F3-02, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-14 |
+| UX/UI | M-01, M-06, M-13, M-14, M-17, F3-01, F3-02, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-14, F3-16 |
 | QA | F-08, M-09, M-18, F3-07, P-05, P-11 |
 | Security | P-02, P-03, P-04, P-15 |
 | DPO | F3-04, F3-06, F3-14, F3-15, P-01, P-10, P-13, P-14 |
