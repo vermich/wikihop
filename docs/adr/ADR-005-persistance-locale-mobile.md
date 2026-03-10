@@ -28,8 +28,10 @@ Les deux candidats principaux sont :
 | `@wikihop/game_history` | `GameRecord[]` (JSON, max 50 entrées) | Aucun | Historique local des parties terminées (F3-02) — insertion en tête, troncature à 50 |
 | `@wikihop/dev_mode` | `boolean` (JSON) | Aucun | Préférence mode développeur — uniquement chargée si `__DEV__ === true` (F3-13) |
 | `@wikihop/difficulty_preference` | `'normal' \| 'hard'` (JSON) | Aucun | Préférence mode difficile — rechargée au démarrage, valeur par défaut `'normal'` (F3-05) |
+| `@wikihop/daily_completion_date` | `string` (YYYY-MM-DD, **brut — pas JSON**) | Aucun | Date du dernier défi quotidien complété. Comparée à `dailyChallengeDate` du défi courant pour l'indicateur de complétion sur HomeScreen (F3-16). Déroge à la convention JSON : valeur stockée sans `JSON.stringify`, lue directement avec `AsyncStorage.getItem`. |
 
 Convention des clés : préfixe `@wikihop/` suivi d'un identifiant en `snake_case`.
+Exception documentée : `@wikihop/daily_completion_date` stocke une string brute YYYY-MM-DD (pas encapsulée en JSON) pour simplifier la lecture/écriture sans désérialisation.
 
 ### Stratégie TTL pour `popular_pages`
 Le champ `fetchedAt` est une chaîne ISO 8601. À chaque lecture, le store vérifie `Date.now() - new Date(fetchedAt).getTime() > 86_400_000`. Si le cache est périmé, une requête réseau est déclenchée et `fetchedAt` est mis à jour.
