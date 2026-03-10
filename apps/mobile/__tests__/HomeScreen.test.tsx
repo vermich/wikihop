@@ -34,6 +34,17 @@ jest.mock('../src/hooks/useRandomPair', () => ({
   useRandomPair: () => ({ state: mockPairState, refresh: mockRefresh }),
 }));
 
+// Mock useDailyChallenge (F3-01) — état loading par défaut dans les tests HomeScreen
+jest.mock('../src/hooks/useDailyChallenge', () => ({
+  useDailyChallenge: () => ({ state: { status: 'loading' } }),
+}));
+
+// Mock useDailyCompletionStatus (F3-16) — retourne false par défaut (non complété)
+// Évite l'erreur "Couldn't find a navigation object" liée à useFocusEffect
+jest.mock('../src/hooks/useDailyCompletionStatus', () => ({
+  useDailyCompletionStatus: () => false,
+}));
+
 const mockNavigate = jest.fn();
 const mockNavigation = {
   navigate: mockNavigate,

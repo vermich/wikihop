@@ -46,6 +46,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useDailyChallenge } from '../hooks/useDailyChallenge';
+import { useDailyCompletionStatus } from '../hooks/useDailyCompletionStatus';
 import { useRandomPair } from '../hooks/useRandomPair';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import * as DifficultyStorage from '../services/difficulty-storage.service';
@@ -160,6 +161,11 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
 
   // ── Défi quotidien (F3-01) ───────────────────────────────────────────────
   const { state: dailyChallengeState } = useDailyChallenge();
+
+  // ── Indicateur de complétion du défi quotidien (F3-16) ──────────────────
+  const dailyChallengeDate =
+    dailyChallengeState.status === 'success' ? dailyChallengeState.data.date : undefined;
+  const isDailyCompleted = useDailyCompletionStatus(dailyChallengeDate);
 
   const language = useLanguageStore((state) => state.language);
   const setLanguage = useLanguageStore((state) => state.setLanguage);
@@ -360,6 +366,24 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
 
   const isLoading = state.status === 'loading';
 
+  // ── Helpers visuels pour le bouton Défi du jour (F3-16) ─────────────────
+  // Centralisés ici pour éviter la duplication entre les blocs loading et success
+  const isDailyButtonCompleted = isDailyCompleted && dailyChallengeState.status === 'success';
+
+  const dailyButtonStyle =
+    isDailyButtonCompleted
+      ? styles.dailyButtonCompleted
+      : dailyChallengeState.status !== 'success'
+        ? styles.dailyButtonDisabled
+        : styles.dailyButton;
+
+  const dailyButtonLabel =
+    isDailyButtonCompleted
+      ? 'Défi du jour complété — rejouer'
+      : dailyChallengeState.status !== 'success'
+        ? 'Défi du jour — chargement en cours'
+        : 'Jouer le défi du jour';
+
   // ── Rendu de la zone de contenu ──────────────────────────────────────────
   function renderContent(): React.JSX.Element {
     if (state.status === 'loading') {
@@ -384,20 +408,24 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
             >
               <Text style={[styles.playButtonText, styles.playButtonTextDisabled]}>{'Jouer'}</Text>
             </TouchableOpacity>
-            {/* Bouton Défi du jour (F3-01) — en dessous du bouton Jouer */}
+            {/* Bouton Défi du jour (F3-01 / F3-16) — en dessous du bouton Jouer */}
             <TouchableOpacity
-              style={[
-                styles.dailyButton,
-                dailyChallengeState.status !== 'success' && styles.dailyButtonDisabled,
-              ]}
+              style={dailyButtonStyle}
               disabled={true}
-              accessibilityLabel="Défi du jour"
+              accessibilityLabel={dailyButtonLabel}
               accessibilityRole="button"
               accessibilityState={{ disabled: true }}
             >
-              <Text style={[styles.dailyButtonText, dailyChallengeState.status !== 'success' && styles.dailyButtonTextDisabled]}>
-                {'Défi du jour'}
-              </Text>
+              {isDailyButtonCompleted ? (
+                <>
+                  <Text style={styles.dailyButtonCheckIcon} accessible={false}>{'✓'}</Text>
+                  <Text style={styles.dailyButtonTextCompleted}>{'Défi du jour complété'}</Text>
+                </>
+              ) : (
+                <Text style={[styles.dailyButtonText, styles.dailyButtonTextDisabled]}>
+                  {'Défi du jour'}
+                </Text>
+              )}
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.refreshButton}
@@ -505,24 +533,23 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
           >
             <Text style={styles.playButtonText}>{'Jouer'}</Text>
           </TouchableOpacity>
-          {/* Bouton Défi du jour (F3-01) — en dessous du bouton Jouer */}
+          {/* Bouton Défi du jour (F3-01 / F3-16) — en dessous du bouton Jouer */}
           <TouchableOpacity
-            style={[
-              styles.dailyButton,
-              dailyChallengeState.status !== 'success' && styles.dailyButtonDisabled,
-            ]}
+            style={dailyButtonStyle}
             onPress={() => { void handlePlayDaily(); }}
-            disabled={dailyChallengeState.status !== 'success'}
-            accessibilityLabel="Défi du jour"
+            disabled={false}
+            accessibilityLabel={dailyButtonLabel}
             accessibilityRole="button"
-            accessibilityState={{ disabled: dailyChallengeState.status !== 'success' }}
+            accessibilityState={{ disabled: false }}
           >
-            <Text style={[
-              styles.dailyButtonText,
-              dailyChallengeState.status !== 'success' && styles.dailyButtonTextDisabled,
-            ]}>
-              {'Défi du jour'}
-            </Text>
+            {isDailyButtonCompleted ? (
+              <>
+                <Text style={styles.dailyButtonCheckIcon} accessible={false}>{'✓'}</Text>
+                <Text style={styles.dailyButtonTextCompleted}>{'Défi du jour complété'}</Text>
+              </>
+            ) : (
+              <Text style={styles.dailyButtonText}>{'Défi du jour'}</Text>
+            )}
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.refreshButton}
@@ -709,6 +736,16 @@ const styles = StyleSheet.create({
   dailyButtonDisabled: {
     backgroundColor: '#E2E8F0',
   },
+  // État complété du défi (F3-16) — fond brun foncé #92400E, flexDirection row pour icône + texte
+  dailyButtonCompleted: {
+    height: 52,
+    backgroundColor: '#92400E',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+    flexDirection: 'row',
+  },
   dailyButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -716,6 +753,19 @@ const styles = StyleSheet.create({
   },
   dailyButtonTextDisabled: {
     color: '#94A3B8',
+  },
+  // Texte du bouton défi en état complété (F3-16) — 16px pour accommoder icône + texte plus long
+  dailyButtonTextCompleted: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  // Icône checkmark décorative (F3-16) — accessible={false} sur le Text
+  dailyButtonCheckIcon: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginRight: 8,
   },
   // Toggle Mode difficile (F3-05)
   difficultyToggleRow: {
