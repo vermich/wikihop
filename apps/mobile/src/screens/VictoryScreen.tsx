@@ -115,6 +115,10 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
   // Intentionnellement vide : vérifie l'état de la session une seule fois au montage
   }, []);
 
+  // F3-17 : détermine si la session courante est un défi quotidien
+  // Utilisé pour masquer le bouton Rejouer (une seule tentative par défi)
+  const isDaily = currentSession?.isDailyChallenge === true;
+
   // ── Persistance de la complétion du défi quotidien (F3-16) ───────────────
   // Écrit la date de complétion au montage si c'est un défi quotidien gagné.
   // deps [] intentionnels : currentSession est stable à ce stade (status 'won'
@@ -392,21 +396,23 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
       <View style={styles.stickyButtons}>
         <View style={styles.primaryButtonsRow}>
           <TouchableOpacity
-            style={[styles.primaryButton, styles.newGameButton]}
+            style={[styles.primaryButton, styles.newGameButton, isDaily && styles.newGameButtonFull]}
             onPress={handleNewGame}
             accessibilityLabel="Démarrer une nouvelle partie"
             accessibilityRole="button"
           >
             <Text style={styles.newGameButtonText}>{'Nouvelle partie'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.primaryButton, styles.replayButton]}
-            onPress={() => { void handleReplay(); }}
-            accessibilityLabel="Rejouer avec les mêmes articles"
-            accessibilityRole="button"
-          >
-            <Text style={styles.replayButtonText}>{'Rejouer'}</Text>
-          </TouchableOpacity>
+          {!isDaily && (
+            <TouchableOpacity
+              style={[styles.primaryButton, styles.replayButton]}
+              onPress={() => { void handleReplay(); }}
+              accessibilityLabel="Rejouer avec les mêmes articles"
+              accessibilityRole="button"
+            >
+              <Text style={styles.replayButtonText}>{'Rejouer'}</Text>
+            </TouchableOpacity>
+          )}
         </View>
         <TouchableOpacity
           style={styles.shareButton}
@@ -616,6 +622,10 @@ const styles = StyleSheet.create({
   newGameButton: {
     backgroundColor: '#2563EB',
     marginRight: 8,
+  },
+  // F3-17 : quand le bouton Rejouer est absent (défi quotidien), Nouvelle partie occupe toute la largeur
+  newGameButtonFull: {
+    marginRight: 0,
   },
   newGameButtonText: {
     fontSize: 16,
