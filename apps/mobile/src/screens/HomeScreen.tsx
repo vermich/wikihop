@@ -366,9 +366,15 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
 
   const isLoading = state.status === 'loading';
 
-  // ── Helpers visuels pour le bouton Défi du jour (F3-16) ─────────────────
+  // ── Helpers visuels pour le bouton Défi du jour (F3-16 / F3-17 / F3-19) ──
   // Centralisés ici pour éviter la duplication entre les blocs loading et success
   const isDailyButtonCompleted = isDailyCompleted && dailyChallengeState.status === 'success';
+
+  // F3-17 : le bouton est désactivé si complété ou si le défi n'est pas encore chargé
+  const isDailyButtonDisabled = isDailyButtonCompleted || dailyChallengeState.status !== 'success';
+
+  // F3-19 : badge NEW visible uniquement si le défi est chargé ET non complété aujourd'hui
+  const showDailyBadge = dailyChallengeState.status === 'success' && !isDailyCompleted;
 
   const dailyButtonStyle =
     isDailyButtonCompleted
@@ -378,11 +384,13 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
         : styles.dailyButton;
 
   const dailyButtonLabel =
-    isDailyButtonCompleted
-      ? 'Défi du jour complété — rejouer'
-      : dailyChallengeState.status !== 'success'
-        ? 'Défi du jour — chargement en cours'
-        : 'Jouer le défi du jour';
+    showDailyBadge
+      ? 'Nouveau défi du jour disponible — jouer le défi quotidien'
+      : isDailyButtonCompleted
+        ? 'Défi du jour déjà complété aujourd\'hui'
+        : dailyChallengeState.status !== 'success'
+          ? 'Défi du jour — chargement en cours'
+          : 'Jouer le défi du jour';
 
   // ── Rendu de la zone de contenu ──────────────────────────────────────────
   function renderContent(): React.JSX.Element {
@@ -408,7 +416,7 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
             >
               <Text style={[styles.playButtonText, styles.playButtonTextDisabled]}>{'Jouer'}</Text>
             </TouchableOpacity>
-            {/* Bouton Défi du jour (F3-01 / F3-16) — en dessous du bouton Jouer */}
+            {/* Bouton Défi du jour (F3-01 / F3-16 / F3-17 / F3-19) — en dessous du bouton Jouer */}
             <TouchableOpacity
               style={dailyButtonStyle}
               disabled={true}
@@ -416,6 +424,11 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
               accessibilityRole="button"
               accessibilityState={{ disabled: true }}
             >
+              {showDailyBadge && (
+                <View style={styles.dailyBadge} accessible={false}>
+                  <Text style={styles.dailyBadgeText} accessible={false}>{'NEW'}</Text>
+                </View>
+              )}
               {isDailyButtonCompleted ? (
                 <>
                   <Text style={styles.dailyButtonCheckIcon} accessible={false}>{'✓'}</Text>
@@ -533,15 +546,20 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
           >
             <Text style={styles.playButtonText}>{'Jouer'}</Text>
           </TouchableOpacity>
-          {/* Bouton Défi du jour (F3-01 / F3-16) — en dessous du bouton Jouer */}
+          {/* Bouton Défi du jour (F3-01 / F3-16 / F3-17 / F3-19) — en dessous du bouton Jouer */}
           <TouchableOpacity
             style={dailyButtonStyle}
             onPress={() => { void handlePlayDaily(); }}
-            disabled={false}
+            disabled={isDailyButtonDisabled}
             accessibilityLabel={dailyButtonLabel}
             accessibilityRole="button"
-            accessibilityState={{ disabled: false }}
+            accessibilityState={{ disabled: isDailyButtonDisabled }}
           >
+            {showDailyBadge && (
+              <View style={styles.dailyBadge} accessible={false}>
+                <Text style={styles.dailyBadgeText} accessible={false}>{'NEW'}</Text>
+              </View>
+            )}
             {isDailyButtonCompleted ? (
               <>
                 <Text style={styles.dailyButtonCheckIcon} accessible={false}>{'✓'}</Text>
@@ -861,6 +879,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#FFFFFF',
+  },
+  // Badge NEW (F3-19) — positionné en absolu sur le coin supérieur droit du bouton Défi du jour
+  dailyBadge: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: '#2563EB',
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    minWidth: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
+    zIndex: 1,
+  },
+  dailyBadgeText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
 });
 
