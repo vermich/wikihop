@@ -55,12 +55,6 @@ export function useDailyChallenge(): UseDailyChallengeReturn {
   useEffect(() => {
     let cancelled = false;
 
-    // BUG-02 : log temporaire pour vérifier si le hook repasse par 'loading'
-    // au retour sur HomeScreen (focus). Si ce log apparaît sans changement de langue,
-    // cela indique que le hook est remonté inutilement (à documenter dans la PR).
-    // eslint-disable-next-line no-console
-    console.log('[useDailyChallenge] useEffect déclenché — language:', language);
-
     setState({ status: 'loading' });
 
     void (async () => {
