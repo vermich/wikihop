@@ -4,9 +4,9 @@ title: "Badge « New » sur le défi quotidien non encore réalisé"
 phase: 3
 priority: Could
 agents: [Frontend Dev, UX/UI]
-status: in-progress
+status: done
 created: 2026-03-10
-completed: ~
+completed: 2026-03-11
 depends_on: [F3-16, F3-17]
 ---
 
@@ -22,12 +22,12 @@ Afficher un sticker/badge "New" sur le bouton "Défi du jour" tant que le joueur
 
 ## Critères d'acceptance
 
-- [ ] Un badge "New" est visible sur le bouton "Défi du jour" quand `isDailyCompleted === false` et `dailyChallengeState.status === 'success'`
-- [ ] Le badge disparaît immédiatement au retour sur HomeScreen après complétion du défi
-- [ ] Le badge n'apparaît pas si le défi est déjà chargé en erreur ou en loading
-- [ ] Design défini par UX/UI (Benjamin)
-- [ ] `tsc --noEmit` passe sans erreur
-- [ ] `npm run lint` passe sans erreur
+- [x] Un badge "New" est visible sur le bouton "Défi du jour" quand `isDailyCompleted === false` et `dailyChallengeState.status === 'success'`
+- [x] Le badge disparaît immédiatement au retour sur HomeScreen après complétion du défi
+- [x] Le badge n'apparaît pas si le défi est déjà chargé en erreur ou en loading
+- [x] Design défini par UX/UI (Benjamin)
+- [x] `tsc --noEmit` passe sans erreur
+- [x] `npm run lint` passe sans erreur
 
 ## Notes UX (à définir par Benjamin)
 
