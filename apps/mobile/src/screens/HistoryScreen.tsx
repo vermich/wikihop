@@ -27,7 +27,7 @@
 import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { GameRecord } from '@wikihop/shared';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import {
   AccessibilityInfo,
   ActivityIndicator,
@@ -194,6 +194,14 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
     );
   }, [deleteAll]);
 
+  // Annonce accessibilité lors du chargement — dans useEffect pour éviter les appels
+  // répétés en cas de re-render pendant que historyLoading est vrai
+  useEffect(() => {
+    if (historyLoading) {
+      void AccessibilityInfo.announceForAccessibility("Chargement de l'historique");
+    }
+  }, [historyLoading]);
+
   // F3-11 — navigation vers GameDetail au tap sur un item
   const handleItemPress = useCallback((record: GameRecord): void => {
     navigation.navigate('GameDetail', { recordId: record.id });
@@ -229,7 +237,6 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
 
   // ── État loading ──────────────────────────────────────────────────────────
   if (historyLoading) {
-    void AccessibilityInfo.announceForAccessibility("Chargement de l'historique");
     return (
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
         <Header onBack={handleBack} onStats={handleStats} />

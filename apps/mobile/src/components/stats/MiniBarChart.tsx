@@ -39,18 +39,23 @@ interface MiniBarChartProps {
 // Constantes
 // ─────────────────────────────────────────────────────────────────────────────
 
-const BAR_WIDTH = 24;
 const LABEL_HEIGHT_TOP = 18; // hauteur réservée au label de sauts au-dessus
 const LABEL_HEIGHT_BOTTOM = 16; // hauteur réservée au label de date dessous
 const BAR_MIN_HEIGHT = 4;
+const CHART_PADDING_HORIZONTAL = 64; // 32px de chaque côté dans StatsScreen
+const MAX_BAR_WIDTH = 36;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Composant
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MiniBarChart({ data, maxHeight = 140 }: MiniBarChartProps): React.JSX.Element {
-  // Pour la largeur dynamique (éco-conception : pas de width hardcodée)
-  useWindowDimensions();
+  const { width: screenWidth } = useWindowDimensions();
+
+  // Largeur dynamique de chaque barre selon la largeur d'écran
+  const barWidth = data.length > 0
+    ? Math.min(MAX_BAR_WIDTH, Math.floor((screenWidth - CHART_PADDING_HORIZONTAL) / data.length))
+    : MAX_BAR_WIDTH;
 
   // ── État vide ─────────────────────────────────────────────────────────────
   if (data.length === 0) {
@@ -94,7 +99,7 @@ export function MiniBarChart({ data, maxHeight = 140 }: MiniBarChartProps): Reac
           const barColor = point.status === 'won' ? '#16A34A' : '#94A3B8';
 
           return (
-            <View key={`${point.label}-${String(index)}`} style={styles.barItem}>
+            <View key={`${point.label}-${String(index)}`} style={[styles.barItem, { width: barWidth + 4 }]}>
               {/* Label sauts au-dessus */}
               <Text style={styles.labelSauts} accessible={false}>
                 {String(point.jumps)}
@@ -104,6 +109,7 @@ export function MiniBarChart({ data, maxHeight = 140 }: MiniBarChartProps): Reac
                 style={[
                   styles.bar,
                   {
+                    width: barWidth,
                     height: barHeight,
                     backgroundColor: barColor,
                   },
@@ -165,7 +171,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   bar: {
-    width: BAR_WIDTH,
     borderRadius: 3,
     minHeight: BAR_MIN_HEIGHT,
   },
