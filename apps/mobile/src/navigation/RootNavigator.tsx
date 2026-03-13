@@ -16,8 +16,10 @@ import { AboutScreen } from '../screens/AboutScreen';
 import { ArticleScreen } from '../screens/ArticleScreen';
 import { ArticleViewerScreen } from '../screens/ArticleViewerScreen';
 import { DonationScreen } from '../screens/DonationScreen';
+import { GameDetailScreen } from '../screens/GameDetailScreen';
 import { HistoryScreen } from '../screens/HistoryScreen';
 import { HomeScreen } from '../screens/HomeScreen';
+import { StatsScreen } from '../screens/StatsScreen';
 import { VictoryScreen } from '../screens/VictoryScreen';
 
 /**
@@ -80,6 +82,18 @@ export type RootStackParamList = {
    * Accessible depuis HomeScreen.
    */
   About: undefined;
+  /**
+   * Route GameDetail : vue détail d'une partie de l'historique (F3-11).
+   * recordId : identifiant UUID de la partie, chargée depuis ScoreStorage.
+   */
+  GameDetail: {
+    recordId: string;
+  };
+  /**
+   * Route Stats : statistiques personnelles (F3-08).
+   * Accessible depuis HistoryScreen.
+   */
+  Stats: undefined;
 };
 
 /** Type NavigationProp pour le stack racine — exporté pour usage dans les écrans */
@@ -130,6 +144,16 @@ export function RootNavigator(): React.JSX.Element {
         <Stack.Screen
           name="About"
           component={AboutScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="GameDetail"
+          component={GameDetailScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Stats"
+          component={StatsScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
