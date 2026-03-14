@@ -46,8 +46,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRandomPair } from '../hooks/useRandomPair';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useGameStore } from '../store/game.store';
-import { useMultiplayerStore, type MultiplayerPlayer } from '../store/multiplayer.store';
-import { rankPlayers } from '../utils/multiplayer.utils';
+import { useMultiplayerStore } from '../store/multiplayer.store';
+import { rankPlayersGlobal } from '../utils/multiplayer.utils';
 
 import { formatElapsed } from './VictoryScreen';
 
@@ -64,23 +64,36 @@ type MultiplayerResultScreenProps = NativeStackScreenProps<RootStackParamList, '
 const RANK_MEDALS = ['🥇', '🥈', '🥉'] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Types internes
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface GlobalRankEntry {
+  name: string;
+  wins: number;
+  totalJumps: number;
+  totalDurationMs: number;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Composant PlayerResultRow (interne)
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface PlayerResultRowProps {
-  player: MultiplayerPlayer;
+  entry: GlobalRankEntry;
   rank: number;
 }
 
-function PlayerResultRow({ player, rank }: PlayerResultRowProps): React.JSX.Element {
-  const isFirstAndWon = rank === 1 && player.won;
+function PlayerResultRow({ entry, rank }: PlayerResultRowProps): React.JSX.Element {
+  const isFirstAndLeading = rank === 1 && entry.wins > 0;
   const medal = rank <= 3 ? RANK_MEDALS[rank - 1] : undefined;
 
-  // Stats texte
-  let statsText = '—';
-  if (player.won && player.jumps !== null && player.durationMs !== null) {
-    const elapsedSeconds = Math.floor(player.durationMs / 1000);
-    statsText = `${String(player.jumps)} saut${player.jumps <= 1 ? '' : 's'} · ${formatElapsed(elapsedSeconds)}`;
+  // Stats texte globales
+  let statsText: string;
+  if (entry.wins > 0) {
+    const elapsedSeconds = Math.floor(entry.totalDurationMs / 1000);
+    statsText = `${String(entry.totalJumps)} saut${entry.totalJumps <= 1 ? '' : 's'} · ${formatElapsed(elapsedSeconds)}`;
+  } else {
+    statsText = '—';
   }
 
   // Accessibilité
@@ -90,14 +103,14 @@ function PlayerResultRow({ player, rank }: PlayerResultRowProps): React.JSX.Elem
     rank === 3 ? 'Troisième place' :
     `${String(rank)}e place`;
 
-  const statusWord = player.won ? 'Victoire' : 'Abandonné';
-  const a11yLabel = player.won && player.jumps !== null && player.durationMs !== null
-    ? `${rankWord} : ${player.name} — ${statusWord} en ${statsText}`
-    : `${rankWord} : ${player.name} — ${statusWord}`;
+  const winsLabel = entry.wins === 1 ? '1 victoire' : `${String(entry.wins)} victoires`;
+  const a11yLabel = entry.wins > 0
+    ? `${rankWord} : ${entry.name} — ${winsLabel}, ${statsText}`
+    : `${rankWord} : ${entry.name} — 0 victoire`;
 
   return (
     <View
-      style={[styles.resultRow, isFirstAndWon && styles.resultRowFirst]}
+      style={[styles.resultRow, isFirstAndLeading && styles.resultRowFirst]}
       accessible={true}
       accessibilityLabel={a11yLabel}
     >
@@ -112,20 +125,20 @@ function PlayerResultRow({ player, rank }: PlayerResultRowProps): React.JSX.Elem
 
       {/* Zone info */}
       <View style={styles.infoZone} accessible={false}>
-        <Text style={styles.playerName}>{player.name}</Text>
+        <Text style={styles.playerName}>{entry.name}</Text>
         <View style={styles.statsRow}>
           <View style={[
             styles.statusBadge,
-            player.won ? styles.statusBadgeWon : styles.statusBadgeAbandoned,
+            entry.wins > 0 ? styles.statusBadgeWon : styles.statusBadgeAbandoned,
           ]}>
             <Text style={[
               styles.statusBadgeText,
-              player.won ? styles.statusBadgeTextWon : styles.statusBadgeTextAbandoned,
+              entry.wins > 0 ? styles.statusBadgeTextWon : styles.statusBadgeTextAbandoned,
             ]}>
-              {player.won ? 'Victoire' : 'Abandonné'}
+              {entry.wins === 1 ? '1 victoire' : `${String(entry.wins)} victoires`}
             </Text>
           </View>
-          {player.won && player.jumps !== null && (
+          {entry.wins > 0 && (
             <Text style={styles.statsText}>{statsText}</Text>
           )}
         </View>
@@ -140,6 +153,7 @@ function PlayerResultRow({ player, rank }: PlayerResultRowProps): React.JSX.Elem
 
 export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenProps): React.JSX.Element {
   const players = useMultiplayerStore((s) => s.players);
+  const roundHistory = useMultiplayerStore((s) => s.roundHistory);
   const startArticle = useMultiplayerStore((s) => s.startArticle);
   const targetArticle = useMultiplayerStore((s) => s.targetArticle);
   const resetSession = useMultiplayerStore((s) => s.resetSession);
@@ -151,7 +165,8 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
   // Le bouton Rejouer est activé dès que pairState.status === 'success'
   const { state: pairState } = useRandomPair('normal');
 
-  const rankedPlayers = rankPlayers(players);
+  const playerNames = players.map((p) => p.name);
+  const rankedPlayers = rankPlayersGlobal(roundHistory, playerNames);
 
   const handleHome = useCallback((): void => {
     resetSession();
@@ -219,10 +234,10 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
         <View style={styles.separator} />
 
         {/* Classement */}
-        {rankedPlayers.map((player, index) => (
+        {rankedPlayers.map((entry, index) => (
           <PlayerResultRow
-            key={player.name}
-            player={player}
+            key={entry.name}
+            entry={entry}
             rank={index + 1}
           />
         ))}

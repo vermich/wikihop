@@ -8,16 +8,40 @@
  *
  * Note : babel-preset-expo + jest-expo ne supporte pas `import type` ni
  * les déclarations de type de niveau module dans les fichiers .ts de test.
- * Les helpers sont typés inline directement dans les retours de fonctions.
+ * Les helpers sont typés avec des interfaces locales.
  */
 
 import { validatePlayerNames, rankPlayers, rankPlayersGlobal } from '../../src/utils/multiplayer.utils';
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Interfaces locales (miroir des types du store — évite import type)
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface PlayerOverrides {
+  name?: string;
+  status?: 'waiting' | 'playing' | 'done';
+  jumps?: number | null;
+  durationMs?: number | null;
+  won?: boolean;
+}
+
+interface RoundResultOverrides {
+  jumps?: number | null;
+  durationMs?: number | null;
+  won?: boolean;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-function makePlayer(overrides) {
+function makePlayer(overrides: PlayerOverrides): {
+  name: string;
+  status: 'waiting' | 'playing' | 'done';
+  jumps: number | null;
+  durationMs: number | null;
+  won: boolean;
+} {
   return {
     name: 'Player',
     status: 'done',
@@ -28,7 +52,11 @@ function makePlayer(overrides) {
   };
 }
 
-function makeRoundResult(overrides) {
+function makeRoundResult(overrides: RoundResultOverrides): {
+  jumps: number | null;
+  durationMs: number | null;
+  won: boolean;
+} {
   return {
     jumps: null,
     durationMs: null,
@@ -80,29 +108,43 @@ describe('rankPlayers', () => {
     const winner = makePlayer({ name: 'Alice', won: true, jumps: 5, durationMs: 60000 });
     const loser = makePlayer({ name: 'Bob', won: false });
     const result = rankPlayers([loser, winner]);
-    expect(result[0].name).toBe('Alice');
+    const first = result[0];
+    expect(first).toBeDefined();
+    if (!first) return;
+    expect(first.name).toBe('Alice');
   });
 
   it('trie deux gagnants par sauts croissants', () => {
     const a = makePlayer({ name: 'Alice', won: true, jumps: 3, durationMs: 60000 });
     const b = makePlayer({ name: 'Bob', won: true, jumps: 5, durationMs: 30000 });
     const result = rankPlayers([b, a]);
-    expect(result[0].name).toBe('Alice');
+    const first = result[0];
+    expect(first).toBeDefined();
+    if (!first) return;
+    expect(first.name).toBe('Alice');
   });
 
   it('trie par durée si sauts égaux', () => {
     const a = makePlayer({ name: 'Alice', won: true, jumps: 3, durationMs: 90000 });
     const b = makePlayer({ name: 'Bob', won: true, jumps: 3, durationMs: 60000 });
     const result = rankPlayers([a, b]);
-    expect(result[0].name).toBe('Bob');
+    const first = result[0];
+    expect(first).toBeDefined();
+    if (!first) return;
+    expect(first.name).toBe('Bob');
   });
 
   it("conserve l'ordre d'arrivée pour les abandons", () => {
     const a = makePlayer({ name: 'Alice', won: false });
     const b = makePlayer({ name: 'Bob', won: false });
     const result = rankPlayers([a, b]);
-    expect(result[0].name).toBe('Alice');
-    expect(result[1].name).toBe('Bob');
+    const first = result[0];
+    const second = result[1];
+    expect(first).toBeDefined();
+    expect(second).toBeDefined();
+    if (!first || !second) return;
+    expect(first.name).toBe('Alice');
+    expect(second.name).toBe('Bob');
   });
 
   it('retourne un tableau vide si entrée vide', () => {
@@ -127,10 +169,15 @@ describe('rankPlayersGlobal', () => {
       ],
     ];
     const result = rankPlayersGlobal(roundHistory, ['A', 'B']);
-    expect(result[0].name).toBe('A');
-    expect(result[0].wins).toBe(2);
-    expect(result[1].name).toBe('B');
-    expect(result[1].wins).toBe(1);
+    const first = result[0];
+    const second = result[1];
+    expect(first).toBeDefined();
+    expect(second).toBeDefined();
+    if (!first || !second) return;
+    expect(first.name).toBe('A');
+    expect(first.wins).toBe(2);
+    expect(second.name).toBe('B');
+    expect(second.wins).toBe(1);
   });
 
   it('cas 2 — égalité victoires, tri par sauts (A=8 sauts, B=5 sauts → B premier)', () => {
@@ -145,10 +192,15 @@ describe('rankPlayersGlobal', () => {
       ],
     ];
     const result = rankPlayersGlobal(roundHistory, ['A', 'B']);
-    expect(result[0].name).toBe('B');
-    expect(result[0].totalJumps).toBe(5);
-    expect(result[1].name).toBe('A');
-    expect(result[1].totalJumps).toBe(8);
+    const first = result[0];
+    const second = result[1];
+    expect(first).toBeDefined();
+    expect(second).toBeDefined();
+    if (!first || !second) return;
+    expect(first.name).toBe('B');
+    expect(first.totalJumps).toBe(5);
+    expect(second.name).toBe('A');
+    expect(second.totalJumps).toBe(8);
   });
 
   it('cas 3 — égalité victoires + sauts, tri par durée (A=12000ms, B=9000ms → B premier)', () => {
@@ -163,10 +215,15 @@ describe('rankPlayersGlobal', () => {
       ],
     ];
     const result = rankPlayersGlobal(roundHistory, ['A', 'B']);
-    expect(result[0].name).toBe('B');
-    expect(result[0].totalDurationMs).toBe(9000);
-    expect(result[1].name).toBe('A');
-    expect(result[1].totalDurationMs).toBe(12000);
+    const first = result[0];
+    const second = result[1];
+    expect(first).toBeDefined();
+    expect(second).toBeDefined();
+    if (!first || !second) return;
+    expect(first.name).toBe('B');
+    expect(first.totalDurationMs).toBe(9000);
+    expect(second.name).toBe('A');
+    expect(second.totalDurationMs).toBe(12000);
   });
 
   it('cas 4 — aucune victoire : tous wins=0, ordre préservé', () => {
@@ -174,10 +231,15 @@ describe('rankPlayersGlobal', () => {
       [makeRoundResult({ won: false }), makeRoundResult({ won: false })],
     ];
     const result = rankPlayersGlobal(roundHistory, ['Alice', 'Bob']);
-    expect(result[0].wins).toBe(0);
-    expect(result[1].wins).toBe(0);
-    expect(result[0].name).toBe('Alice');
-    expect(result[1].name).toBe('Bob');
+    const first = result[0];
+    const second = result[1];
+    expect(first).toBeDefined();
+    expect(second).toBeDefined();
+    if (!first || !second) return;
+    expect(first.wins).toBe(0);
+    expect(second.wins).toBe(0);
+    expect(first.name).toBe('Alice');
+    expect(second.name).toBe('Bob');
   });
 
   it('cas 5 — 3 joueurs, 2 manches (agrégation correcte)', () => {
@@ -194,12 +256,19 @@ describe('rankPlayersGlobal', () => {
       ],
     ];
     const result = rankPlayersGlobal(roundHistory, ['A', 'B', 'C']);
-    expect(result[0].name).toBe('B');
-    expect(result[0].wins).toBe(2);
-    expect(result[0].totalJumps).toBe(7);
-    expect(result[0].totalDurationMs).toBe(15000);
-    expect(result[1].name).toBe('A');
-    expect(result[2].name).toBe('C');
+    const first = result[0];
+    const second = result[1];
+    const third = result[2];
+    expect(first).toBeDefined();
+    expect(second).toBeDefined();
+    expect(third).toBeDefined();
+    if (!first || !second || !third) return;
+    expect(first.name).toBe('B');
+    expect(first.wins).toBe(2);
+    expect(first.totalJumps).toBe(7);
+    expect(first.totalDurationMs).toBe(15000);
+    expect(second.name).toBe('A');
+    expect(third.name).toBe('C');
   });
 
   it('cas 6 — roundHistory vide : tous wins=0, totalJumps=0, totalDurationMs=0', () => {
@@ -221,6 +290,8 @@ describe('rankPlayersGlobal', () => {
     ];
     const result = rankPlayersGlobal(roundHistory, ['A', 'B']);
     const bResult = result.find((r) => r.name === 'B');
+    expect(bResult).toBeDefined();
+    if (!bResult) return;
     expect(bResult.wins).toBe(0);
     expect(bResult.totalJumps).toBe(0);
     expect(bResult.totalDurationMs).toBe(0);

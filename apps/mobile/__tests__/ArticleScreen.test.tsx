@@ -1,18 +1,19 @@
 /**
  * ArticleScreen Tests — WikiHop Mobile — Réécriture WebView native
  *
- * Teste la nouvelle architecture WebView native (F3-22 — retour via navigation.goBack) :
+ * Teste la nouvelle architecture WebView native (F3-27 — retour via webViewRef.goBack) :
  *
  *   Navigation :
- *     - onPageChange est connecté à WikipediaWebView
+ *     - onPageChange est connecté à WikipediaWebView via onNavigationStateChange
  *     - Chaque changement de page appelle addJump
  *     - Victoire : titlesMatch(newTitle, targetTitle) → completeSession + navigate('Victory')
- *     - Navigation header : bouton "← Retour" visible si navigation.canGoBack() === true
+ *     - Navigation header : bouton "← Retour" visible si webViewCanGoBack === true
+ *       (mis à jour via onNavigationStateChange, pas via navigation.canGoBack())
  *
  *   BackHandler Android :
  *     - Enregistré quand isFocused === true
- *     - navigation.goBack() si navigation.canGoBack() === true → return true
- *     - Si navigation.canGoBack() === false → handleAbandon() + return true
+ *     - webViewRef.goBack() si webViewCanGoBack === true → return true
+ *     - Si webViewCanGoBack === false → handleAbandon() + return true
  *
  *   État d'erreur :
  *     - onError de WikipediaWebView → affichage écran erreur + bouton Réessayer
@@ -153,13 +154,12 @@ import { ArticleScreen } from '../src/screens/ArticleScreen';
 const mockGoBack = jest.fn();
 const mockPush = jest.fn();
 const mockNavigate = jest.fn();
-const mockCanGoBack = jest.fn(() => true);
 
 const mockNavigation = {
   goBack: mockGoBack,
   push: mockPush,
   navigate: mockNavigate,
-  canGoBack: mockCanGoBack,
+  canGoBack: jest.fn(() => false),
   replace: jest.fn(),
 };
 
@@ -183,7 +183,6 @@ describe('ArticleScreen', () => {
     jest.clearAllMocks();
     capturedWebViewProps = {};
     mockIsFocused = true;
-    mockCanGoBack.mockReturnValue(true);
     mockWebViewGoBack.mockClear();
     mockWebViewInjectJavaScript.mockClear();
     mockAddJump.mockResolvedValue(undefined);
@@ -203,17 +202,29 @@ describe('ArticleScreen', () => {
       expect(getByText('Tour Eiffel')).toBeTruthy();
     });
 
-    it('n\'affiche pas le bouton retour si navigation.canGoBack() === false', () => {
-      // F3-22 : le bouton est conditionné sur navigation.canGoBack()
-      mockCanGoBack.mockReturnValue(false);
+    it('n\'affiche pas le bouton retour si webViewCanGoBack === false (état initial)', async () => {
+      // F3-27 : le bouton est conditionné sur webViewCanGoBack (état interne WebView)
+      // webViewCanGoBack démarre à false — onNavigationStateChange pas encore déclenché
       const { queryByText } = renderArticleScreen();
+      await act(async () => { await Promise.resolve(); });
       expect(queryByText('← Retour')).toBeNull();
     });
 
-    it('affiche le bouton retour si navigation.canGoBack() === true', () => {
-      // F3-22 : navigation.canGoBack() === true (valeur par défaut dans beforeEach)
-      mockCanGoBack.mockReturnValue(true);
+    it('affiche le bouton retour si webViewCanGoBack === true (après onNavigationStateChange)', async () => {
+      // F3-27 : le bouton devient visible quand la WebView signale canGoBack: true
       const { getByText } = renderArticleScreen();
+      await act(async () => { await Promise.resolve(); });
+
+      // Simuler la WebView qui signale qu'elle peut reculer
+      await act(async () => {
+        capturedWebViewProps.onNavigationStateChange?.({
+          canGoBack: true,
+          url: 'https://fr.m.wikipedia.org/wiki/Paris',
+          loading: false,
+        });
+        await Promise.resolve();
+      });
+
       expect(getByText('← Retour')).toBeTruthy();
     });
 
@@ -406,10 +417,9 @@ describe('ArticleScreen', () => {
       expect(addEventListenerSpy).not.toHaveBeenCalled();
     });
 
-    it('appelle navigation.goBack() et retourne true quand navigation.canGoBack() === true', async () => {
-      // F3-22 : le BackHandler utilise navigation.goBack() (plus de webViewRef)
+    it('appelle webViewRef.goBack() et retourne true quand webViewCanGoBack === true', async () => {
+      // F3-27 : le BackHandler utilise webViewRef.current?.goBack() (retour interne WebView)
       mockIsFocused = true;
-      mockCanGoBack.mockReturnValue(true);
 
       const handlers: Array<() => boolean> = [];
       jest.spyOn(BackHandler, 'addEventListener').mockImplementation(
@@ -422,20 +432,30 @@ describe('ArticleScreen', () => {
       renderArticleScreen();
       await act(async () => { await Promise.resolve(); });
 
+      // Signaler que la WebView peut reculer → webViewCanGoBack = true
+      await act(async () => {
+        capturedWebViewProps.onNavigationStateChange?.({
+          canGoBack: true,
+          url: 'https://fr.m.wikipedia.org/wiki/Paris',
+          loading: false,
+        });
+        await Promise.resolve();
+      });
+
       const lastHandler = handlers[handlers.length - 1];
       expect(lastHandler).toBeDefined();
       const result = lastHandler?.();
-      // navigation.canGoBack() === true → navigation.goBack() + return true
+      // webViewCanGoBack === true → webViewRef.goBack() + return true
       expect(result).toBe(true);
-      expect(mockGoBack).toHaveBeenCalled();
-      // webViewRef.goBack() ne doit plus être appelé (F3-22)
-      expect(mockWebViewGoBack).not.toHaveBeenCalled();
+      expect(mockWebViewGoBack).toHaveBeenCalled();
+      // navigation.goBack() ne doit plus être appelé (F3-27)
+      expect(mockGoBack).not.toHaveBeenCalled();
     });
 
-    it('appelle handleAbandon (Alert) et retourne true si navigation.canGoBack() === false', async () => {
-      // F3-22 : si pas d'écran précédent dans le stack → proposer abandon
+    it('appelle handleAbandon (Alert) et retourne true si webViewCanGoBack === false', async () => {
+      // F3-27 : si la WebView ne peut plus reculer → proposer abandon
       mockIsFocused = true;
-      mockCanGoBack.mockReturnValue(false);
+      // webViewCanGoBack est false par défaut (état initial)
 
       const alertSpy = jest.spyOn(Alert, 'alert');
 
@@ -453,7 +473,7 @@ describe('ArticleScreen', () => {
       const lastHandler = handlers[handlers.length - 1];
       expect(lastHandler).toBeDefined();
       const result = lastHandler?.();
-      // navigation.canGoBack() === false → handleAbandon() + return true
+      // webViewCanGoBack === false → handleAbandon() + return true
       expect(result).toBe(true);
       expect(alertSpy).toHaveBeenCalledWith(
         'Abandonner la partie ?',
