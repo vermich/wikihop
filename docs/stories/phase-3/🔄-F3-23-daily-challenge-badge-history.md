@@ -4,7 +4,7 @@ title: Badge "défi du jour" dans l'historique des parties
 phase: 3-Features
 priority: Should
 agents: [Frontend Dev, UX/UI]
-status: pending
+status: in-progress
 created: 2026-03-14
 completed:
 depends_on: [F3-02, F3-01]

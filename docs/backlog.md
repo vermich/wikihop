@@ -86,10 +86,10 @@
 | [F3-06](stories/phase-3/✅-F3-06-about-screen.md) | Écran "À propos" et crédits | Should | Frontend Dev, UX/UI, DPO | ✅ done |
 | [F3-07](stories/phase-3/⬜-F3-07-integration-tests.md) | Tests d'intégration — parcours de jeu complet | Should | QA | ⬜ pending |
 | [F3-08](stories/phase-3/✅-F3-08-personal-stats.md) | Statistiques personnelles | Could | Frontend Dev, UX/UI | ✅ done |
-| [F3-09](stories/phase-3/⬜-F3-09-animations-haptics.md) | Animations et feedback haptique | Could | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-09](stories/phase-3/🔄-F3-09-animations-haptics.md) | Animations et feedback haptique | Could | Frontend Dev, UX/UI | 🔄 in-progress |
 | [F3-10](stories/phase-3/✅-F3-10-history-sort.md) | Tri multi-critères dans l'historique des parties | Should | Frontend Dev, UX/UI | ✅ done |
 | [F3-11](stories/phase-3/✅-F3-11-game-detail-screen.md) | Vue détail d'une partie — parcours, suppression et rejouer | Should | Frontend Dev, UX/UI | ✅ done |
-| [F3-12](stories/phase-3/⬜-F3-12-local-multiplayer.md) | Multijoueur local hot-seat (passage du téléphone) | Should | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-12](stories/phase-3/🔄-F3-12-local-multiplayer.md) | Multijoueur local hot-seat (passage du téléphone) | Should | Frontend Dev, UX/UI | 🔄 in-progress |
 | [F3-13](stories/phase-3/🚫-F3-13-dev-mode.md) | Mode développeur — toggle affichage de l'article cible | Could | Frontend Dev | 🚫 won't |
 | [F3-14](stories/wont/🚫-F3-14-contact-feedback.md) | Formulaire de feedback in-app (ContactScreen) | Could | Frontend Dev, UX/UI, DPO, Backend Dev | 🚫 won't |
 | [F3-15](stories/wont/🚫-F3-15-firebase-analytics.md) | Firebase Analytics — intégration skeleton (événements de base) | Could | Frontend Dev, DPO | 🚫 won't |
@@ -99,7 +99,7 @@
 | [F3-20](stories/phase-3/🔄-F3-20-fix-history-duplicate-keys.md) | Fix doublon de clés dans HistoryScreen | Must | Frontend Dev | 🔄 in-progress |
 | [F3-21](stories/phase-3/🔄-F3-21-fix-daily-challenge-button-visual-state.md) | Fix état visuel bouton défi du jour complété | Must | Frontend Dev | 🔄 in-progress |
 | [F3-22](stories/phase-3/🔄-F3-22-fix-back-navigation-article.md) | Fix retour arrière dans la partie | Must | Frontend Dev | 🔄 in-progress |
-| [F3-23](stories/phase-3/⬜-F3-23-daily-challenge-badge-history.md) | Badge "défi du jour" dans l'historique des parties | Should | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-23](stories/phase-3/🔄-F3-23-daily-challenge-badge-history.md) | Badge "défi du jour" dans l'historique des parties | Should | Frontend Dev, UX/UI | 🔄 in-progress |
 | [F3-24](stories/phase-3/⬜-F3-24-game-detail-full-path.md) | Parcours complet dans GameDetailScreen | Could | Tech Lead, Frontend Dev | ⬜ pending |
 | [F3-25](stories/phase-3/⬜-F3-25-ux-ui-global-rework.md) | Refonte UX/UI globale (vague dédiée) | Should | UX/UI, Frontend Dev | ⬜ pending |
 | [F3-26](stories/phase-3/⬜-F3-26-internationalization.md) | Internationalisation des interfaces | Should | Tech Lead, Frontend Dev, Backend Dev | ⬜ pending |
@@ -199,4 +199,5 @@
 *v3.2 : F3-02, F3-03, F3-06, F3-13 done — historique, partage, à propos, mode dev validés QA (2026-03-10)*
 *v3.3 : F3-08, F3-10, F3-11 done — stats perso, tri historique, vue détail validés QA (2026-03-13)*
 *v3.4 : F3-20 à F3-26 créées — retours tests PO vague B (3 bugs Must + 4 features) (2026-03-14)*
+*v3.5 : Vague C démarrée — F3-09, F3-12, F3-23 passées en in-progress (2026-03-14)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*

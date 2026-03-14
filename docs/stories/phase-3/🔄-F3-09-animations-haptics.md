@@ -4,7 +4,7 @@ title: Animations et feedback haptique
 phase: 3-Features
 priority: Could
 agents: [Frontend Dev, UX/UI]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---

@@ -4,7 +4,7 @@ title: Multijoueur local hot-seat (passage du téléphone)
 phase: 3-Features
 priority: Should
 agents: [Frontend Dev, UX/UI]
-status: pending
+status: in-progress
 created: 2026-03-01
 completed:
 ---
