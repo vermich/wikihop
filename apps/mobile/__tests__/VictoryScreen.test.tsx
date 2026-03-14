@@ -72,6 +72,14 @@ let mockCurrentSession: MockSession | null = {
   completedAt: mockCompletedAt,
 };
 
+jest.mock('expo-haptics', () => ({
+  notificationAsync: jest.fn().mockResolvedValue(undefined),
+  NotificationFeedbackType: { Success: 'success', Warning: 'warning', Error: 'error' },
+  impactAsync: jest.fn().mockResolvedValue(undefined),
+  ImpactFeedbackStyle: { Light: 'light', Medium: 'medium', Heavy: 'heavy' },
+  selectionAsync: jest.fn().mockResolvedValue(undefined),
+}));
+
 jest.mock('../src/store/game.store', () => ({
   useGameStore: jest.fn((selector: (state: {
     currentSession: MockSession | null;

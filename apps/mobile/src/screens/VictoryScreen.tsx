@@ -32,6 +32,7 @@
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { Article } from '@wikihop/shared';
+import * as Haptics from 'expo-haptics';
 import React, {
   useCallback,
   useEffect,
@@ -150,13 +151,23 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
         return;
       }
 
+      // F3-09 : paramètres spring validés par Benjamin (tension:80, friction:7)
       Animated.spring(scaleAnim, {
         toValue: 1,
         useNativeDriver: true,
-        friction: 5,
+        tension: 80,
+        friction: 7,
       }).start();
     });
   }, [scaleAnim]);
+
+  // F3-09 : haptique victoire — déclenché une seule fois au montage
+  // Indépendant de reduceMotion (l'haptique n'est pas une animation visuelle)
+  useEffect(() => {
+    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {
+      // Silencieux — certains appareils n'ont pas de retour haptique
+    });
+  }, []);
 
   // ── Calcul des stats via useMemo ─────────────────────────────────────────
   const stats = useMemo<VictoryStats | null>(() => {
