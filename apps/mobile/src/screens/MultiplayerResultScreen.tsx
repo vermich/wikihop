@@ -1,8 +1,11 @@
 /**
- * MultiplayerResultScreen — WikiHop Mobile — Multijoueur local (F3-12)
+ * MultiplayerResultScreen — WikiHop Mobile — Multijoueur local (F3-12, F3-29)
  *
  * Écran de résultats final du mode multijoueur hot-seat.
  * Affiche le classement de tous les joueurs après que chacun a joué son tour.
+ *
+ * F3-29 : ajout du bouton "Rejouer" qui charge une nouvelle paire silencieusement
+ * au montage et lance une nouvelle session avec les mêmes joueurs.
  *
  * gestureEnabled: false défini dans RootNavigator (pas de swipe back).
  * PAS de bouton retour dans le header.
@@ -14,10 +17,13 @@
  *       ├── Bloc paire jouée
  *       ├── Séparateur
  *       ├── Liste classement rankPlayers(players)
- *       └── Zone bouton fixe bas : "Retour à l'accueil"
+ *       └── Zone bouton fixe bas : [Rejouer] + [Retour à l'accueil]
  *
  * Navigation "Retour à l'accueil" :
  *   resetSession() + navigation.reset({ index: 0, routes: [{ name: 'Home' }] })
+ *
+ * Navigation "Rejouer" :
+ *   restartSession(start, target) + startSession + navigate PassPhone joueur 1
  *
  * Conventions :
  *   - Export nommé MultiplayerResultScreen
@@ -26,6 +32,7 @@
  */
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { Article } from '@wikihop/shared';
 import React, { useCallback } from 'react';
 import {
   ScrollView,
@@ -36,7 +43,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useRandomPair } from '../hooks/useRandomPair';
 import type { RootStackParamList } from '../navigation/RootNavigator';
+import { useGameStore } from '../store/game.store';
 import { useMultiplayerStore, type MultiplayerPlayer } from '../store/multiplayer.store';
 import { rankPlayers } from '../utils/multiplayer.utils';
 
@@ -134,6 +143,13 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
   const startArticle = useMultiplayerStore((s) => s.startArticle);
   const targetArticle = useMultiplayerStore((s) => s.targetArticle);
   const resetSession = useMultiplayerStore((s) => s.resetSession);
+  const restartSession = useMultiplayerStore((s) => s.restartSession);
+  const clearSession = useGameStore((s) => s.clearSession);
+  const startSession = useGameStore((s) => s.startSession);
+
+  // Chargement silencieux d'une nouvelle paire en arrière-plan (F3-29)
+  // Le bouton Rejouer est activé dès que pairState.status === 'success'
+  const { state: pairState } = useRandomPair('normal');
 
   const rankedPlayers = rankPlayers(players);
 
@@ -141,6 +157,37 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
     resetSession();
     navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
   }, [resetSession, navigation]);
+
+  // F3-29 : lancer une nouvelle session avec les mêmes joueurs + nouvelle paire
+  const handleReplay = useCallback(async (): Promise<void> => {
+    if (pairState.status !== 'success') return;
+
+    // Construction explicite Article — pas de spread depuis ArticleSummary
+    const newStartArticle: Article = {
+      id: pairState.start.id,
+      title: pairState.start.title,
+      url: pairState.start.url,
+      language: pairState.start.language,
+    };
+    const newTargetArticle: Article = {
+      id: pairState.target.id,
+      title: pairState.target.title,
+      url: pairState.target.url,
+      language: pairState.target.language,
+    };
+
+    // Réinitialiser le store multijoueur avec la nouvelle paire
+    restartSession(newStartArticle, newTargetArticle);
+
+    // Démarrer la session de jeu pour le joueur 1
+    await clearSession();
+    // F3-30 : isMultiplayer: true → non enregistré dans l'historique solo
+    await startSession(newStartArticle, newTargetArticle, { isMultiplayer: true });
+
+    const firstPlayer = players[0];
+    // navigate (pas replace) — Home est toujours accessible en bas du stack
+    navigation.navigate('PassPhone', { playerName: firstPlayer?.name ?? '' });
+  }, [pairState, players, restartSession, clearSession, startSession, navigation]);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -181,16 +228,33 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
         ))}
       </ScrollView>
 
-      {/* Zone bouton fixe bas */}
+      {/* Zone boutons fixe bas — F3-29 : deux boutons côte à côte */}
       <View style={styles.bottomZone}>
-        <TouchableOpacity
-          style={styles.homeButton}
-          onPress={handleHome}
-          accessibilityLabel="Retour à l'accueil"
-          accessibilityRole="button"
-        >
-          <Text style={styles.homeButtonText}>{"Retour à l'accueil"}</Text>
-        </TouchableOpacity>
+        <View style={styles.bottomButtons}>
+          <TouchableOpacity
+            style={[styles.replayButton, pairState.status !== 'success' && styles.replayButtonDisabled]}
+            onPress={() => { void handleReplay(); }}
+            disabled={pairState.status !== 'success'}
+            accessibilityLabel="Rejouer avec les mêmes joueurs"
+            accessibilityRole="button"
+            accessibilityState={{ disabled: pairState.status !== 'success' }}
+          >
+            <Text style={[
+              styles.replayButtonText,
+              pairState.status !== 'success' && styles.replayButtonTextDisabled,
+            ]}>
+              {'Rejouer'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.homeButton}
+            onPress={handleHome}
+            accessibilityLabel="Retour à l'accueil"
+            accessibilityRole="button"
+          >
+            <Text style={styles.homeButtonText}>{"Retour à l'accueil"}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -320,7 +384,32 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#E2E8F0',
   },
+  bottomButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  replayButton: {
+    flex: 1,
+    height: 52,
+    borderWidth: 2,
+    borderColor: '#2563EB',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  replayButtonDisabled: {
+    borderColor: '#CBD5E1',
+  },
+  replayButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2563EB',
+  },
+  replayButtonTextDisabled: {
+    color: '#94A3B8',
+  },
   homeButton: {
+    flex: 1,
     height: 52,
     backgroundColor: '#2563EB',
     borderRadius: 12,
