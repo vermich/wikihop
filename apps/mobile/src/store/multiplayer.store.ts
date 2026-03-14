@@ -15,9 +15,8 @@
  *   - Zéro any — typage explicite
  */
 
-import { create } from 'zustand';
-
 import type { Article } from '@wikihop/shared';
+import { create } from 'zustand';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types publics (exportés — utilisés dans les tests et les composants)

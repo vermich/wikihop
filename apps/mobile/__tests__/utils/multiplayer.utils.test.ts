@@ -5,8 +5,8 @@
  * Les tests doivent être rouges au moment du premier commit.
  */
 
-import { validatePlayerNames, rankPlayers } from '../../src/utils/multiplayer.utils';
 import type { MultiplayerPlayer } from '../../src/store/multiplayer.store';
+import { validatePlayerNames, rankPlayers } from '../../src/utils/multiplayer.utils';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helper

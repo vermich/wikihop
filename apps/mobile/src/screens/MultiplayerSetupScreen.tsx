@@ -43,8 +43,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useRandomPair } from '../hooks/useRandomPair';
+import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useGameStore } from '../store/game.store';
 import { useMultiplayerStore } from '../store/multiplayer.store';
 import { validatePlayerNames } from '../utils/multiplayer.utils';
@@ -238,18 +238,23 @@ export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenPro
           <Text style={styles.sectionLabel}>{'JOUEURS'}</Text>
 
           {/* Liste des joueurs */}
-          {players.map((player, index) => (
-            <PlayerRow
-              key={player.id}
-              index={index}
-              name={player.name}
-              onChangeName={handleChangeName}
-              onRemove={handleRemovePlayer}
-              canRemove={players.length > 2}
-              inputRef={inputRefs.current[index]}
-              nextInputRef={index < players.length - 1 ? inputRefs.current[index + 1] : undefined}
-            />
-          ))}
+          {/* exactOptionalPropertyTypes : spread conditionnel pour inputRef / nextInputRef */}
+          {players.map((player, index) => {
+            const currentRef = inputRefs.current[index];
+            const nextRef = index < players.length - 1 ? inputRefs.current[index + 1] : undefined;
+            return (
+              <PlayerRow
+                key={player.id}
+                index={index}
+                name={player.name}
+                onChangeName={handleChangeName}
+                onRemove={handleRemovePlayer}
+                canRemove={players.length > 2}
+                {...(currentRef !== undefined ? { inputRef: currentRef } : {})}
+                {...(nextRef !== undefined ? { nextInputRef: nextRef } : {})}
+              />
+            );
+          })}
 
           {/* Bouton Ajouter un joueur */}
           <TouchableOpacity

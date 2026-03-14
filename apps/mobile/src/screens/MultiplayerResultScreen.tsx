@@ -37,9 +37,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { RootStackParamList } from '../navigation/RootNavigator';
-import { useMultiplayerStore } from '../store/multiplayer.store';
-import type { MultiplayerPlayer } from '../store/multiplayer.store';
+import { useMultiplayerStore, type MultiplayerPlayer } from '../store/multiplayer.store';
 import { rankPlayers } from '../utils/multiplayer.utils';
+
 import { formatElapsed } from './VictoryScreen';
 
 // ─────────────────────────────────────────────────────────────────────────────
