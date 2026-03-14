@@ -221,19 +221,19 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
   ), []);
 
   // ── ListFooterComponent — bouton Effacer (uniquement si liste non vide) ──
-  const renderFooter = useCallback((): React.JSX.Element | null => {
-    if (sortedRecords.length === 0) return null;
-    return (
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={handleDeleteAll}
-        accessibilityLabel="Effacer tout l'historique"
-        accessibilityRole="button"
-      >
-        <Text style={styles.deleteButtonText}>{'Effacer l\'historique'}</Text>
-      </TouchableOpacity>
-    );
-  }, [sortedRecords.length, handleDeleteAll]);
+  // F3-20 : le guard est géré via la prop ListFooterComponent directement
+  // (listFooterComponent={sortedRecords.length > 0 ? renderFooter : null})
+  // pour éviter un problème de clé React quand la liste devient vide.
+  const renderFooter = useCallback((): React.JSX.Element => (
+    <TouchableOpacity
+      style={styles.deleteButton}
+      onPress={handleDeleteAll}
+      accessibilityLabel="Effacer tout l'historique"
+      accessibilityRole="button"
+    >
+      <Text style={styles.deleteButtonText}>{'Effacer l\'historique'}</Text>
+    </TouchableOpacity>
+  ), [handleDeleteAll]);
 
   // ── État loading ──────────────────────────────────────────────────────────
   if (historyLoading) {
@@ -281,7 +281,7 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={renderSeparator}
-        ListFooterComponent={renderFooter}
+        ListFooterComponent={sortedRecords.length > 0 ? renderFooter : null}
         style={styles.list}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
