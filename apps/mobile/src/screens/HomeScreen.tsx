@@ -392,6 +392,10 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
           ? 'Défi du jour — chargement en cours'
           : 'Jouer le défi du jour';
 
+  // F3-21 : opacité réduite quand le bouton est désactivé
+  // TouchableOpacity ne gère pas automatiquement l'opacity sur disabled=true
+  const dailyButtonOpacity = isDailyButtonDisabled ? 0.5 : 1;
+
   // ── Rendu de la zone de contenu ──────────────────────────────────────────
   function renderContent(): React.JSX.Element {
     if (state.status === 'loading') {
@@ -417,9 +421,11 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
               <Text style={[styles.playButtonText, styles.playButtonTextDisabled]}>{'Jouer'}</Text>
             </TouchableOpacity>
             {/* Bouton Défi du jour (F3-01 / F3-16 / F3-17 / F3-19) — en dessous du bouton Jouer */}
+            {/* F3-21 : opacity et activeOpacity gérés explicitement (disabled ne gère pas opacity) */}
             <TouchableOpacity
-              style={dailyButtonStyle}
+              style={[dailyButtonStyle, { opacity: dailyButtonOpacity }]}
               disabled={true}
+              activeOpacity={1}
               accessibilityLabel={dailyButtonLabel}
               accessibilityRole="button"
               accessibilityState={{ disabled: true }}
@@ -547,10 +553,12 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
             <Text style={styles.playButtonText}>{'Jouer'}</Text>
           </TouchableOpacity>
           {/* Bouton Défi du jour (F3-01 / F3-16 / F3-17 / F3-19) — en dessous du bouton Jouer */}
+          {/* F3-21 : opacity et activeOpacity gérés explicitement (disabled ne gère pas opacity) */}
           <TouchableOpacity
-            style={dailyButtonStyle}
+            style={[dailyButtonStyle, { opacity: dailyButtonOpacity }]}
             onPress={() => { void handlePlayDaily(); }}
             disabled={isDailyButtonDisabled}
+            activeOpacity={isDailyButtonDisabled ? 1 : 0.8}
             accessibilityLabel={dailyButtonLabel}
             accessibilityRole="button"
             accessibilityState={{ disabled: isDailyButtonDisabled }}
