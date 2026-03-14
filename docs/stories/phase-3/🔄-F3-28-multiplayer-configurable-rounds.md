@@ -4,7 +4,7 @@ title: Multijoueur — nombre de manches configurable
 phase: 3-Features
 priority: Should
 agents: [Tech Lead, Frontend Dev]
-status: pending
+status: in-progress
 created: 2026-03-14
 completed:
 depends_on: [F3-12]
@@ -31,4 +31,4 @@ En tant que joueur en mode multijoueur, je veux pouvoir définir le nombre de ma
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending
+in-progress

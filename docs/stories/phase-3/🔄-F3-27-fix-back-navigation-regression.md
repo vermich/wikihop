@@ -4,7 +4,7 @@ title: Fix retour arrière — régression F3-22
 phase: 3-Features
 priority: Must
 agents: [Tech Lead, Frontend Dev]
-status: pending
+status: in-progress
 created: 2026-03-14
 completed:
 depends_on: [F3-22]
@@ -34,4 +34,4 @@ F3-22 a remplacé `webViewRef.current.goBack()` par `navigation.goBack()`. Cette
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending
+in-progress

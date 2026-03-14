@@ -103,10 +103,10 @@
 | [F3-24](stories/phase-3/⬜-F3-24-game-detail-full-path.md) | Parcours complet dans GameDetailScreen | Could | Tech Lead, Frontend Dev | ⬜ pending |
 | [F3-25](stories/phase-3/⬜-F3-25-ux-ui-global-rework.md) | Refonte UX/UI globale (vague dédiée) | Should | UX/UI, Frontend Dev | ⬜ pending |
 | [F3-26](stories/phase-3/⬜-F3-26-internationalization.md) | Internationalisation des interfaces | Should | Tech Lead, Frontend Dev, Backend Dev | ⬜ pending |
-| [F3-27](stories/phase-3/⬜-F3-27-fix-back-navigation-regression.md) | Fix retour arrière — régression F3-22 | Must | Tech Lead, Frontend Dev | ⬜ pending |
-| [F3-28](stories/phase-3/⬜-F3-28-multiplayer-configurable-rounds.md) | Multijoueur — nombre de manches configurable | Should | Tech Lead, Frontend Dev | ⬜ pending |
-| [F3-29](stories/phase-3/⬜-F3-29-multiplayer-replay-button.md) | Multijoueur — bouton Rejouer sur l'écran résultats | Should | Frontend Dev | ⬜ pending |
-| [F3-30](stories/phase-3/⬜-F3-30-fix-multiplayer-history-isolation.md) | Fix — parties multijoueur exclues de l'historique solo | Must | Tech Lead, Frontend Dev | ⬜ pending |
+| [F3-27](stories/phase-3/🔄-F3-27-fix-back-navigation-regression.md) | Fix retour arrière — régression F3-22 | Must | Tech Lead, Frontend Dev | 🔄 in-progress |
+| [F3-28](stories/phase-3/🔄-F3-28-multiplayer-configurable-rounds.md) | Multijoueur — nombre de manches configurable | Should | Tech Lead, Frontend Dev | 🔄 in-progress |
+| [F3-29](stories/phase-3/🔄-F3-29-multiplayer-replay-button.md) | Multijoueur — bouton Rejouer sur l'écran résultats | Should | Frontend Dev | 🔄 in-progress |
+| [F3-30](stories/phase-3/🔄-F3-30-fix-multiplayer-history-isolation.md) | Fix — parties multijoueur exclues de l'historique solo | Must | Tech Lead, Frontend Dev | 🔄 in-progress |
 | [F3-31](stories/phase-3/⬜-F3-31-multiplayer-history.md) | Historique des parties multijoueur | Could | Tech Lead, UX/UI, Frontend Dev | ⬜ pending |
 
 ---

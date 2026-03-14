@@ -4,7 +4,7 @@ title: Multijoueur — bouton Rejouer sur l'écran résultats
 phase: 3-Features
 priority: Should
 agents: [Frontend Dev]
-status: pending
+status: in-progress
 created: 2026-03-14
 completed:
 depends_on: [F3-12, F3-28]
@@ -29,4 +29,4 @@ En tant que groupe de joueurs ayant terminé une session multijoueur, je veux po
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending
+in-progress

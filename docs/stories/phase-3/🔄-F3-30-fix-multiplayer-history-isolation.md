@@ -4,7 +4,7 @@ title: Fix — parties multijoueur exclues de l'historique solo
 phase: 3-Features
 priority: Must
 agents: [Tech Lead, Frontend Dev]
-status: pending
+status: in-progress
 created: 2026-03-14
 completed:
 depends_on: [F3-12]
@@ -32,4 +32,4 @@ Dans la session multijoueur, `clearSession()` du game store est appelé après c
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending
+in-progress
