@@ -446,6 +446,15 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
                 </Text>
               )}
             </TouchableOpacity>
+            {/* Bouton Multijoueur (F3-12) */}
+            <TouchableOpacity
+              style={styles.multiplayerButton}
+              onPress={() => { navigation.navigate('MultiplayerSetup'); }}
+              accessibilityLabel="Multijoueur — jouer à plusieurs sur cet appareil"
+              accessibilityRole="button"
+            >
+              <Text style={styles.multiplayerButtonText}>{'Multijoueur'}</Text>
+            </TouchableOpacity>
             <TouchableOpacity
               style={styles.refreshButton}
               disabled={true}
@@ -576,6 +585,15 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
             ) : (
               <Text style={styles.dailyButtonText}>{'Défi du jour'}</Text>
             )}
+          </TouchableOpacity>
+          {/* Bouton Multijoueur (F3-12) */}
+          <TouchableOpacity
+            style={styles.multiplayerButton}
+            onPress={() => { navigation.navigate('MultiplayerSetup'); }}
+            accessibilityLabel="Multijoueur — jouer à plusieurs sur cet appareil"
+            accessibilityRole="button"
+          >
+            <Text style={styles.multiplayerButtonText}>{'Multijoueur'}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.refreshButton}
@@ -909,6 +927,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
     letterSpacing: 0.5,
+  },
+  // Bouton Multijoueur (F3-12) — outline bleu, fond blanc
+  multiplayerButton: {
+    height: 52,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#2563EB',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+  },
+  multiplayerButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2563EB',
   },
 });
 

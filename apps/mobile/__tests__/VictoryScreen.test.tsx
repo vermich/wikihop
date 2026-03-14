@@ -94,6 +94,30 @@ jest.mock('../src/store/game.store', () => ({
   ),
 }));
 
+// Mock useMultiplayerStore — mode solo par défaut (isSessionActive: false)
+const mockMultiplayerState = {
+  isSessionActive: false,
+  currentPlayerIndex: 0,
+  players: [] as unknown[],
+  recordTurnResult: jest.fn(),
+  advanceToNextPlayer: jest.fn(),
+  startArticle: null,
+  targetArticle: null,
+};
+
+const mockUseMultiplayerStore = Object.assign(
+  jest.fn((selector: (state: typeof mockMultiplayerState) => unknown) =>
+    selector(mockMultiplayerState),
+  ),
+  {
+    getState: jest.fn(() => mockMultiplayerState),
+  },
+);
+
+jest.mock('../src/store/multiplayer.store', () => ({
+  useMultiplayerStore: mockUseMultiplayerStore,
+}));
+
 jest.mock('../src/services/wikipedia.service', () => ({
   clearSummaryCache: jest.fn(),
   getArticleSummary: jest.fn(),
