@@ -108,12 +108,14 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
   const clearSession = useGameStore((state) => state.clearSession);
   const startSession = useGameStore((state) => state.startSession);
 
-  // ── Sélecteurs multijoueur (F3-12) ───────────────────────────────────────
+  // ── Sélecteurs multijoueur (F3-12, F3-28) ────────────────────────────────
   const isMultiplayerActive = useMultiplayerStore((state) => state.isSessionActive);
   const currentPlayerIndex = useMultiplayerStore((state) => state.currentPlayerIndex);
   const multiplayerPlayers = useMultiplayerStore((state) => state.players);
   const recordTurnResult = useMultiplayerStore((state) => state.recordTurnResult);
   const advanceToNextPlayer = useMultiplayerStore((state) => state.advanceToNextPlayer);
+  const roundCount = useMultiplayerStore((state) => state.roundCount);
+  const currentRound = useMultiplayerStore((state) => state.currentRound);
 
   // ── Guard d'entrée — déclenché une seule fois au montage ──────────────────
   // Note : deps vides intentionnellement — on vérifie l'état au montage uniquement
@@ -211,7 +213,7 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
     );
   }, [stats]);
 
-  // ── handleNextTurn : tour du joueur suivant en mode multijoueur (F3-12) ────
+  // ── handleNextTurn : tour du joueur suivant en mode multijoueur (F3-12, F3-28) ────
   const handleNextTurn = useCallback(async (): Promise<void> => {
     if (currentSession === null) return;
 
@@ -219,6 +221,8 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
       ? currentSession.completedAt.getTime() - currentSession.startedAt.getTime()
       : 0;
 
+    // Ordre strict : recordTurnResult + advanceToNextPlayer AVANT la vérification
+    // de fin de manche (snapshot roundHistory correct dans startNextRound)
     recordTurnResult(
       currentPlayerIndex,
       currentSession.jumps,
@@ -229,21 +233,31 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
     advanceToNextPlayer();
 
     const nextIndex = currentPlayerIndex + 1;
-    const allDone = nextIndex >= multiplayerPlayers.length;
+    const allPlayersThisRoundDone = nextIndex >= multiplayerPlayers.length;
 
     await clearSession();
 
-    if (allDone) {
-      navigation.navigate('MultiplayerResult');
-      return;
+    if (allPlayersThisRoundDone) {
+      // Tous les joueurs ont joué cette manche
+      if (currentRound < roundCount) {
+        // Pas la dernière manche → écran de transition vers la manche suivante
+        navigation.navigate('MultiplayerRoundTransition');
+        return;
+      } else {
+        // Dernière manche → résultats finaux
+        navigation.navigate('MultiplayerResult');
+        return;
+      }
     }
 
+    // Pas la fin de la manche : joueur suivant
     const nextPlayer = multiplayerPlayers[nextIndex];
     if (nextPlayer === undefined) {
       navigation.navigate('MultiplayerResult');
       return;
     }
 
+    // Accès direct au store (hors re-render, dans le callback)
     const startArticle = useMultiplayerStore.getState().startArticle;
     const targetArticle = useMultiplayerStore.getState().targetArticle;
 
@@ -264,6 +278,8 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
     clearSession,
     startSession,
     navigation,
+    currentRound,
+    roundCount,
   ]);
 
   // ── handleReplay : rejouer avec la même paire ────────────────────────────

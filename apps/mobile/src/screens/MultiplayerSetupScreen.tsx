@@ -126,6 +126,7 @@ export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenPro
     { id: '2', name: '' },
   ]);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [roundCount, setRoundCount] = useState(1);
 
   const { state: pairState } = useRandomPair('normal');
 
@@ -192,8 +193,8 @@ export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenPro
       language: pairState.target.language,
     };
 
-    // Initialiser le store multijoueur
-    setupSession(names, startArticle, targetArticle);
+    // Initialiser le store multijoueur avec le nombre de manches configuré
+    setupSession(names, startArticle, targetArticle, roundCount);
 
     // Effacer toute session de jeu résiduelle et démarrer pour le joueur 1
     // F3-30 : isMultiplayer: true → session non enregistrée dans l'historique solo
@@ -202,7 +203,7 @@ export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenPro
 
     const firstPlayerName = players[0]?.name ?? '';
     navigation.navigate('PassPhone', { playerName: firstPlayerName });
-  }, [players, pairState, setupSession, clearSession, startSession, navigation]);
+  }, [players, pairState, roundCount, setupSession, clearSession, startSession, navigation]);
 
   // Désactivation du bouton Commencer : noms vides, ou paire non chargée, ou < 2 joueurs
   const hasEmptyName = players.some((p) => p.name.trim().length === 0);
@@ -270,6 +271,37 @@ export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenPro
               {'+ Ajouter un joueur'}
             </Text>
           </TouchableOpacity>
+
+          {/* Sélecteur de manches (F3-28) */}
+          <Text style={styles.sectionLabel}>{'MANCHES'}</Text>
+          <View style={styles.stepperRow}>
+            <TouchableOpacity
+              style={[styles.stepperButton, roundCount <= 1 && styles.stepperButtonDisabled]}
+              onPress={() => { setRoundCount((prev) => Math.max(1, prev - 1)); }}
+              disabled={roundCount <= 1}
+              accessibilityLabel="Diminuer le nombre de manches"
+              accessibilityRole="button"
+              accessibilityState={{ disabled: roundCount <= 1 }}
+            >
+              <Text style={styles.stepperButtonText}>{'−'}</Text>
+            </TouchableOpacity>
+            <Text
+              style={styles.stepperValue}
+              accessibilityLabel={`${String(roundCount)} manche${roundCount > 1 ? 's' : ''}`}
+            >
+              {String(roundCount)}
+            </Text>
+            <TouchableOpacity
+              style={[styles.stepperButton, roundCount >= 5 && styles.stepperButtonDisabled]}
+              onPress={() => { setRoundCount((prev) => Math.min(5, prev + 1)); }}
+              disabled={roundCount >= 5}
+              accessibilityLabel="Augmenter le nombre de manches"
+              accessibilityRole="button"
+              accessibilityState={{ disabled: roundCount >= 5 }}
+            >
+              <Text style={styles.stepperButtonText}>{'+'}</Text>
+            </TouchableOpacity>
+          </View>
 
           {/* Erreurs de validation */}
           {validationErrors.length > 0 && (
@@ -435,6 +467,36 @@ const styles = StyleSheet.create({
   },
   addButtonTextDisabled: {
     color: '#94A3B8',
+  },
+  stepperRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 4,
+    marginBottom: 16,
+  },
+  stepperButton: {
+    width: 44,
+    height: 44,
+    backgroundColor: '#F1F5F9',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepperButtonDisabled: {
+    opacity: 0.4,
+  },
+  stepperButtonText: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#1E293B',
+  },
+  stepperValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1E293B',
+    minWidth: 48,
+    textAlign: 'center',
   },
   errorsContainer: {
     marginTop: 8,
