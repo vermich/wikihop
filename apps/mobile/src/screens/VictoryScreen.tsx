@@ -32,6 +32,7 @@
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { Article } from '@wikihop/shared';
+import * as Haptics from 'expo-haptics';
 import React, {
   useCallback,
   useEffect,
@@ -54,6 +55,7 @@ import type { RootStackParamList } from '../navigation/RootNavigator';
 import { saveDailyCompletionDate } from '../services/daily-completion.service';
 import { clearSummaryCache } from '../services/wikipedia.service';
 import { useGameStore } from '../store/game.store';
+import { useMultiplayerStore } from '../store/multiplayer.store';
 import { formatDailyChallengeDate } from '../utils/daily-challenge.utils';
 import { buildShareMessage } from '../utils/share.utils';
 
@@ -106,6 +108,13 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
   const clearSession = useGameStore((state) => state.clearSession);
   const startSession = useGameStore((state) => state.startSession);
 
+  // ── Sélecteurs multijoueur (F3-12) ───────────────────────────────────────
+  const isMultiplayerActive = useMultiplayerStore((state) => state.isSessionActive);
+  const currentPlayerIndex = useMultiplayerStore((state) => state.currentPlayerIndex);
+  const multiplayerPlayers = useMultiplayerStore((state) => state.players);
+  const recordTurnResult = useMultiplayerStore((state) => state.recordTurnResult);
+  const advanceToNextPlayer = useMultiplayerStore((state) => state.advanceToNextPlayer);
+
   // ── Guard d'entrée — déclenché une seule fois au montage ──────────────────
   // Note : deps vides intentionnellement — on vérifie l'état au montage uniquement
   useEffect(() => {
@@ -150,13 +159,23 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
         return;
       }
 
+      // F3-09 : paramètres spring validés par Benjamin (tension:80, friction:7)
       Animated.spring(scaleAnim, {
         toValue: 1,
         useNativeDriver: true,
-        friction: 5,
+        tension: 80,
+        friction: 7,
       }).start();
     });
   }, [scaleAnim]);
+
+  // F3-09 : haptique victoire — déclenché une seule fois au montage
+  // Indépendant de reduceMotion (l'haptique n'est pas une animation visuelle)
+  useEffect(() => {
+    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {
+      // Silencieux — certains appareils n'ont pas de retour haptique
+    });
+  }, []);
 
   // ── Calcul des stats via useMemo ─────────────────────────────────────────
   const stats = useMemo<VictoryStats | null>(() => {
@@ -191,6 +210,60 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
       `Victoire ! ${String(stats.jumps)} saut${stats.jumps <= 1 ? '' : 's'} en ${formatElapsed(stats.elapsedSeconds)}. De ${stats.startTitle} à ${stats.targetTitle}.`,
     );
   }, [stats]);
+
+  // ── handleNextTurn : tour du joueur suivant en mode multijoueur (F3-12) ────
+  const handleNextTurn = useCallback(async (): Promise<void> => {
+    if (currentSession === null) return;
+
+    const durationMs = currentSession.completedAt !== undefined
+      ? currentSession.completedAt.getTime() - currentSession.startedAt.getTime()
+      : 0;
+
+    recordTurnResult(
+      currentPlayerIndex,
+      currentSession.jumps,
+      durationMs,
+      currentSession.status === 'won',
+    );
+
+    advanceToNextPlayer();
+
+    const nextIndex = currentPlayerIndex + 1;
+    const allDone = nextIndex >= multiplayerPlayers.length;
+
+    await clearSession();
+
+    if (allDone) {
+      navigation.navigate('MultiplayerResult');
+      return;
+    }
+
+    const nextPlayer = multiplayerPlayers[nextIndex];
+    if (nextPlayer === undefined) {
+      navigation.navigate('MultiplayerResult');
+      return;
+    }
+
+    const startArticle = useMultiplayerStore.getState().startArticle;
+    const targetArticle = useMultiplayerStore.getState().targetArticle;
+
+    if (startArticle === null || targetArticle === null) {
+      navigation.navigate('MultiplayerResult');
+      return;
+    }
+
+    await startSession(startArticle, targetArticle);
+    navigation.navigate('PassPhone', { playerName: nextPlayer.name });
+  }, [
+    currentSession,
+    currentPlayerIndex,
+    multiplayerPlayers,
+    recordTurnResult,
+    advanceToNextPlayer,
+    clearSession,
+    startSession,
+    navigation,
+  ]);
 
   // ── handleReplay : rejouer avec la même paire ────────────────────────────
   const handleReplay = useCallback(async (): Promise<void> => {
@@ -392,18 +465,25 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Zone boutons sticky */}
+      {/* Zone boutons sticky (F3-12 : gestion mode multijoueur) */}
       <View style={styles.stickyButtons}>
         <View style={styles.primaryButtonsRow}>
+          {/* Bouton principal : "Tour suivant" en multijoueur, "Nouvelle partie" sinon */}
           <TouchableOpacity
-            style={[styles.primaryButton, styles.newGameButton, isDaily && styles.newGameButtonFull]}
-            onPress={handleNewGame}
-            accessibilityLabel="Démarrer une nouvelle partie"
+            style={[
+              styles.primaryButton,
+              styles.newGameButton,
+              (isDaily || isMultiplayerActive) && styles.newGameButtonFull,
+            ]}
+            onPress={isMultiplayerActive ? () => { void handleNextTurn(); } : handleNewGame}
+            accessibilityLabel={isMultiplayerActive ? 'Tour du joueur suivant' : 'Démarrer une nouvelle partie'}
             accessibilityRole="button"
           >
-            <Text style={styles.newGameButtonText}>{'Nouvelle partie'}</Text>
+            <Text style={styles.newGameButtonText}>
+              {isMultiplayerActive ? 'Tour suivant →' : 'Nouvelle partie'}
+            </Text>
           </TouchableOpacity>
-          {!isDaily && (
+          {!isDaily && !isMultiplayerActive && (
             <TouchableOpacity
               style={[styles.primaryButton, styles.replayButton]}
               onPress={() => { void handleReplay(); }}
@@ -422,14 +502,17 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
         >
           <Text style={styles.shareButtonText}>{'Partager'}</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.historyButton}
-          onPress={() => { navigation.navigate('History'); }}
-          accessibilityLabel="Voir l'historique de mes parties"
-          accessibilityRole="button"
-        >
-          <Text style={styles.historyButtonText}>{"Voir l'historique"}</Text>
-        </TouchableOpacity>
+        {/* Bouton historique masqué en mode multijoueur */}
+        {!isMultiplayerActive && (
+          <TouchableOpacity
+            style={styles.historyButton}
+            onPress={() => { navigation.navigate('History'); }}
+            accessibilityLabel="Voir l'historique de mes parties"
+            accessibilityRole="button"
+          >
+            <Text style={styles.historyButtonText}>{"Voir l'historique"}</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );

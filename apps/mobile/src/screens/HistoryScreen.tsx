@@ -27,6 +27,7 @@
 import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { GameRecord } from '@wikihop/shared';
+import * as Haptics from 'expo-haptics';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import {
   AccessibilityInfo,
@@ -207,6 +208,17 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
     navigation.navigate('GameDetail', { recordId: record.id });
   }, [navigation]);
 
+  // F3-09 : wrapper haptique autour de setCriterion
+  // Déclenche Haptics.impactAsync uniquement si le critère change (Benjamin F3-09-C)
+  const handleCriterionSelect = useCallback(async (c: SortCriterion): Promise<void> => {
+    if (c !== criterion) {
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {
+        // Silencieux — certains appareils n'ont pas de retour haptique
+      });
+    }
+    await setCriterion(c);
+  }, [criterion, setCriterion]);
+
   // ── keyExtractor ──────────────────────────────────────────────────────────
   const keyExtractor = useCallback((item: GameRecord): string => item.id, []);
 
@@ -221,19 +233,19 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
   ), []);
 
   // ── ListFooterComponent — bouton Effacer (uniquement si liste non vide) ──
-  const renderFooter = useCallback((): React.JSX.Element | null => {
-    if (sortedRecords.length === 0) return null;
-    return (
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={handleDeleteAll}
-        accessibilityLabel="Effacer tout l'historique"
-        accessibilityRole="button"
-      >
-        <Text style={styles.deleteButtonText}>{'Effacer l\'historique'}</Text>
-      </TouchableOpacity>
-    );
-  }, [sortedRecords.length, handleDeleteAll]);
+  // F3-20 : le guard est géré via la prop ListFooterComponent directement
+  // (listFooterComponent={sortedRecords.length > 0 ? renderFooter : null})
+  // pour éviter un problème de clé React quand la liste devient vide.
+  const renderFooter = useCallback((): React.JSX.Element => (
+    <TouchableOpacity
+      style={styles.deleteButton}
+      onPress={handleDeleteAll}
+      accessibilityLabel="Effacer tout l'historique"
+      accessibilityRole="button"
+    >
+      <Text style={styles.deleteButtonText}>{'Effacer l\'historique'}</Text>
+    </TouchableOpacity>
+  ), [handleDeleteAll]);
 
   // ── État loading ──────────────────────────────────────────────────────────
   if (historyLoading) {
@@ -241,7 +253,7 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
         <Header onBack={handleBack} onStats={handleStats} />
         <View style={styles.headerSeparator} />
-        <SortBar activeCriterion={criterion} isLoading={sortLoading} onSelect={setCriterion} />
+        <SortBar activeCriterion={criterion} isLoading={sortLoading} onSelect={handleCriterionSelect} />
         <ActivityIndicator
           style={styles.loader}
           color="#2563EB"
@@ -257,7 +269,7 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
         <Header onBack={handleBack} onStats={handleStats} />
         <View style={styles.headerSeparator} />
-        <SortBar activeCriterion={criterion} isLoading={sortLoading} onSelect={setCriterion} />
+        <SortBar activeCriterion={criterion} isLoading={sortLoading} onSelect={handleCriterionSelect} />
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyIcon} accessible={false}>{'📋'}</Text>
           <Text style={styles.emptyText}>
@@ -273,7 +285,7 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <Header onBack={handleBack} onStats={handleStats} />
       <View style={styles.headerSeparator} />
-      <SortBar activeCriterion={criterion} isLoading={sortLoading} onSelect={setCriterion} />
+      <SortBar activeCriterion={criterion} isLoading={sortLoading} onSelect={handleCriterionSelect} />
 
       {/* FlatList — éco-conception : windowSize, maxToRenderPerBatch, initialNumToRender */}
       <FlatList<GameRecord>
@@ -281,7 +293,7 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={renderSeparator}
-        ListFooterComponent={renderFooter}
+        ListFooterComponent={sortedRecords.length > 0 ? renderFooter : null}
         style={styles.list}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}

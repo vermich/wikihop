@@ -17,14 +17,12 @@
  * ADR-003 : React Native Testing Library pour les tests
  */
 
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-import { AccessibilityInfo } from 'react-native';
 import React from 'react';
+import { AccessibilityInfo } from 'react-native';
 
-import {
-  computeElapsedSeconds,
-  formatElapsed,
-} from '../src/screens/VictoryScreen';
+import type { RootStackParamList } from '../src/navigation/RootNavigator';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Mocks
@@ -72,6 +70,14 @@ let mockCurrentSession: MockSession | null = {
   completedAt: mockCompletedAt,
 };
 
+jest.mock('expo-haptics', () => ({
+  notificationAsync: jest.fn().mockResolvedValue(undefined),
+  NotificationFeedbackType: { Success: 'success', Warning: 'warning', Error: 'error' },
+  impactAsync: jest.fn().mockResolvedValue(undefined),
+  ImpactFeedbackStyle: { Light: 'light', Medium: 'medium', Heavy: 'heavy' },
+  selectionAsync: jest.fn().mockResolvedValue(undefined),
+}));
+
 jest.mock('../src/store/game.store', () => ({
   useGameStore: jest.fn((selector: (state: {
     currentSession: MockSession | null;
@@ -85,6 +91,26 @@ jest.mock('../src/store/game.store', () => ({
     }),
   ),
 }));
+
+// Mock useMultiplayerStore — mode solo par défaut (isSessionActive: false)
+// La factory jest.mock est hoistée, les variables doivent être déclarées dedans.
+jest.mock('../src/store/multiplayer.store', () => {
+  const mockState = {
+    isSessionActive: false,
+    currentPlayerIndex: 0,
+    players: [],
+    recordTurnResult: jest.fn(),
+    advanceToNextPlayer: jest.fn(),
+    startArticle: null,
+    targetArticle: null,
+  };
+  const mockFn = jest.fn((selector: (state: typeof mockState) => unknown) =>
+    selector(mockState),
+  );
+  // Ajouter getState comme propriété statique pour handleNextTurn
+  (mockFn as unknown as { getState: () => typeof mockState }).getState = jest.fn(() => mockState);
+  return { useMultiplayerStore: mockFn };
+});
 
 jest.mock('../src/services/wikipedia.service', () => ({
   clearSummaryCache: jest.fn(),
@@ -100,7 +126,11 @@ jest.mock('../src/services/wikipedia.service', () => ({
 // Import après mocks
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { VictoryScreen } from '../src/screens/VictoryScreen';
+import {
+  VictoryScreen,
+  computeElapsedSeconds,
+  formatElapsed,
+} from '../src/screens/VictoryScreen';
 import { clearSummaryCache } from '../src/services/wikipedia.service';
 
 const mockClearSummaryCache = clearSummaryCache as jest.MockedFunction<typeof clearSummaryCache>;
@@ -109,11 +139,13 @@ const mockClearSummaryCache = clearSummaryCache as jest.MockedFunction<typeof cl
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-function renderVictoryScreen() {
+type VictoryScreenProps = NativeStackScreenProps<RootStackParamList, 'Victory'>;
+
+function renderVictoryScreen(): ReturnType<typeof render> {
   return render(
     <VictoryScreen
-      navigation={mockNavigation as never}
-      route={{ key: 'Victory', name: 'Victory', params: undefined } as never}
+      navigation={mockNavigation as unknown as VictoryScreenProps['navigation']}
+      route={{ key: 'Victory', name: 'Victory', params: undefined } as unknown as VictoryScreenProps['route']}
     />,
   );
 }

@@ -48,7 +48,9 @@ export function HistoryItem({ record, onPress }: HistoryItemProps): React.JSX.El
   const jumpLabel = record.jumps <= 1 ? 'saut' : 'sauts';
 
   // Label d'accessibilité complet (badge, date et stats sont accessible={false})
-  const accessibilityLabel = `${isVictory ? 'Victoire' : 'Abandonné'}. ${record.startArticle.title} vers ${record.targetArticle.title}. ${String(record.jumps)} ${jumpLabel}. ${formattedDuration}. Le ${formattedDate}.`;
+  // F3-23 : préfixe "Défi du jour." si isDailyChallenge === true (=== true car champ optionnel)
+  const dailyChallengePrefix = record.isDailyChallenge === true ? 'Défi du jour. ' : '';
+  const accessibilityLabel = `${isVictory ? 'Victoire' : 'Abandonné'}. ${dailyChallengePrefix}${record.startArticle.title} vers ${record.targetArticle.title}. ${String(record.jumps)} ${jumpLabel}. ${formattedDuration}. Le ${formattedDate}.`;
 
   return (
     <TouchableOpacity
@@ -58,7 +60,7 @@ export function HistoryItem({ record, onPress }: HistoryItemProps): React.JSX.El
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
     >
-      {/* Ligne 1 : Badge + Trajet + Icône navigation */}
+      {/* Ligne 1 : Badge statut + Badge défi (conditionnel) + Trajet + Icône navigation */}
       <View style={styles.row}>
         <View
           style={[styles.badge, isVictory ? styles.badgeVictory : styles.badgeAbandoned]}
@@ -68,6 +70,14 @@ export function HistoryItem({ record, onPress }: HistoryItemProps): React.JSX.El
             {isVictory ? 'Victoire' : 'Abandonné'}
           </Text>
         </View>
+
+        {/* Badge défi du jour (F3-23) — conditionnel, utilise === true car champ optionnel */}
+        {record.isDailyChallenge === true && (
+          <View style={styles.badgeDaily} accessible={false}>
+            <Text style={styles.badgeDailyText}>{'DÉFI'}</Text>
+          </View>
+        )}
+
         <Text
           style={styles.trajet}
           numberOfLines={1}
@@ -125,6 +135,19 @@ const styles = StyleSheet.create({
   },
   badgeTextAbandoned: {
     color: '#64748B',
+  },
+  // Badge défi du jour (F3-23) — ambre #D97706
+  badgeDaily: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 4,
+    backgroundColor: '#D97706',
+    marginLeft: 4,
+  },
+  badgeDailyText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
   },
   trajet: {
     flex: 1,

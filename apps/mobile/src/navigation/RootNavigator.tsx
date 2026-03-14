@@ -19,6 +19,9 @@ import { DonationScreen } from '../screens/DonationScreen';
 import { GameDetailScreen } from '../screens/GameDetailScreen';
 import { HistoryScreen } from '../screens/HistoryScreen';
 import { HomeScreen } from '../screens/HomeScreen';
+import { MultiplayerResultScreen } from '../screens/MultiplayerResultScreen';
+import { MultiplayerSetupScreen } from '../screens/MultiplayerSetupScreen';
+import { PassPhoneScreen } from '../screens/PassPhoneScreen';
 import { StatsScreen } from '../screens/StatsScreen';
 import { VictoryScreen } from '../screens/VictoryScreen';
 
@@ -94,6 +97,25 @@ export type RootStackParamList = {
    * Accessible depuis HistoryScreen.
    */
   Stats: undefined;
+  /**
+   * Route MultiplayerSetup : configuration d'une session multijoueur hot-seat (F3-12).
+   * Saisie des noms de joueurs (2-6) et chargement de la paire d'articles.
+   */
+  MultiplayerSetup: undefined;
+  /**
+   * Route PassPhone : transition entre deux tours en mode multijoueur (F3-12).
+   * playerName : nom du joueur qui doit maintenant jouer.
+   * gestureEnabled: false — empêche le swipe back accidentel.
+   */
+  PassPhone: {
+    playerName: string;
+  };
+  /**
+   * Route MultiplayerResult : classement final après la session multijoueur (F3-12).
+   * Les données (joueurs, résultats) viennent de useMultiplayerStore.
+   * gestureEnabled: false — pas de retour arrière depuis cet écran.
+   */
+  MultiplayerResult: undefined;
 };
 
 /** Type NavigationProp pour le stack racine — exporté pour usage dans les écrans */
@@ -155,6 +177,22 @@ export function RootNavigator(): React.JSX.Element {
           name="Stats"
           component={StatsScreen}
           options={{ headerShown: false }}
+        />
+        {/* Routes multijoueur (F3-12) */}
+        <Stack.Screen
+          name="MultiplayerSetup"
+          component={MultiplayerSetupScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="PassPhone"
+          component={PassPhoneScreen}
+          options={{ headerShown: false, gestureEnabled: false }}
+        />
+        <Stack.Screen
+          name="MultiplayerResult"
+          component={MultiplayerResultScreen}
+          options={{ headerShown: false, gestureEnabled: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>
