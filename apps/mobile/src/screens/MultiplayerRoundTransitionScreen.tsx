@@ -94,9 +94,12 @@ export function MultiplayerRoundTransitionScreen(
         playerName: firstPlayer?.name ?? '',
       });
     })();
-  // pairState.status est la seule dep qui doit déclencher cet effet
-  // Les autres sont des actions de store stables (Zustand garantit la stabilité)
-  }, [pairState.status]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Dépendance intentionnellement limitée à pairState.status :
+  // les actions Zustand (startNextRound, clearSession, startSession) sont stables
+  // (identité de référence garantie par Zustand create).
+  // players capturé au moment du mount — stable pendant la transition.
+  // eslint-plugin-react-hooks non installé dans ce projet.
+  }, [pairState.status]);
 
   // ── Gestion d'erreur de chargement de paire ────────────────────────────────
   if (pairState.status === 'error') {
