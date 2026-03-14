@@ -20,6 +20,7 @@ import { GameDetailScreen } from '../screens/GameDetailScreen';
 import { HistoryScreen } from '../screens/HistoryScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { MultiplayerResultScreen } from '../screens/MultiplayerResultScreen';
+import { MultiplayerRoundTransitionScreen } from '../screens/MultiplayerRoundTransitionScreen';
 import { MultiplayerSetupScreen } from '../screens/MultiplayerSetupScreen';
 import { PassPhoneScreen } from '../screens/PassPhoneScreen';
 import { StatsScreen } from '../screens/StatsScreen';
@@ -116,6 +117,12 @@ export type RootStackParamList = {
    * gestureEnabled: false — pas de retour arrière depuis cet écran.
    */
   MultiplayerResult: undefined;
+  /**
+   * Route MultiplayerRoundTransition : transition entre deux manches (F3-28).
+   * Charge une nouvelle paire d'articles et déclenche startNextRound.
+   * gestureEnabled: false — empêche tout retour accidentel.
+   */
+  MultiplayerRoundTransition: undefined;
 };
 
 /** Type NavigationProp pour le stack racine — exporté pour usage dans les écrans */
@@ -192,6 +199,11 @@ export function RootNavigator(): React.JSX.Element {
         <Stack.Screen
           name="MultiplayerResult"
           component={MultiplayerResultScreen}
+          options={{ headerShown: false, gestureEnabled: false }}
+        />
+        <Stack.Screen
+          name="MultiplayerRoundTransition"
+          component={MultiplayerRoundTransitionScreen}
           options={{ headerShown: false, gestureEnabled: false }}
         />
       </Stack.Navigator>

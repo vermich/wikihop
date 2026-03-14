@@ -290,8 +290,6 @@ export function WikipediaWebView(props: WikipediaWebViewProps): React.JSX.Elemen
       return;
     }
 
-    // eslint-disable-next-line no-console
-    console.log('[WikiHop] onPageChange:', title, '| url:', navState.url, '| loading:', navState.loading);
     lastReportedTitle.current = title;
     onPageChange(title);
   }

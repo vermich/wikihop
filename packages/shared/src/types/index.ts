@@ -87,6 +87,12 @@ export interface GameSession {
   dailyChallengeDate?: string;
   /** Difficulté de la partie (F3-05). Absent = 'normal' pour rétrocompatibilité. */
   difficulty?: GameDifficulty;
+  /**
+   * Indique si la session fait partie d'une session multijoueur hot-seat (F3-30).
+   * Absent = false pour les sessions solo.
+   * Les sessions multijoueur ne sont PAS enregistrées dans l'historique solo.
+   */
+  isMultiplayer?: boolean;
 }
 
 // ─────────────────────────────────────────────
