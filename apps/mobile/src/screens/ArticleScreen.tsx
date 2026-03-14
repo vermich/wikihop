@@ -1,15 +1,16 @@
 /**
- * ArticleScreen — WikiHop Mobile — Réécriture WebView native
+ * ArticleScreen — WikiHop Mobile — Fix retour arrière WebView (F3-27)
  *
  * Écran principal du jeu. Charge directement m.wikipedia.org dans la WebView.
  *
- * Architecture (F3-22 — retour arrière via navigation.goBack) :
- *   - La navigation inter-articles utilise navigation.push('Game', ...) empilant
- *     des instances successives de ArticleScreen dans le stack natif.
- *   - Le retour arrière utilise navigation.goBack() (React Navigation native-stack),
- *     ce qui dépile l'écran précédent sans compter de saut supplémentaire.
- *   - BackHandler Android : navigation.goBack() si canGoBack, sinon handleAbandon.
- *   - Le bouton "← Retour" dans le header est conditionné sur navigation.canGoBack().
+ * Architecture (F3-27 — single-screen WebView avec goBack interne) :
+ *   - Il n'y a qu'une seule instance de ArticleScreen dans le stack natif.
+ *   - Toute la navigation Wikipedia se passe à l'intérieur de la WebView via
+ *     onNavigationStateChange (pas de navigation.push entre articles).
+ *   - Le retour arrière utilise webViewRef.current?.goBack() (API native WebView),
+ *     distingué d'un saut forward via le flag isBackNavigation.
+ *   - BackHandler Android : goBack() si webViewCanGoBack, sinon handleAbandon.
+ *   - Le bouton "← Retour" dans le header est conditionné sur webViewCanGoBack.
  *
  * Layout :
  *   [Header fixe — 52pt — SafeAreaView]
@@ -19,7 +20,7 @@
  * Références :
  *   Story : docs/stories/M-03-article-content-display.md
  *   Story : docs/stories/M-04-article-navigation.md
- *   Story : docs/stories/F3-22-fix-back-navigation.md
+ *   Story : docs/stories/F3-27-fix-back-navigation-webview.md
  *
  * Conventions :
  *   - Export nommé
@@ -33,6 +34,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, {
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import {
@@ -44,6 +46,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { WebView } from 'react-native-webview';
 
 import { GameHUD } from '../components/game/GameHUD';
 import {
@@ -85,13 +88,27 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
   // Erreur WebView
   const [webViewError, setWebViewError] = useState<string | null>(null);
 
+  // Ref vers la WebView native — permet goBack() depuis le BackHandler et le bouton header
+  const webViewRef = useRef<WebView>(null);
+
+  // Suit canGoBack de la WebView (remplace navigation.canGoBack() pour le retour intra-partie)
+  const [webViewCanGoBack, setWebViewCanGoBack] = useState(false);
+
+  // Flag interne : distingue un retour arrière (goBack) d'un saut forward
+  // true pendant le cycle : goBack() appelé → handlePageChangeSync reçu
+  const isBackNavigation = useRef(false);
+
   const isFocused = useIsFocused();
 
+  // ── Callback onNavigationStateChange pour la WebView ─────────────────────
+  const handleNavStateChange = useCallback(
+    (navState: { canGoBack: boolean; url: string }): void => {
+      setWebViewCanGoBack(navState.canGoBack);
+    },
+    [],
+  );
+
   // ── Gestion des sauts et de la victoire ─────────────────────────────────────
-  //
-  // Appelé par WikipediaWebView quand l'utilisateur change de page (saut avant).
-  // navigation.push empile une nouvelle instance de Game — le retour arrière
-  // via navigation.goBack() dépile sans appeler handlePageChange (pas de saut).
   const handlePageChange = useCallback(
     async (newTitle: string): Promise<void> => {
       // Mise à jour du titre courant
@@ -120,9 +137,18 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
     [lang, addJump, completeSession, targetArticle, navigation],
   );
 
-  // ── Wrapper non-async pour onPageChange (prop de WikipediaWebView) ───────────
+  // ── Wrapper non-async pour onPageChange ─────────────────────────────────────
+  // F3-27 : intercepte les retours arrière pour ne pas comptabiliser de saut
   const handlePageChangeSync = useCallback(
     (newTitle: string): void => {
+      // Si c'est un retour arrière, on met seulement à jour le titre affiché
+      // et on reset le flag — on NE compte PAS de saut, on N'appelle PAS addJump
+      if (isBackNavigation.current) {
+        isBackNavigation.current = false;
+        setCurrentTitle(newTitle);
+        return;
+      }
+      // Forward navigation : comportement inchangé
       void handlePageChange(newTitle);
     },
     [handlePageChange],
@@ -148,9 +174,9 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
 
   // ── BackHandler Android ──────────────────────────────────────────────────────
   //
-  // F3-22 : utilise navigation.goBack() (React Navigation native-stack).
-  // Le retour arrière dépile l'écran précédent sans compter de saut.
-  // Si pas d'écran précédent dans le stack → proposer abandon.
+  // F3-27 : utilise webViewRef.current?.goBack() si la WebView peut reculer,
+  // sinon propose l'abandon. Le flag isBackNavigation distingue le retour
+  // arrière d'un saut forward dans handlePageChangeSync.
   useEffect(() => {
     if (!isFocused) {
       return;
@@ -159,11 +185,12 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
     const subscription = BackHandler.addEventListener(
       'hardwareBackPress',
       () => {
-        if (navigation.canGoBack()) {
-          navigation.goBack();
+        if (webViewCanGoBack) {
+          isBackNavigation.current = true;
+          webViewRef.current?.goBack();
           return true;
         }
-        // Premier écran du stack → proposer abandon de la partie
+        // WebView ne peut plus reculer → proposer abandon de la partie
         handleAbandon();
         return true;
       },
@@ -172,7 +199,7 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
     return () => {
       subscription.remove();
     };
-  }, [isFocused, navigation, handleAbandon]);
+  }, [isFocused, webViewCanGoBack, handleAbandon]);
 
   // ── Rendu ────────────────────────────────────────────────────────────────────
 
@@ -181,11 +208,14 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
       {/* Header fixe avec SafeAreaView edges top */}
       <SafeAreaView edges={['top']} style={styles.headerSafeArea}>
         <View style={styles.header}>
-          {/* F3-22 : bouton retour conditionné sur navigation.canGoBack() */}
-          {navigation.canGoBack() ? (
+          {/* F3-27 : bouton retour conditionné sur webViewCanGoBack */}
+          {webViewCanGoBack ? (
             <TouchableOpacity
               style={styles.backButton}
-              onPress={() => { navigation.goBack(); }}
+              onPress={() => {
+                isBackNavigation.current = true;
+                webViewRef.current?.goBack();
+              }}
               accessibilityLabel="Retour à l'article précédent"
               accessibilityRole="button"
             >
@@ -247,6 +277,8 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
             lang={lang}
             onPageChange={handlePageChangeSync}
             onError={(error) => { setWebViewError(error); }}
+            webViewRef={webViewRef}
+            onNavigationStateChange={handleNavStateChange}
           />
         )}
       </View>
