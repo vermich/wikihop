@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-14 | **Version** : 3.4
+**PM** : Gauderic | **Mis à jour** : 2026-03-14 | **Version** : 3.6
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -89,7 +89,7 @@
 | [F3-09](stories/phase-3/🔄-F3-09-animations-haptics.md) | Animations et feedback haptique | Could | Frontend Dev, UX/UI | 🔄 in-progress |
 | [F3-10](stories/phase-3/✅-F3-10-history-sort.md) | Tri multi-critères dans l'historique des parties | Should | Frontend Dev, UX/UI | ✅ done |
 | [F3-11](stories/phase-3/✅-F3-11-game-detail-screen.md) | Vue détail d'une partie — parcours, suppression et rejouer | Should | Frontend Dev, UX/UI | ✅ done |
-| [F3-12](stories/phase-3/🔄-F3-12-local-multiplayer.md) | Multijoueur local hot-seat (passage du téléphone) | Should | Frontend Dev, UX/UI | 🔄 in-progress |
+| [F3-12](stories/phase-3/✅-F3-12-local-multiplayer.md) | Multijoueur local hot-seat (passage du téléphone) | Should | Frontend Dev, UX/UI | ✅ done |
 | [F3-13](stories/phase-3/🚫-F3-13-dev-mode.md) | Mode développeur — toggle affichage de l'article cible | Could | Frontend Dev | 🚫 won't |
 | [F3-14](stories/wont/🚫-F3-14-contact-feedback.md) | Formulaire de feedback in-app (ContactScreen) | Could | Frontend Dev, UX/UI, DPO, Backend Dev | 🚫 won't |
 | [F3-15](stories/wont/🚫-F3-15-firebase-analytics.md) | Firebase Analytics — intégration skeleton (événements de base) | Could | Frontend Dev, DPO | 🚫 won't |
@@ -97,12 +97,17 @@
 | [F3-17](stories/phase-3/🔄-F3-17-daily-challenge-once-only.md) | Défi quotidien — une seule tentative par jour | Should | Frontend Dev | ✅ done |
 | [F3-19](stories/phase-3/🔄-F3-19-daily-challenge-new-badge.md) | Badge « New » sur le défi non encore réalisé | Could | Frontend Dev, UX/UI | ✅ done |
 | [F3-20](stories/phase-3/🔄-F3-20-fix-history-duplicate-keys.md) | Fix doublon de clés dans HistoryScreen | Must | Frontend Dev | 🔄 in-progress |
-| [F3-21](stories/phase-3/🔄-F3-21-fix-daily-challenge-button-visual-state.md) | Fix état visuel bouton défi du jour complété | Must | Frontend Dev | 🔄 in-progress |
+| [F3-21](stories/phase-3/✅-F3-21-fix-daily-challenge-button-visual-state.md) | Fix état visuel bouton défi du jour complété | Must | Frontend Dev | ✅ done |
 | [F3-22](stories/phase-3/🔄-F3-22-fix-back-navigation-article.md) | Fix retour arrière dans la partie | Must | Frontend Dev | 🔄 in-progress |
 | [F3-23](stories/phase-3/🔄-F3-23-daily-challenge-badge-history.md) | Badge "défi du jour" dans l'historique des parties | Should | Frontend Dev, UX/UI | 🔄 in-progress |
 | [F3-24](stories/phase-3/⬜-F3-24-game-detail-full-path.md) | Parcours complet dans GameDetailScreen | Could | Tech Lead, Frontend Dev | ⬜ pending |
 | [F3-25](stories/phase-3/⬜-F3-25-ux-ui-global-rework.md) | Refonte UX/UI globale (vague dédiée) | Should | UX/UI, Frontend Dev | ⬜ pending |
 | [F3-26](stories/phase-3/⬜-F3-26-internationalization.md) | Internationalisation des interfaces | Should | Tech Lead, Frontend Dev, Backend Dev | ⬜ pending |
+| [F3-27](stories/phase-3/⬜-F3-27-fix-back-navigation-regression.md) | Fix retour arrière — régression F3-22 | Must | Tech Lead, Frontend Dev | ⬜ pending |
+| [F3-28](stories/phase-3/⬜-F3-28-multiplayer-configurable-rounds.md) | Multijoueur — nombre de manches configurable | Should | Tech Lead, Frontend Dev | ⬜ pending |
+| [F3-29](stories/phase-3/⬜-F3-29-multiplayer-replay-button.md) | Multijoueur — bouton Rejouer sur l'écran résultats | Should | Frontend Dev | ⬜ pending |
+| [F3-30](stories/phase-3/⬜-F3-30-fix-multiplayer-history-isolation.md) | Fix — parties multijoueur exclues de l'historique solo | Must | Tech Lead, Frontend Dev | ⬜ pending |
+| [F3-31](stories/phase-3/⬜-F3-31-multiplayer-history.md) | Historique des parties multijoueur | Could | Tech Lead, UX/UI, Frontend Dev | ⬜ pending |
 
 ---
 
@@ -161,11 +166,11 @@
 |-------|------|--------|-------|-------|
 | 1-Fondations | 10 | 2 | 0 | 12 |
 | 2-MVP | 12 | 5 | 1 | 18 |
-| 3-Features | 7 | 11 | 6 | 24 |
+| 3-Features | 9 | 13 | 7 | 29 |
 | 5-Services managés | 0 | 1 | 0 | 1 |
 | 4-Production | 9 | 4 | 2 | 15 |
 | Won't | — | — | — | 4 |
-| **Total** | **38** | **23** | **9** | **74** |
+| **Total** | **40** | **25** | **10** | **79** |
 
 > Phase 5 non incluse dans le total — décision différée.
 
@@ -176,7 +181,7 @@
 | Agent | Stories |
 |-------|---------|
 | Tech Lead | F-01, F-02, F-03, F-04, F-05, F-06, F-07, F-08, F-09, F-10, F-12, P-06, P-12 |
-| Frontend Dev | F-04, M-01, M-03, M-04, M-05, M-06, M-07, M-08, M-10, M-11, M-12, M-13, M-14, M-15, M-16, M-17, F3-02, F3-03, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-13, F3-14, F3-15, F3-20, F3-21, F3-22, F3-23, F3-24, F3-25, F3-26, P-07, P-08, P-12, P-13, P-14 |
+| Frontend Dev | F-04, M-01, M-03, M-04, M-05, M-06, M-07, M-08, M-10, M-11, M-12, M-13, M-14, M-15, M-16, M-17, F3-02, F3-03, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-13, F3-14, F3-15, F3-20, F3-21, F3-22, F3-23, F3-24, F3-25, F3-26, F3-27, F3-28, F3-29, F3-30, F3-31, P-07, P-08, P-12, P-13, P-14 |
 | Backend Dev | F-05, F-06, F-11, M-02, M-08, M-12, M-16, F3-01, F3-05, F3-14, F3-26, P-03, P-05, P-06, P-09 |
 | UX/UI | M-01, M-06, M-13, M-14, M-17, F3-01, F3-02, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-14, F3-16, F3-23, F3-25 |
 | QA | F-08, M-09, M-18, F3-07, P-05, P-11 |
@@ -200,4 +205,5 @@
 *v3.3 : F3-08, F3-10, F3-11 done — stats perso, tri historique, vue détail validés QA (2026-03-13)*
 *v3.4 : F3-20 à F3-26 créées — retours tests PO vague B (3 bugs Must + 4 features) (2026-03-14)*
 *v3.5 : Vague C démarrée — F3-09, F3-12, F3-23 passées en in-progress (2026-03-14)*
+*v3.6 : F3-12, F3-21 passées en done — F3-22 régression confirmée — F3-27 à F3-31 créées (vague D) (2026-03-14)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
