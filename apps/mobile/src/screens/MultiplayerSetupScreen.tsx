@@ -196,8 +196,9 @@ export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenPro
     setupSession(names, startArticle, targetArticle);
 
     // Effacer toute session de jeu résiduelle et démarrer pour le joueur 1
+    // F3-30 : isMultiplayer: true → session non enregistrée dans l'historique solo
     await clearSession();
-    await startSession(startArticle, targetArticle);
+    await startSession(startArticle, targetArticle, { isMultiplayer: true });
 
     const firstPlayerName = players[0]?.name ?? '';
     navigation.navigate('PassPhone', { playerName: firstPlayerName });

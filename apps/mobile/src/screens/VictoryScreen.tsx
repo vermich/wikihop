@@ -252,7 +252,8 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
       return;
     }
 
-    await startSession(startArticle, targetArticle);
+    // F3-30 : isMultiplayer: true → session non enregistrée dans l'historique solo
+    await startSession(startArticle, targetArticle, { isMultiplayer: true });
     navigation.navigate('PassPhone', { playerName: nextPlayer.name });
   }, [
     currentSession,

@@ -73,6 +73,7 @@ interface GameSessionSlice {
    * @param options.isDailyChallenge - true si c'est un défi quotidien (F3-01)
    * @param options.dailyChallengeDate - Date YYYY-MM-DD du défi (F3-01)
    * @param options.difficulty - Niveau de difficulté (F3-05), défaut 'normal'
+   * @param options.isMultiplayer - true si session multijoueur hot-seat (F3-30)
    */
   startSession: (
     startArticle: Article,
@@ -81,6 +82,7 @@ interface GameSessionSlice {
       isDailyChallenge?: boolean;
       dailyChallengeDate?: string;
       difficulty?: GameDifficulty;
+      isMultiplayer?: boolean;
     },
   ) => Promise<void>;
 
@@ -164,6 +166,7 @@ export const useGameStore = create<GameSessionSlice>()((set, get) => ({
       isDailyChallenge?: boolean;
       dailyChallengeDate?: string;
       difficulty?: GameDifficulty;
+      isMultiplayer?: boolean;
     },
   ): Promise<void> => {
     // Construction de la session — exactOptionalPropertyTypes :
@@ -182,16 +185,15 @@ export const useGameStore = create<GameSessionSlice>()((set, get) => ({
       difficulty: options?.difficulty ?? 'normal' as GameDifficulty,
     };
 
-    // Ajout conditionnel des champs isDailyChallenge et dailyChallengeDate
-    // via spread conditionnel (conforme exactOptionalPropertyTypes)
-    const session: GameSession =
-      options?.isDailyChallenge === true && options.dailyChallengeDate !== undefined
-        ? {
-            ...baseSession,
-            isDailyChallenge: true,
-            dailyChallengeDate: options.dailyChallengeDate,
-          }
-        : baseSession;
+    // Champs optionnels additionnels — spread conditionnel (exactOptionalPropertyTypes)
+    const optionalFields = {
+      ...(options?.isDailyChallenge === true && options.dailyChallengeDate !== undefined
+        ? { isDailyChallenge: true as const, dailyChallengeDate: options.dailyChallengeDate }
+        : {}),
+      ...(options?.isMultiplayer === true ? { isMultiplayer: true as const } : {}),
+    };
+
+    const session: GameSession = { ...baseSession, ...optionalFields };
 
     set({ currentSession: session });
     await persistSession(session);
@@ -243,8 +245,9 @@ export const useGameStore = create<GameSessionSlice>()((set, get) => ({
 
     // Historique best-effort : fire-and-forget intentionnel (void).
     // Une erreur AsyncStorage ne doit jamais bloquer la navigation vers VictoryScreen.
+    // F3-30 : les sessions multijoueur ne sont PAS enregistrées dans l'historique solo.
     const record = buildGameRecord(updatedSession);
-    if (record !== null) {
+    if (record !== null && updatedSession.isMultiplayer !== true) {
       void ScoreStorage.save(record);
     }
   },
@@ -267,8 +270,9 @@ export const useGameStore = create<GameSessionSlice>()((set, get) => ({
 
     // Historique best-effort : fire-and-forget intentionnel (void).
     // Une erreur AsyncStorage ne doit jamais bloquer le retour à HomeScreen.
+    // F3-30 : les sessions multijoueur ne sont PAS enregistrées dans l'historique solo.
     const record = buildGameRecord(updatedSession);
-    if (record !== null) {
+    if (record !== null && updatedSession.isMultiplayer !== true) {
       void ScoreStorage.save(record);
     }
   },
@@ -307,6 +311,7 @@ export const useGameStore = create<GameSessionSlice>()((set, get) => ({
           isDailyChallenge?: boolean;
           dailyChallengeDate?: string;
           difficulty?: GameDifficulty;
+          isMultiplayer?: boolean;
         };
 
         // Construction explicite sans spread du type intermédiaire,
@@ -325,6 +330,8 @@ export const useGameStore = create<GameSessionSlice>()((set, get) => ({
           ...(parsed.dailyChallengeDate !== undefined
             ? { dailyChallengeDate: parsed.dailyChallengeDate }
             : {}),
+          // F3-30 : isMultiplayer — spread conditionnel
+          ...(parsed.isMultiplayer === true ? { isMultiplayer: true as const } : {}),
         };
 
         const session: GameSession =
