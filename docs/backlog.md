@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-14 | **Version** : 3.6
+**PM** : Gauderic | **Mis à jour** : 2026-03-15 | **Version** : 3.9
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -108,6 +108,9 @@
 | [F3-29](stories/phase-3/🔄-F3-29-multiplayer-replay-button.md) | Multijoueur — bouton Rejouer sur l'écran résultats | Should | Frontend Dev | 🔄 in-progress |
 | [F3-30](stories/phase-3/🔄-F3-30-fix-multiplayer-history-isolation.md) | Fix — parties multijoueur exclues de l'historique solo | Must | Tech Lead, Frontend Dev | 🔄 in-progress |
 | [F3-31](stories/phase-3/⬜-F3-31-multiplayer-history.md) | Historique des parties multijoueur | Could | Tech Lead, UX/UI, Frontend Dev | ⬜ pending |
+| [F3-32](stories/phase-3/✅-F3-32-multiplayer-pairs-per-round.md) | Multijoueur — paires préchargées par manche | Should | Tech Lead, UX/UI, Frontend Dev | ✅ done |
+| [F3-33](stories/phase-3/✅-F3-33-multiplayer-results-per-round.md) | Multijoueur — résultats par manche + médaille partagée | Should | Tech Lead, UX/UI, Frontend Dev | ✅ done |
+| [F3-34](stories/phase-3/🔄-F3-34-fix-back-navigation-webview.md) | Fix retour arrière WebView — régression persistante après F3-27 | Must | Tech Lead, Frontend Dev | 🔄 in-progress |
 
 ---
 
@@ -206,4 +209,7 @@
 *v3.4 : F3-20 à F3-26 créées — retours tests PO vague B (3 bugs Must + 4 features) (2026-03-14)*
 *v3.5 : Vague C démarrée — F3-09, F3-12, F3-23 passées en in-progress (2026-03-14)*
 *v3.6 : F3-12, F3-21 passées en done — F3-22 régression confirmée — F3-27 à F3-31 créées (vague D) (2026-03-14)*
+*v3.7 : Vague D mergée PR #25 — F3-27/28/29/30 in-progress (2026-03-14)*
+*v3.8 : F3-32/33/34 créées — vague E lancée (2026-03-15)*
+*v3.9 : Vague E mergée PR #26 — F3-32/33 done (QA Halim 2026-03-15) — F3-34 in-progress (gate device requis) (2026-03-15)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
