@@ -6,7 +6,6 @@
  *   - Succès (fetchDailyChallenge retourne des données) → status 'success'
  *   - Échec (fetchDailyChallenge retourne null) → status 'error'
  *   - Changement de langue → relance le fetch
- *   - Démontage pendant fetch → pas de setState (cancelled flag)
  *
  * Stratégie de mock :
  *   - daily-challenge.service entièrement mocké (jest.mock)
@@ -119,21 +118,7 @@ describe('useDailyChallenge', () => {
   });
 
   describe('erreur', () => {
-    it('passe à l\'état error quand fetchDailyChallenge retourne null', async () => {
-      jest.spyOn(DailyChallengeService, 'fetchDailyChallenge').mockResolvedValue(null);
-
-      const { result } = renderHook(() => useDailyChallenge());
-
-      await waitFor(() => {
-        expect(result.current.state.status).toBe('error');
-      });
-
-      if (result.current.state.status === 'error') {
-        expect(result.current.state.message).toBeTruthy();
-      }
-    });
-
-    it('le message d\'erreur est une chaîne non vide', async () => {
+    it('passe à l\'état error avec un message non vide quand fetchDailyChallenge retourne null', async () => {
       jest.spyOn(DailyChallengeService, 'fetchDailyChallenge').mockResolvedValue(null);
 
       const { result } = renderHook(() => useDailyChallenge());
@@ -172,6 +157,28 @@ describe('useDailyChallenge', () => {
       await waitFor(() => {
         expect(spy).toHaveBeenCalledTimes(1);
       });
+    });
+
+    it('relance fetchDailyChallenge quand la langue change', async () => {
+      const spy = jest.spyOn(DailyChallengeService, 'fetchDailyChallenge').mockResolvedValue(
+        mockDailyResponse,
+      );
+
+      const { rerender } = renderHook(() => useDailyChallenge());
+
+      await waitFor(() => {
+        expect(spy).toHaveBeenCalledWith('fr');
+      });
+
+      // Changer la langue → le hook doit relancer le fetch
+      mockLanguage = 'en';
+      rerender({});
+
+      await waitFor(() => {
+        expect(spy).toHaveBeenCalledWith('en');
+      });
+
+      expect(spy).toHaveBeenCalledTimes(2);
     });
   });
 });

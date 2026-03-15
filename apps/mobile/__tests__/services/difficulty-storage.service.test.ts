@@ -111,7 +111,7 @@ describe('setDifficultyPreference', () => {
   it('persiste "normal" dans AsyncStorage', async () => {
     await setDifficultyPreference('normal');
 
-    const raw = await AsyncStorage.getItem(DIFFICULTY_KEY, undefined as never);
+    const raw = await AsyncStorage.getItem(DIFFICULTY_KEY);
     expect(JSON.parse(raw as string)).toBe('normal');
   });
 
