@@ -1,0 +1,56 @@
+# Maestro — Flow F3-07 Test 3 : Défi quotidien non rejouable
+#
+# Critère d'acceptance :
+#   "Test E2E : jouer le défi quotidien → vérifier qu'il ne peut pas être rejoué"
+#
+# Ce flow valide :
+#   1. HomeScreen → bouton "Défi du jour" visible
+#   2. Tap "Défi du jour" → GameScreen (GameHUD visible)
+#   3. Abandon immédiat → VictoryScreen → tap "Retour"
+#   4. HomeScreen → indicateur de complétion quotidienne visible
+#      (le bouton "Défi du jour" doit être absent ou remplacé par daily-completed-indicator)
+#
+# Remarque sur AsyncStorage :
+#   Ce flow s'appuie sur l'état réel de l'app (AsyncStorage) après un premier cycle.
+#   `clearState: true` efface l'état AsyncStorage au lancement — ce qui garantit que
+#   le défi n'est pas déjà marqué comme joué avant le test.
+#
+# Dépendances testID (Laurent) — PR feat/laurent-f3-35-f3-24 :
+#   - GameHUD conteneur racine : testID="game-hud"
+#   - Bouton abandon : testID="abandon-button"
+#   - Indicateur de complétion quotidienne : testID="daily-completed-indicator"
+#     (composant déjà implémenté en F3-16 — le testID sera ajouté par Laurent)
+#   Ce flow sera exécutable après merge de la PR de Laurent.
+#
+# Référence : docs/stories/phase-3/🔄-F3-07-integration-tests.md — Section 4
+appId: com.wikihop.app
+---
+# Fresh state : garantit que le défi n'est pas déjà marqué comme joué
+- launchApp:
+    clearState: true
+
+# HomeScreen : vérifier la présence du bouton "Défi du jour"
+- assertVisible: "Défi du jour"
+
+# Démarrer le défi quotidien
+- tapOn: "Défi du jour"
+- waitForAnimationToEnd
+
+# GameScreen : GameHUD doit être visible
+- assertVisible:
+    id: "game-hud"
+
+# Abandon immédiat pour déclencher la complétion
+- tapOn:
+    id: "abandon-button"
+- waitForAnimationToEnd
+
+# VictoryScreen : retour vers HomeScreen
+- tapOn: "Retour"
+- waitForAnimationToEnd
+
+# HomeScreen : après complétion du défi, le bouton "Défi du jour" doit être absent
+# et l'indicateur de complétion doit être visible (F3-16)
+- assertNotVisible: "Défi du jour"
+- assertVisible:
+    id: "daily-completed-indicator"

@@ -1,0 +1,39 @@
+# Maestro — Flow F3-07 Test 2 : Abandon de partie
+#
+# Critère d'acceptance :
+#   "Test E2E : abandonner une partie en cours"
+#
+# Ce flow valide le flux complet :
+#   HomeScreen → tap "Nouvelle partie" → GameScreen (GameHUD) → tap "Abandon"
+#   → VictoryScreen avec statut 'abandoned' → badge "Abandonné" + bouton "Retour"
+#
+# Dépendances testID (Laurent) — PR feat/laurent-f3-35-f3-24 :
+#   - GameHUD conteneur racine : testID="game-hud"
+#   - Bouton abandon dans GameHUD : testID="abandon-button"
+#   Ce flow sera exécutable après merge de la PR de Laurent.
+#
+# Référence : docs/stories/phase-3/🔄-F3-07-integration-tests.md — Section 3
+appId: com.wikihop.app
+---
+# Fresh state : isolation garantie entre flows
+- launchApp:
+    clearState: true
+
+# HomeScreen
+- assertVisible: "Jouer"
+
+# Démarrer une partie
+- tapOn: "Jouer"
+- waitForAnimationToEnd
+
+# GameScreen : GameHUD doit être visible
+- assertVisible:
+    id: "game-hud"
+
+# Tap sur le bouton abandon
+- tapOn:
+    id: "abandon-button"
+
+# VictoryScreen : statut 'abandoned' — badge et bouton retour
+- assertVisible: "Abandonné"
+- assertVisible: "Retour"

@@ -1,0 +1,41 @@
+# Maestro — Flow F3-07 Test 1 : Parcours solo (démarrage + abandon → VictoryScreen)
+#
+# Critère d'acceptance :
+#   "Test E2E : démarrer une partie → naviguer 3 articles → atteindre la destination → voir le résultat"
+#
+# Limitation Maestro/WebView connue (acceptée Phase 3) :
+#   Les taps sur les liens Wikipedia dans la WebView ne sont pas interceptés par Maestro.
+#   La navigation inter-articles (Article A → B → C) ne peut pas être automatisée en E2E.
+#   Ce flow valide uniquement : démarrage de partie + GameHUD visible + bouton abandon + VictoryScreen.
+#   La navigation complète reste couverte par le gate device physique manuel (CLAUDE.md).
+#
+# Dépendances testID (Laurent) — PR feat/laurent-f3-35-f3-24 :
+#   - GameHUD conteneur racine : testID="game-hud"
+#   - Bouton abandon dans GameHUD : testID="abandon-button"
+#   Ce flow sera exécutable après merge de la PR de Laurent.
+#
+# Référence : docs/stories/phase-3/🔄-F3-07-integration-tests.md — Section 2
+appId: com.wikihop.app
+---
+# Démarrage : toujours fresh state pour isolation entre flows
+- launchApp:
+    clearState: true
+
+# HomeScreen : vérifier la présence du bouton de démarrage
+- assertVisible: "Jouer"
+
+# Démarrer une partie solo
+- tapOn: "Jouer"
+- waitForAnimationToEnd
+
+# GameScreen : vérifier que le GameHUD est visible (article chargé)
+- assertVisible:
+    id: "game-hud"
+
+# Abandon : simuler un abandon de partie (seule interaction native possible)
+# La navigation inter-articles via WebView n'est pas testable avec Maestro
+- tapOn:
+    id: "abandon-button"
+
+# VictoryScreen : vérifier l'affichage du badge "Abandonné"
+- assertVisible: "Abandonné"
