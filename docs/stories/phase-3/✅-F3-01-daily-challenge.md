@@ -4,9 +4,9 @@ title: Défi quotidien (même paire pour tous les joueurs)
 phase: 3-Features
 priority: Must
 agents: [Backend Dev, Frontend Dev, UX/UI]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-15
 ---
 
 # F3-01 — Défi quotidien (même paire pour tous les joueurs)
@@ -15,12 +15,12 @@ completed:
 En tant que joueur régulier, je veux un défi quotidien avec la même paire d'articles pour tous, afin de pouvoir comparer mes résultats avec d'autres joueurs.
 
 ## Critères d'acceptance
-- [ ] Endpoint `GET /api/game/daily` retourne la paire du jour (identique pour tous les appels de la journée)
-- [ ] La paire quotidienne change automatiquement à minuit UTC
-- [ ] Les paires sont générées à l'avance et stockées en base de données
-- [ ] Un joueur ne peut jouer le défi quotidien qu'une seule fois par jour (contrôle local)
-- [ ] L'écran d'accueil affiche clairement le défi du jour avec une indication visuelle distincte
-- [ ] Si le joueur a déjà joué le défi du jour, son résultat est affiché à la place du bouton "Jouer"
+- [x] Endpoint `GET /api/game/daily` retourne la paire du jour (identique pour tous les appels de la journée)
+- [x] La paire quotidienne change automatiquement à minuit UTC
+- [x] Les paires sont générées à l'avance et stockées en base de données *(recadré en génération déterministe stateless — voir Notes de réalisation)*
+- [x] Un joueur ne peut jouer le défi quotidien qu'une seule fois par jour (contrôle local)
+- [x] L'écran d'accueil affiche clairement le défi du jour avec une indication visuelle distincte
+- [ ] Si le joueur a déjà joué le défi du jour, son résultat est affiché à la place du bouton "Jouer" *(hors scope Phase 3 — documenté dans Notes de réalisation ; bouton "Défi du jour complété" affiché à la place)*
 
 ## Notes de réalisation
 
@@ -364,7 +364,67 @@ Fichier de test : `apps/mobile/src/__tests__/daily-challenge.utils.test.ts`
 5. **`buildGameRecord`** : propager `isDailyChallenge` et `dailyChallengeDate` vers `GameRecord` — ne pas oublier la branche conditionnelle
 
 ## Validation QA — Halim
-<!-- Rempli par QA après les tests -->
+
+**Date** : 2026-03-15
+**Testeur** : Halim
+**Statut global** : ✅ Validé avec réserves
+
+### Critères d'acceptance
+- [x] Endpoint `GET /api/game/daily` retourne la paire du jour — OK. Route implémentée dans `game.route.ts` (intégré plutôt que fichier séparé — écart specs non bloquant). Tests Supertest idempotence passants (9 tests).
+- [x] La paire quotidienne change automatiquement à minuit UTC — OK. `getTodayUTC()` via `new Date().toISOString().slice(0,10)` garantit le changement à minuit UTC.
+- [x] Les paires sont générées à l'avance et stockées en base de données — OK. Recadré en génération déterministe stateless (djb2Hash + computeDailyIndices). Décision documentée dans les Notes de réalisation.
+- [x] Un joueur ne peut jouer le défi quotidien qu'une seule fois par jour (contrôle local) — OK. `useDailyCompletionStatus` + AsyncStorage clé `@wikihop/daily_completion_date` implémentés via F3-16. Bouton désactivé et libellé "Défi du jour complété" affiché.
+- [x] L'écran d'accueil affiche clairement le défi du jour avec une indication visuelle distincte — OK. Bouton fond `#D97706` (ambre), height 52, borderRadius 12, libellé "Défi du jour". Badge date affiché selon état chargement (F3-19). Désactivé pendant le chargement.
+- [ ] Si le joueur a déjà joué le défi du jour, son résultat est affiché à la place du bouton "Jouer" — HORS SCOPE Phase 3 (documenté dans Notes de réalisation). Bouton "Défi du jour complété" affiché à la place du bouton actif. Le résultat chiffré (sauts, durée) n'est pas affiché. Acceptable per spec.
+
+### Tests automatisés
+- `npm test` (backend) : ✅ 92 tests passants dans les suites liées à F3-01 (daily-challenge.utils, daily-challenge.route). 1 test en échec non bloquant (voir Bug #1 ci-dessous). Échecs `db.test.ts` préexistants (PostgreSQL non démarrée) — hors scope F3-01.
+- `npm test` (mobile) : ✅ 600 tests passants, 0 échec. Inclut `daily-challenge.utils.test.ts`, `daily-challenge.service.test.ts`, `useDailyChallenge.test.ts`.
+- `tsc --noEmit` : ⚠️ 1 erreur préexistante dans `RootNavigator.tsx` (story TODO connue). 1 erreur dans `V1/` (hors scope). Aucune nouvelle erreur introduite par F3-01.
+- `npm run lint` : ✅ 0 erreur, 18 warnings `no-console` préexistants.
+
+### TDD strict vérifié
+- Backend : commit `147302a` (tests) antérieur à `2a96a1d` (implémentation) — TDD conforme.
+- Mobile : commit `d315c7f` (tests fonctions pures + service) antérieur à `9240a10` (implémentation) — TDD conforme.
+
+### Couverture de code (fichiers F3-01 mobile)
+- `daily-challenge.utils.ts` : 100% statements, 70% branches (lignes 35-37), 100% fonctions.
+- `daily-challenge.service.ts` : 93.75% statements, 75% branches, 100% lignes.
+- `useDailyChallenge.ts` : 94.11% statements, 75% branches, 100% lignes.
+- Couverture globale > 70% : ✅ conforme.
+
+### Cas limites testés (automatisés)
+- Idempotence (deux appels le même jour) : ✅
+- Changement de langue (fr/en) : ✅
+- Lang invalide → 400 : ✅
+- 5 tentatives Wikipedia en erreur → 503 : ✅
+- Pool trop petit : ✅
+- `getTodayUTC` format YYYY-MM-DD : ✅
+- `computeDailyIndices` déterministe, indices distincts, bornes : ✅
+- `formatDailyChallengeDate` + `isDailyChallengeToday` : ✅
+- `isDailyChallenge` et `dailyChallengeDate` propagés dans `buildGameRecord` : ✅
+- Persistance `hydrate()` avec champs optionnels : ✅
+
+### Gate device physique
+- [x] Flux Home → Défi du jour → Game → VictoryScreen : **confirmé par le Client le 2026-03-15**
+
+### Bug identifié
+
+**Bug #1 — Sévérité : Faible**
+**Composant** : `apps/backend/__tests__/daily-challenge.utils.test.ts`
+**Story liée** : F3-01
+
+**Description** : Le test `"produit la valeur djb2 correcte pour 'abc'"` attend `193491849` mais l'implémentation produit `193485963`. La divergence vient du commentaire de calcul dans le test lui-même : il calcule sans appliquer `>>> 0` à chaque itération (comme le fait l'implémentation). L'algorithme djb2 de l'implémentation est valide, déterministe et satisfait toutes les propriétés requises. Seul le commentaire de vérification `// h = ((5863276 << 5) + 5863276) + 99 = 193491849` est incorrect — il devrait indiquer `5863208` et `193485963`.
+
+**Comportement observé** : Test en échec avec `Expected: 193491849 / Received: 193485963`.
+**Comportement attendu** : Test en succès avec la valeur correcte `193485963`, correspondant à l'algo `>>> 0` intermédiaire.
+
+**Impact** : Non bloquant — l'algorithme djb2 est fonctionnel pour toutes les dates réelles. Le test vérifie une valeur de référence incorrecte. Les tests d'idempotence, déterminisme et bornes passent tous.
+
+**Escalade** : Bug Faible — à corriger par Backend Dev (Julien). La correction est triviale : remplacer `193491849` par `193485963` dans le test et corriger le commentaire de calcul.
+
+### Conclusion
+Story F3-01 validée. Critères fonctionnels : 5/6 cochés (le 6e est hors scope per spec). 1 bug faible dans un test (valeur de référence djb2 incorrecte) — à corriger par Julien. Gate device physique confirmé par le Client le 2026-03-15 : flux Home → Défi du jour → Game → VictoryScreen validé sur device physique.
 
 ## Statut
 pending → in-progress → done

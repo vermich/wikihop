@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-15 | **Version** : 4.2
+**PM** : Gauderic | **Mis à jour** : 2026-03-15 | **Version** : 4.4
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -78,11 +78,11 @@
 
 | ID | Titre | Priorité | Agent(s) | Statut |
 |----|-------|----------|----------|--------|
-| [F3-01](stories/phase-3/🔄-F3-01-daily-challenge.md) | Défi quotidien (même paire pour tous les joueurs) | Must | Backend Dev, Frontend Dev, UX/UI | 🔄 in-progress |
+| [F3-01](stories/phase-3/✅-F3-01-daily-challenge.md) | Défi quotidien (même paire pour tous les joueurs) | Must | Backend Dev, Frontend Dev, UX/UI | ✅ done |
 | [F3-02](stories/phase-3/✅-F3-02-game-history.md) | Historique des parties (stockage local) | Must | Frontend Dev, UX/UI | ✅ done |
 | [F3-03](stories/phase-3/✅-F3-03-share-result.md) | Partage du résultat | Must | Frontend Dev | ✅ done |
 | [F3-04](stories/phase-3/✅-F3-04-donation-page.md) | Page donation Wikipedia | Must | Frontend Dev, UX/UI, DPO | ✅ done |
-| [F3-05](stories/phase-3/🔄-F3-05-hard-mode.md) | Mode difficile (articles sans liens évidents) | Should | Backend Dev, Frontend Dev, UX/UI | 🔄 in-progress |
+| [F3-05](stories/phase-3/✅-F3-05-hard-mode.md) | Mode difficile (articles sans liens évidents) | Should | Backend Dev, Frontend Dev, UX/UI | ✅ done |
 | [F3-06](stories/phase-3/✅-F3-06-about-screen.md) | Écran "À propos" et crédits | Should | Frontend Dev, UX/UI, DPO | ✅ done |
 | [F3-07](stories/phase-3/⬜-F3-07-integration-tests.md) | Tests d'intégration — parcours de jeu complet | Should | QA | ⬜ pending |
 | [F3-08](stories/phase-3/✅-F3-08-personal-stats.md) | Statistiques personnelles | Could | Frontend Dev, UX/UI | ✅ done |
@@ -111,6 +111,7 @@
 | [F3-32](stories/phase-3/✅-F3-32-multiplayer-pairs-per-round.md) | Multijoueur — paires préchargées par manche | Should | Tech Lead, UX/UI, Frontend Dev | ✅ done |
 | [F3-33](stories/phase-3/✅-F3-33-multiplayer-results-per-round.md) | Multijoueur — résultats par manche + médaille partagée | Should | Tech Lead, UX/UI, Frontend Dev | ✅ done |
 | [F3-34](stories/phase-3/✅-F3-34-fix-back-navigation-webview.md) | Fix retour arrière WebView — régression persistante après F3-27 | Must | Tech Lead, Frontend Dev | ✅ done |
+| [F3-35](stories/phase-3/⬜-F3-35-hard-mode-badge-history.md) | Badge "Mode difficile" dans l'historique des parties | Should | Frontend Dev, UX/UI | ⬜ pending |
 
 ---
 
@@ -169,11 +170,11 @@
 |-------|------|--------|-------|-------|
 | 1-Fondations | 10 | 2 | 0 | 12 |
 | 2-MVP | 12 | 5 | 1 | 18 |
-| 3-Features | 9 | 13 | 7 | 29 |
+| 3-Features | 9 | 14 | 7 | 30 |
 | 5-Services managés | 0 | 1 | 0 | 1 |
 | 4-Production | 9 | 4 | 2 | 15 |
 | Won't | — | — | — | 4 |
-| **Total** | **40** | **25** | **10** | **79** |
+| **Total** | **40** | **26** | **10** | **80** |
 
 > Phase 5 non incluse dans le total — décision différée.
 
@@ -184,9 +185,9 @@
 | Agent | Stories |
 |-------|---------|
 | Tech Lead | F-01, F-02, F-03, F-04, F-05, F-06, F-07, F-08, F-09, F-10, F-12, P-06, P-12 |
-| Frontend Dev | F-04, M-01, M-03, M-04, M-05, M-06, M-07, M-08, M-10, M-11, M-12, M-13, M-14, M-15, M-16, M-17, F3-02, F3-03, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-13, F3-14, F3-15, F3-20, F3-21, F3-22, F3-23, F3-24, F3-25, F3-26, F3-27, F3-28, F3-29, F3-30, F3-31, P-07, P-08, P-12, P-13, P-14 |
+| Frontend Dev | F-04, M-01, M-03, M-04, M-05, M-06, M-07, M-08, M-10, M-11, M-12, M-13, M-14, M-15, M-16, M-17, F3-02, F3-03, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-13, F3-14, F3-15, F3-20, F3-21, F3-22, F3-23, F3-24, F3-25, F3-26, F3-27, F3-28, F3-29, F3-30, F3-31, F3-35, P-07, P-08, P-12, P-13, P-14 |
 | Backend Dev | F-05, F-06, F-11, M-02, M-08, M-12, M-16, F3-01, F3-05, F3-14, F3-26, P-03, P-05, P-06, P-09 |
-| UX/UI | M-01, M-06, M-13, M-14, M-17, F3-01, F3-02, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-14, F3-16, F3-23, F3-25 |
+| UX/UI | M-01, M-06, M-13, M-14, M-17, F3-01, F3-02, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-14, F3-16, F3-23, F3-25, F3-35 |
 | QA | F-08, M-09, M-18, F3-07, P-05, P-11 |
 | Security | P-02, P-03, P-04, P-15 |
 | DPO | F3-04, F3-06, F3-14, F3-15, P-01, P-10, P-13, P-14 |
@@ -215,4 +216,6 @@
 *v4.0 : Gate device physique confirmé par le Client — F3-27/28/29/30/34 passées en done (2026-03-15)*
 *v4.1 : Cohérence backlog — F3-20/22/23 passées en done (frontmatter + icônes corrigés) (2026-03-15)*
 *v4.2 : F3-09 done (rétro), F3-01/F3-05 in-progress — lancement vague F (2026-03-15)*
+*v4.3 : F3-01/F3-05 passées en done — gate device physique confirmé par le Client (2026-03-15)*
+*v4.4 : F3-35 créée — badge "Mode difficile" dans l'historique des parties (Should / Frontend Dev, UX/UI) (2026-03-15)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*

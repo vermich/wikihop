@@ -1,0 +1,35 @@
+---
+id: F3-35
+title: Badge "Mode difficile" dans l'historique des parties
+phase: 3-Features
+priority: Should
+agents: [Frontend Dev, UX/UI]
+status: pending
+created: 2026-03-15
+completed:
+depends_on: [F3-02, F3-05, F3-23]
+---
+
+# F3-35 — Badge "Mode difficile" dans l'historique des parties
+
+## User Story
+En tant que joueur, je veux voir dans l'historique de mes parties lesquelles ont été jouées en mode difficile, afin de distinguer mes performances en mode difficile de mes parties standard.
+
+## Critères d'acceptance
+- [ ] Chaque `HistoryItem` correspondant à une partie dont `difficulty === 'hard'` (évalué via `isHardMode()` de `difficulty.utils.ts`) affiche un badge "DIFF" visible sans interaction supplémentaire
+- [ ] Les `HistoryItem` de parties standard (`difficulty` absent, `undefined`, ou `'normal'`) n'affichent pas le badge
+- [ ] Le badge "DIFF" adopte un style cohérent avec le badge "DÉFI" existant (même zone d'affichage, même gabarit typographique) mais avec une couleur distincte : fond `#FEE2E2`, texte `#991B1B` (rouge — palette identique à l'indicateur mode difficile de `VictoryScreen`)
+- [ ] Le badge est accessible : présence d'un `accessibilityLabel` incluant "Mode difficile" sur l'élément interactif parent (`TouchableOpacity`), cohérent avec le pattern établi en F3-23
+- [ ] L'affichage est cohérent après un changement de tri via le `SortBar` (F3-10) — le badge reste présent sur les bonnes parties
+- [ ] `tsc --noEmit` passe sans erreur
+- [ ] `npm run lint` passe sans erreur
+- [ ] Tests alongside dans `HistoryItem.test.tsx` couvrant au minimum : badge présent quand `difficulty === 'hard'`, badge absent quand `difficulty` est `undefined`, badge absent quand `difficulty === 'normal'`, coexistence badge "DIFF" + badge "DÉFI" sur une même partie (défi quotidien joué en mode difficile)
+
+## Notes de réalisation
+<!-- Rempli par l'agent lors de l'implémentation -->
+
+## Validation QA — Halim
+<!-- Rempli par QA après les tests -->
+
+## Statut
+pending
