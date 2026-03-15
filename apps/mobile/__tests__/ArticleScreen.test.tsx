@@ -602,7 +602,7 @@ describe('ArticleScreen', () => {
 
   describe('Erreur WebView', () => {
     it('affiche l\'écran d\'erreur si WikipediaWebView appelle onError', async () => {
-      renderArticleScreen();
+      const { getByText } = renderArticleScreen();
       await act(async () => { await Promise.resolve(); });
 
       const { onError } = capturedWebViewProps;
@@ -612,9 +612,124 @@ describe('ArticleScreen', () => {
         onError?.({ nativeEvent: { description: 'Network request failed' } });
       });
 
-      // Après l'erreur, on réaffiche l'écran avec le message d'erreur
-      // (WikipediaWebView est remplacé par l'UI d'erreur)
-      // On vérifie que le composant est rendu sans crash
+      // Après l'erreur, l'UI d'erreur est affichée
+      expect(getByText('Impossible de charger cet article.')).toBeTruthy();
+    });
+
+    it('affiche le message de connexion dans l\'écran d\'erreur', async () => {
+      const { getByText } = renderArticleScreen();
+      await act(async () => { await Promise.resolve(); });
+
+      await act(async () => {
+        capturedWebViewProps.onError?.({ nativeEvent: { description: 'Timeout' } });
+      });
+
+      expect(getByText('Vérifiez votre connexion internet.')).toBeTruthy();
+    });
+
+    it('affiche le bouton Réessayer dans l\'écran d\'erreur', async () => {
+      const { getByLabelText } = renderArticleScreen();
+      await act(async () => { await Promise.resolve(); });
+
+      await act(async () => {
+        capturedWebViewProps.onError?.({ nativeEvent: { description: 'Error' } });
+      });
+
+      expect(getByLabelText("Réessayer de charger l'article")).toBeTruthy();
+    });
+
+    it('le bouton Réessayer réinitialise l\'état d\'erreur et recharge l\'article', async () => {
+      const { getByLabelText, queryByText } = renderArticleScreen('Tour Eiffel');
+      await act(async () => { await Promise.resolve(); });
+
+      // Déclencher l'erreur
+      await act(async () => {
+        capturedWebViewProps.onError?.({ nativeEvent: { description: 'Error' } });
+      });
+
+      // Vérifier que l'erreur est affichée
+      expect(queryByText('Impossible de charger cet article.')).toBeTruthy();
+
+      // Appuyer sur Réessayer
+      await act(async () => {
+        fireEvent.press(getByLabelText("Réessayer de charger l'article"));
+      });
+
+      // L'écran d'erreur disparaît
+      expect(queryByText('Impossible de charger cet article.')).toBeNull();
+    });
+  });
+
+  // ── Bouton retour header (stackSize > 1 — F3-34) ─────────────────────────
+
+  describe('Bouton retour header (F3-34 — stack applicatif)', () => {
+    it('appelle handleGoBack au clic et décrémente le stack', async () => {
+      // F3-34 : le bouton retour appelle handleGoBack() qui pop le stack applicatif
+      const { getByLabelText, queryByText } = renderArticleScreen('Tour Eiffel');
+      await act(async () => { await Promise.resolve(); });
+
+      // Saut forward pour que stackSize > 1
+      await act(async () => {
+        capturedWebViewProps.onNavigationStateChange?.({
+          canGoBack: true,
+          url: 'https://fr.m.wikipedia.org/wiki/Paris',
+          loading: false,
+        });
+        await Promise.resolve();
+      });
+
+      await waitFor(() => { expect(mockAddJump).toHaveBeenCalledTimes(1); });
+      expect(queryByText('← Retour')).toBeTruthy();
+
+      // Appuyer sur le bouton retour → handleGoBack → pop stack
+      mockAddJump.mockClear();
+      fireEvent.press(getByLabelText("Retour à l'article précédent"));
+
+      // Après le retour, le stack revient à 1 → le bouton disparaît
+      await waitFor(() => {
+        expect(queryByText('← Retour')).toBeNull();
+      });
+    });
+
+    it('ne comptabilise pas de saut lors du retour (isBackNavigation flag)', async () => {
+      // F3-34 : handleGoBack pose isBackNavigation.current = true
+      // Le prochain onPageChange (déclenché par setCurrentTitle) ne doit PAS appeler addJump
+      const { queryByText } = renderArticleScreen('Tour Eiffel');
+      await act(async () => { await Promise.resolve(); });
+
+      // Saut forward : Paris
+      await act(async () => {
+        capturedWebViewProps.onNavigationStateChange?.({
+          url: 'https://fr.m.wikipedia.org/wiki/Paris',
+          canGoBack: true,
+          loading: false,
+        });
+        await Promise.resolve();
+      });
+      await waitFor(() => { expect(mockAddJump).toHaveBeenCalledTimes(1); });
+
+      // Retour arrière via bouton header
+      mockAddJump.mockClear();
+      const backButton = queryByText('← Retour');
+      expect(backButton).toBeTruthy();
+
+      await act(async () => {
+        if (backButton) { fireEvent.press(backButton); }
+        await Promise.resolve();
+      });
+
+      // WikipediaWebView change de source → onPageChange déclenché avec le titre précédent
+      await act(async () => {
+        capturedWebViewProps.onNavigationStateChange?.({
+          url: 'https://fr.m.wikipedia.org/wiki/Tour_Eiffel',
+          canGoBack: false,
+          loading: false,
+        });
+        await Promise.resolve();
+      });
+
+      // addJump NE doit PAS être appelé (retour arrière — isBackNavigation flag)
+      expect(mockAddJump).not.toHaveBeenCalled();
     });
   });
 });
