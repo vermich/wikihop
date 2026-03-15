@@ -17,7 +17,7 @@
  *   - Zéro any — typage explicite
  */
 
-import type { Article } from '@wikihop/shared';
+import type { Article, MultiplayerRoundResult } from '@wikihop/shared';
 import { create } from 'zustand';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -36,13 +36,9 @@ export interface MultiplayerPlayer {
 
 /**
  * Résultat d'un joueur pour une manche donnée.
- * null = joueur qui n'a pas encore joué (ne devrait pas arriver en pratique).
+ * Type migré dans @wikihop/shared (F3-31) — ré-exporté ici pour rétrocompatibilité.
  */
-export interface MultiplayerRoundResult {
-  jumps: number | null;
-  durationMs: number | null;
-  won: boolean;
-}
+export type { MultiplayerRoundResult } from '@wikihop/shared';
 
 export interface MultiplayerState {
   players: MultiplayerPlayer[];
