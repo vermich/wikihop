@@ -35,6 +35,15 @@ export type SortCriterion =
 
 export const DEFAULT_SORT_CRITERION: SortCriterion = 'date_desc';
 
+/**
+ * Bouton de tri à 3 états (F3-25 critère 6).
+ * Remplace les 6 chips par 3 boutons avec cycle de direction.
+ */
+export type SortButtonCriterion = 'date' | 'jumps' | 'duration';
+
+/** Direction du tri — null = état neutre (pas de tri actif sur ce critère) */
+export type SortDirection = 'asc' | 'desc' | null;
+
 export const SORT_CRITERION_LABELS: Record<SortCriterion, string> = {
   date_desc: 'Date ↓',
   date_asc: 'Date ↑',
@@ -46,6 +55,39 @@ export const SORT_CRITERION_LABELS: Record<SortCriterion, string> = {
 
 /** Clé AsyncStorage pour la persistance du critère de tri */
 export const SORT_CRITERION_STORAGE_KEY = '@wikihop/history_sort_criterion';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// nextSortState — cycle à 3 états (F3-25 critère 6)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Retourne l'état suivant dans le cycle de direction : null → 'asc' → 'desc' → null.
+ *
+ * Fonction pure — utilisée par la SortBar refactorisée (F3-25).
+ */
+export function nextSortState(current: SortDirection): SortDirection {
+  if (current === null) return 'asc';
+  if (current === 'asc') return 'desc';
+  return null;
+}
+
+/**
+ * Mappe un SortButtonCriterion + SortDirection vers un SortCriterion legacy.
+ * Utilisé pour passer à sortRecords sans modifier la logique de tri existante.
+ * Si direction === null, retourne le critère de fallback 'date_desc'.
+ */
+export function toSortCriterion(
+  criterion: SortButtonCriterion,
+  direction: SortDirection,
+): SortCriterion {
+  if (direction === null) return DEFAULT_SORT_CRITERION;
+  const map: Record<SortButtonCriterion, Record<'asc' | 'desc', SortCriterion>> = {
+    date: { asc: 'date_asc', desc: 'date_desc' },
+    jumps: { asc: 'jumps_asc', desc: 'jumps_desc' },
+    duration: { asc: 'duration_asc', desc: 'duration_desc' },
+  };
+  return map[criterion][direction];
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Ensemble des valeurs valides (pour le type guard)
