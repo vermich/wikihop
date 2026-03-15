@@ -11,7 +11,7 @@
  * Les helpers sont typés avec des interfaces locales.
  */
 
-import { validatePlayerNames, rankPlayers, rankPlayersGlobal } from '../../src/utils/multiplayer.utils';
+import { validatePlayerNames, rankPlayers, rankPlayersGlobal, rankPlayersGlobalWithRank } from '../../src/utils/multiplayer.utils';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Interfaces locales (miroir des types du store — évite import type)
@@ -281,7 +281,7 @@ describe('rankPlayersGlobal', () => {
     });
   });
 
-  it('cas 7 — résultat avec jumps null (won=false) ne contribue pas aux stats', () => {
+  it('cas 7 — résultat avec jumps null (won=false) ne contribue pas aux stats (rankPlayersGlobal)', () => {
     const roundHistory = [
       [
         makeRoundResult({ won: true, jumps: 5, durationMs: 10000 }),
@@ -295,5 +295,130 @@ describe('rankPlayersGlobal', () => {
     expect(bResult.wins).toBe(0);
     expect(bResult.totalJumps).toBe(0);
     expect(bResult.totalDurationMs).toBe(0);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// rankPlayersGlobalWithRank — F3-33 — TDD strict
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('rankPlayersGlobalWithRank', () => {
+  it('cas 1 — 3 joueurs, aucune égalité → ranks 1, 2, 3', () => {
+    // Alice : 2 victoires, Bob : 1 victoire, Charlie : 0
+    const roundHistory = [
+      [
+        makeRoundResult({ won: true, jumps: 3, durationMs: 10000 }),
+        makeRoundResult({ won: true, jumps: 3, durationMs: 10000 }),
+        makeRoundResult({ won: false }),
+      ],
+      [
+        makeRoundResult({ won: true, jumps: 2, durationMs: 8000 }),
+        makeRoundResult({ won: false }),
+        makeRoundResult({ won: false }),
+      ],
+    ];
+    const result = rankPlayersGlobalWithRank(roundHistory, ['Alice', 'Bob', 'Charlie']);
+    expect(result).toHaveLength(3);
+    const alice = result.find((r) => r.name === 'Alice');
+    const bob = result.find((r) => r.name === 'Bob');
+    const charlie = result.find((r) => r.name === 'Charlie');
+    expect(alice).toBeDefined();
+    expect(bob).toBeDefined();
+    expect(charlie).toBeDefined();
+    if (!alice || !bob || !charlie) return;
+    expect(alice.rank).toBe(1);
+    expect(bob.rank).toBe(2);
+    expect(charlie.rank).toBe(3);
+  });
+
+  it('cas 2 — 2 joueurs ex-aequo sur tout → ranks 1, 1', () => {
+    // Alice et Bob : wins=1, totalJumps=3, totalDurationMs=10000
+    const roundHistory = [
+      [
+        makeRoundResult({ won: true, jumps: 3, durationMs: 10000 }),
+        makeRoundResult({ won: true, jumps: 3, durationMs: 10000 }),
+      ],
+    ];
+    const result = rankPlayersGlobalWithRank(roundHistory, ['Alice', 'Bob']);
+    const alice = result.find((r) => r.name === 'Alice');
+    const bob = result.find((r) => r.name === 'Bob');
+    expect(alice).toBeDefined();
+    expect(bob).toBeDefined();
+    if (!alice || !bob) return;
+    expect(alice.rank).toBe(1);
+    expect(bob.rank).toBe(1);
+  });
+
+  it('cas 3 — 3 joueurs, les 2 premiers ex-aequo → ranks 1, 1, 3 (pas 2)', () => {
+    // Alice et Bob : wins=2, totalJumps=3, totalDurationMs=10000
+    // Charlie : wins=1, totalJumps=2, totalDurationMs=5000
+    const roundHistory = [
+      [
+        makeRoundResult({ won: true, jumps: 1, durationMs: 5000 }),
+        makeRoundResult({ won: true, jumps: 1, durationMs: 5000 }),
+        makeRoundResult({ won: true, jumps: 2, durationMs: 5000 }),
+      ],
+      [
+        makeRoundResult({ won: true, jumps: 2, durationMs: 5000 }),
+        makeRoundResult({ won: true, jumps: 2, durationMs: 5000 }),
+        makeRoundResult({ won: false }),
+      ],
+    ];
+    const result = rankPlayersGlobalWithRank(roundHistory, ['Alice', 'Bob', 'Charlie']);
+    const alice = result.find((r) => r.name === 'Alice');
+    const bob = result.find((r) => r.name === 'Bob');
+    const charlie = result.find((r) => r.name === 'Charlie');
+    expect(alice).toBeDefined();
+    expect(bob).toBeDefined();
+    expect(charlie).toBeDefined();
+    if (!alice || !bob || !charlie) return;
+    expect(alice.rank).toBe(1);
+    expect(bob.rank).toBe(1);
+    // Charlie 3e (pas 2e) car 2 joueurs avant lui ont le même rang 1
+    expect(charlie.rank).toBe(3);
+  });
+
+  it('cas 4 — tous ex-aequo (wins=0, totalJumps=0, totalDurationMs=0) → tous rank 1', () => {
+    const roundHistory = [
+      [
+        makeRoundResult({ won: false }),
+        makeRoundResult({ won: false }),
+        makeRoundResult({ won: false }),
+      ],
+    ];
+    const result = rankPlayersGlobalWithRank(roundHistory, ['A', 'B', 'C']);
+    result.forEach((r) => {
+      expect(r.rank).toBe(1);
+    });
+  });
+
+  it('cas 5 — session 1 manche, comportement standard', () => {
+    // Alice gagne, Bob abandonne
+    const roundHistory = [
+      [
+        makeRoundResult({ won: true, jumps: 3, durationMs: 5000 }),
+        makeRoundResult({ won: false, jumps: null, durationMs: null }),
+      ],
+    ];
+    const result = rankPlayersGlobalWithRank(roundHistory, ['Alice', 'Bob']);
+    const alice = result.find((r) => r.name === 'Alice');
+    const bob = result.find((r) => r.name === 'Bob');
+    expect(alice).toBeDefined();
+    expect(bob).toBeDefined();
+    if (!alice || !bob) return;
+    expect(alice.rank).toBe(1);
+    expect(alice.wins).toBe(1);
+    expect(bob.rank).toBe(2);
+    expect(bob.wins).toBe(0);
+  });
+
+  it('cas 6 — roundHistory vide : retourne tableau vide', () => {
+    const result = rankPlayersGlobalWithRank([], ['Alice', 'Bob']);
+    // Tous wins=0, tous rank=1 (cas défensif)
+    expect(result).toHaveLength(2);
+    result.forEach((r) => {
+      expect(r.wins).toBe(0);
+      expect(r.rank).toBe(1);
+    });
   });
 });
