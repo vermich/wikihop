@@ -4,7 +4,7 @@ title: Parcours complet dans GameDetailScreen
 phase: 3-Features
 priority: Could
 agents: [Tech Lead, Frontend Dev]
-status: pending
+status: in-progress
 created: 2026-03-14
 completed:
 depends_on: [F3-11]
@@ -32,4 +32,4 @@ En tant que joueur, je veux voir la liste ordonnée des articles que j'ai visit�
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending
+pending → in-progress

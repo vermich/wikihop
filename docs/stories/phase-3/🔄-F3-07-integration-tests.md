@@ -4,7 +4,7 @@ title: Tests d'intégration — parcours de jeu complet
 phase: 3-Features
 priority: Should
 agents: [QA]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---

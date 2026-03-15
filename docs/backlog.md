@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-15 | **Version** : 4.4
+**PM** : Gauderic | **Mis à jour** : 2026-03-15 | **Version** : 4.5
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -84,7 +84,7 @@
 | [F3-04](stories/phase-3/✅-F3-04-donation-page.md) | Page donation Wikipedia | Must | Frontend Dev, UX/UI, DPO | ✅ done |
 | [F3-05](stories/phase-3/✅-F3-05-hard-mode.md) | Mode difficile (articles sans liens évidents) | Should | Backend Dev, Frontend Dev, UX/UI | ✅ done |
 | [F3-06](stories/phase-3/✅-F3-06-about-screen.md) | Écran "À propos" et crédits | Should | Frontend Dev, UX/UI, DPO | ✅ done |
-| [F3-07](stories/phase-3/⬜-F3-07-integration-tests.md) | Tests d'intégration — parcours de jeu complet | Should | QA | ⬜ pending |
+| [F3-07](stories/phase-3/🔄-F3-07-integration-tests.md) | Tests d'intégration — parcours de jeu complet | Should | QA | 🔄 in-progress |
 | [F3-08](stories/phase-3/✅-F3-08-personal-stats.md) | Statistiques personnelles | Could | Frontend Dev, UX/UI | ✅ done |
 | [F3-09](stories/phase-3/✅-F3-09-animations-haptics.md) | Animations et feedback haptique | Could | Frontend Dev, UX/UI | ✅ done |
 | [F3-10](stories/phase-3/✅-F3-10-history-sort.md) | Tri multi-critères dans l'historique des parties | Should | Frontend Dev, UX/UI | ✅ done |
@@ -100,7 +100,7 @@
 | [F3-21](stories/phase-3/✅-F3-21-fix-daily-challenge-button-visual-state.md) | Fix état visuel bouton défi du jour complété | Must | Frontend Dev | ✅ done |
 | [F3-22](stories/phase-3/✅-F3-22-fix-back-navigation-article.md) | Fix retour arrière dans la partie | Must | Frontend Dev | ✅ done |
 | [F3-23](stories/phase-3/✅-F3-23-daily-challenge-badge-history.md) | Badge "défi du jour" dans l'historique des parties | Should | Frontend Dev, UX/UI | ✅ done |
-| [F3-24](stories/phase-3/⬜-F3-24-game-detail-full-path.md) | Parcours complet dans GameDetailScreen | Could | Tech Lead, Frontend Dev | ⬜ pending |
+| [F3-24](stories/phase-3/🔄-F3-24-game-detail-full-path.md) | Parcours complet dans GameDetailScreen | Could | Tech Lead, Frontend Dev | 🔄 in-progress |
 | [F3-25](stories/phase-3/⬜-F3-25-ux-ui-global-rework.md) | Refonte UX/UI globale (vague dédiée) | Should | UX/UI, Frontend Dev | ⬜ pending |
 | [F3-26](stories/phase-3/⬜-F3-26-internationalization.md) | Internationalisation des interfaces | Should | Tech Lead, Frontend Dev, Backend Dev | ⬜ pending |
 | [F3-27](stories/phase-3/✅-F3-27-fix-back-navigation-regression.md) | Fix retour arrière — régression F3-22 | Must | Tech Lead, Frontend Dev | ✅ done |
@@ -111,7 +111,7 @@
 | [F3-32](stories/phase-3/✅-F3-32-multiplayer-pairs-per-round.md) | Multijoueur — paires préchargées par manche | Should | Tech Lead, UX/UI, Frontend Dev | ✅ done |
 | [F3-33](stories/phase-3/✅-F3-33-multiplayer-results-per-round.md) | Multijoueur — résultats par manche + médaille partagée | Should | Tech Lead, UX/UI, Frontend Dev | ✅ done |
 | [F3-34](stories/phase-3/✅-F3-34-fix-back-navigation-webview.md) | Fix retour arrière WebView — régression persistante après F3-27 | Must | Tech Lead, Frontend Dev | ✅ done |
-| [F3-35](stories/phase-3/⬜-F3-35-hard-mode-badge-history.md) | Badge "Mode difficile" dans l'historique des parties | Should | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-35](stories/phase-3/🔄-F3-35-hard-mode-badge-history.md) | Badge "Mode difficile" dans l'historique des parties | Should | Frontend Dev, UX/UI | 🔄 in-progress |
 
 ---
 
@@ -218,4 +218,5 @@
 *v4.2 : F3-09 done (rétro), F3-01/F3-05 in-progress — lancement vague F (2026-03-15)*
 *v4.3 : F3-01/F3-05 passées en done — gate device physique confirmé par le Client (2026-03-15)*
 *v4.4 : F3-35 créée — badge "Mode difficile" dans l'historique des parties (Should / Frontend Dev, UX/UI) (2026-03-15)*
+*v4.5 : Vague G lancée — F3-35/F3-24/F3-07 in-progress (2026-03-15)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*

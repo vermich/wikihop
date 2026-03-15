@@ -4,7 +4,7 @@ title: Badge "Mode difficile" dans l'historique des parties
 phase: 3-Features
 priority: Should
 agents: [Frontend Dev, UX/UI]
-status: pending
+status: in-progress
 created: 2026-03-15
 completed:
 depends_on: [F3-02, F3-05, F3-23]
@@ -32,4 +32,4 @@ En tant que joueur, je veux voir dans l'historique de mes parties lesquelles ont
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending
+pending → in-progress
