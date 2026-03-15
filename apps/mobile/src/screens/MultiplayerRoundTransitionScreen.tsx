@@ -1,18 +1,18 @@
 /**
- * MultiplayerRoundTransitionScreen — WikiHop Mobile — F3-28
+ * MultiplayerRoundTransitionScreen — WikiHop Mobile — F3-28 (mod. F3-32)
  *
  * Écran de transition entre deux manches multijoueur.
  *
- * Responsabilité :
- *   - Charge une nouvelle paire d'articles (useRandomPair)
+ * Responsabilité (F3-32 : paires préchargées) :
+ *   - Lit la paire de la prochaine manche depuis allPairs[currentRound] du store
+ *     (plus de fetch dynamique — paires préchargées dans MultiplayerSetupScreen)
  *   - Appelle startNextRound() sur le store multijoueur
  *   - Démarre la session de jeu pour le joueur 1 de la nouvelle manche
  *   - Navigue vers PassPhone via navigation.replace (pas navigate, pour ne pas
  *     laisser cet écran accessible par retour arrière)
  *
  * Gestion d'erreur :
- *   - Si pairState.status === 'error' : affiche un message et un bouton
- *     "Retour aux résultats" qui navigue vers MultiplayerResult
+ *   - Si allPairs[currentRound] === undefined : cas défensif, navigue vers MultiplayerResult
  *
  * Conventions :
  *   - Export nommé MultiplayerRoundTransitionScreen
@@ -27,12 +27,10 @@ import {
   ActivityIndicator,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useRandomPair } from '../hooks/useRandomPair';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useGameStore } from '../store/game.store';
 import { useMultiplayerStore } from '../store/multiplayer.store';
@@ -53,8 +51,8 @@ type MultiplayerRoundTransitionScreenProps = NativeStackScreenProps<
 export function MultiplayerRoundTransitionScreen(
   { navigation }: MultiplayerRoundTransitionScreenProps,
 ): React.JSX.Element {
-  const { state: pairState } = useRandomPair('normal');
-
+  // F3-32 : lecture des paires préchargées depuis le store — plus de useRandomPair
+  const allPairs = useMultiplayerStore((s) => s.allPairs);
   const currentRound = useMultiplayerStore((s) => s.currentRound);
   const roundCount = useMultiplayerStore((s) => s.roundCount);
   const players = useMultiplayerStore((s) => s.players);
@@ -62,22 +60,29 @@ export function MultiplayerRoundTransitionScreen(
   const clearSession = useGameStore((s) => s.clearSession);
   const startSession = useGameStore((s) => s.startSession);
 
-  // Déclencher la transition dès que la paire est chargée
+  // Déclencher la transition dès le montage — la paire est déjà disponible dans le store
   useEffect(() => {
-    if (pairState.status !== 'success') return;
+    // La paire pour la prochaine manche est allPairs[currentRound]
+    // (currentRound est 1-indexed, allPairs est 0-indexed)
+    const nextPair = allPairs[currentRound];
+    if (nextPair === undefined) {
+      // Cas défensif — ne devrait pas arriver si allPairs est correctement rempli
+      navigation.navigate('MultiplayerResult');
+      return;
+    }
 
-    // Construction explicite Article — pas de spread depuis ArticleSummary
+    // Construction explicite Article — pas de spread depuis le type du store
     const startArticle: Article = {
-      id: pairState.start.id,
-      title: pairState.start.title,
-      url: pairState.start.url,
-      language: pairState.start.language,
+      id: nextPair.start.id,
+      title: nextPair.start.title,
+      url: nextPair.start.url,
+      language: nextPair.start.language,
     };
     const targetArticle: Article = {
-      id: pairState.target.id,
-      title: pairState.target.title,
-      url: pairState.target.url,
-      language: pairState.target.language,
+      id: nextPair.target.id,
+      title: nextPair.target.title,
+      url: nextPair.target.url,
+      language: nextPair.target.language,
     };
 
     // Ordre strict :
@@ -94,38 +99,15 @@ export function MultiplayerRoundTransitionScreen(
         playerName: firstPlayer?.name ?? '',
       });
     })();
-  // Dépendance intentionnellement limitée à pairState.status :
-  // les actions Zustand (startNextRound, clearSession, startSession) sont stables
-  // (identité de référence garantie par Zustand create).
-  // players capturé au moment du mount — stable pendant la transition.
+  // Dépendance intentionnellement limitée à currentRound :
+  // allPairs, startNextRound, clearSession, startSession, navigation, players
+  // ont une identité stable (Zustand create) ou sont capturés au mount.
   // eslint-plugin-react-hooks non installé dans ce projet.
-  }, [pairState.status]);
-
-  // ── Gestion d'erreur de chargement de paire ────────────────────────────────
-  if (pairState.status === 'error') {
-    return (
-      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>
-            {'Impossible de charger la manche suivante.'}
-          </Text>
-          <Text style={styles.errorSubtext}>
-            {'Vérifiez votre connexion internet.'}
-          </Text>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => { navigation.navigate('MultiplayerResult'); }}
-            accessibilityLabel="Retour aux résultats"
-            accessibilityRole="button"
-          >
-            <Text style={styles.backButtonText}>{'Retour aux résultats'}</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  }, [currentRound]);
 
   // ── Affichage de chargement ────────────────────────────────────────────────
+  // F3-32 : plus d'état loading/error lié à un fetch — transition quasi-instantanée.
+  // Le spinner s'affiche pendant la fraction de seconde avant que useEffect s'exécute.
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <View style={styles.loadingContainer}>
@@ -158,37 +140,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#64748B',
     textAlign: 'center',
-  },
-  errorContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-  errorText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1E293B',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  errorSubtext: {
-    fontSize: 14,
-    color: '#64748B',
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  backButton: {
-    height: 52,
-    paddingHorizontal: 24,
-    backgroundColor: '#2563EB',
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
   },
 });

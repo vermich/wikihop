@@ -1,19 +1,25 @@
 /**
- * ArticleScreen Tests — WikiHop Mobile — Réécriture WebView native
+ * ArticleScreen Tests — WikiHop Mobile — Fix retour arrière (F3-34)
  *
- * Teste la nouvelle architecture WebView native (F3-27 — retour via webViewRef.goBack) :
+ * Teste la nouvelle architecture stack applicatif (F3-34) :
  *
  *   Navigation :
  *     - onPageChange est connecté à WikipediaWebView via onNavigationStateChange
- *     - Chaque changement de page appelle addJump
+ *     - Chaque changement de page (forward) appelle addJump et push dans articleStack
  *     - Victoire : titlesMatch(newTitle, targetTitle) → completeSession + navigate('Victory')
- *     - Navigation header : bouton "← Retour" visible si webViewCanGoBack === true
- *       (mis à jour via onNavigationStateChange, pas via navigation.canGoBack())
+ *     - Navigation header : bouton "← Retour" visible si stackSize > 1
+ *       (stack applicatif, pas webViewCanGoBack)
  *
- *   BackHandler Android :
+ *   BackHandler Android (F3-34) :
  *     - Enregistré quand isFocused === true
- *     - webViewRef.goBack() si webViewCanGoBack === true → return true
- *     - Si webViewCanGoBack === false → handleAbandon() + return true
+ *     - stackSize > 1 → handleGoBack() (pop stack + setCurrentTitle) → return true
+ *     - stackSize === 1 → handleAbandon() (Alert) + return true
+ *     - mockWebViewGoBack ne doit PLUS être appelé (architecture F3-34)
+ *
+ *   Retour arrière via bouton header :
+ *     - isBackNavigation flag distingue pop stack d'un saut forward
+ *     - pop stack → setCurrentTitle(prevTitle) → onNavigationStateChange déclenché
+ *     - Ne compte PAS de saut (pas addJump)
  *
  *   État d'erreur :
  *     - onError de WikipediaWebView → affichage écran erreur + bouton Réessayer
@@ -202,20 +208,20 @@ describe('ArticleScreen', () => {
       expect(getByText('Tour Eiffel')).toBeTruthy();
     });
 
-    it('n\'affiche pas le bouton retour si webViewCanGoBack === false (état initial)', async () => {
-      // F3-27 : le bouton est conditionné sur webViewCanGoBack (état interne WebView)
-      // webViewCanGoBack démarre à false — onNavigationStateChange pas encore déclenché
+    it('n\'affiche pas le bouton retour si stackSize === 1 (état initial — F3-34)', async () => {
+      // F3-34 : le bouton est conditionné sur stackSize > 1 (stack applicatif)
+      // stackSize démarre à 1 — aucun saut forward encore
       const { queryByText } = renderArticleScreen();
       await act(async () => { await Promise.resolve(); });
       expect(queryByText('← Retour')).toBeNull();
     });
 
-    it('affiche le bouton retour si webViewCanGoBack === true (après onNavigationStateChange)', async () => {
-      // F3-27 : le bouton devient visible quand la WebView signale canGoBack: true
-      const { getByText } = renderArticleScreen();
+    it('affiche le bouton retour après un saut forward (stackSize > 1 — F3-34)', async () => {
+      // F3-34 : le bouton devient visible après un saut forward (push dans articleStack)
+      const { queryByText } = renderArticleScreen();
       await act(async () => { await Promise.resolve(); });
 
-      // Simuler la WebView qui signale qu'elle peut reculer
+      // Simuler un saut forward : Paris (nouvel article)
       await act(async () => {
         capturedWebViewProps.onNavigationStateChange?.({
           canGoBack: true,
@@ -225,7 +231,14 @@ describe('ArticleScreen', () => {
         await Promise.resolve();
       });
 
-      expect(getByText('← Retour')).toBeTruthy();
+      // Attendre addJump (qui indique le saut forward pris en compte)
+      await waitFor(() => {
+        expect(mockAddJump).toHaveBeenCalledWith(
+          expect.objectContaining({ title: 'Paris' }),
+        );
+      });
+
+      expect(queryByText('← Retour')).toBeTruthy();
     });
 
     it('affiche le GameHUD', () => {
@@ -238,8 +251,6 @@ describe('ArticleScreen', () => {
 
   describe('Configuration de WikipediaWebView', () => {
     it('configure WikipediaWebView avec onNavigationStateChange (pour le comptage de sauts)', async () => {
-      // F3-22 : onNavigationStateChange est toujours utilisé pour détecter les changements d'URL
-      // et déclencher handlePageChange → addJump
       renderArticleScreen();
       await act(async () => { await Promise.resolve(); });
       expect(capturedWebViewProps.onNavigationStateChange).toBeDefined();
@@ -249,7 +260,6 @@ describe('ArticleScreen', () => {
       renderArticleScreen();
       await act(async () => { await Promise.resolve(); });
       // WikipediaWebView est rendu (testID mock-webview)
-      // onShouldStartLoadWithRequest est géré par WikipediaWebView directement
     });
   });
 
@@ -318,6 +328,51 @@ describe('ArticleScreen', () => {
         await Promise.resolve();
       });
 
+      expect(mockAddJump).not.toHaveBeenCalled();
+    });
+
+    it('ne déclenche pas addJump lors d\'un retour arrière (isBackNavigation flag — F3-34)', async () => {
+      // F3-34 : quand handleGoBack() est appelé, isBackNavigation.current = true
+      // Le prochain onNavigationStateChange doit être ignoré (pas de addJump)
+      const { queryByText } = renderArticleScreen('Tour Eiffel');
+      await act(async () => { await Promise.resolve(); });
+
+      const { onNavigationStateChange } = capturedWebViewProps;
+
+      // 1. Saut forward : Paris
+      await act(async () => {
+        onNavigationStateChange?.({
+          url: 'https://fr.m.wikipedia.org/wiki/Paris',
+          canGoBack: true,
+          loading: false,
+        });
+        await Promise.resolve();
+      });
+      await waitFor(() => { expect(mockAddJump).toHaveBeenCalledTimes(1); });
+
+      // 2. Retour arrière via bouton header
+      mockAddJump.mockClear();
+      const backButton = queryByText('← Retour');
+      expect(backButton).toBeTruthy();
+
+      await act(async () => {
+        if (backButton) {
+          fireEvent.press(backButton);
+        }
+        await Promise.resolve();
+      });
+
+      // 3. onNavigationStateChange déclenché par le changement de source (retour)
+      await act(async () => {
+        onNavigationStateChange?.({
+          url: 'https://fr.m.wikipedia.org/wiki/Tour_Eiffel',
+          canGoBack: false,
+          loading: false,
+        });
+        await Promise.resolve();
+      });
+
+      // addJump NE doit PAS être appelé (retour arrière)
       expect(mockAddJump).not.toHaveBeenCalled();
     });
   });
@@ -417,8 +472,8 @@ describe('ArticleScreen', () => {
       expect(addEventListenerSpy).not.toHaveBeenCalled();
     });
 
-    it('appelle webViewRef.goBack() et retourne true quand webViewCanGoBack === true', async () => {
-      // F3-27 : le BackHandler utilise webViewRef.current?.goBack() (retour interne WebView)
+    it('appelle handleGoBack (pop stack) et retourne true si stackSize > 1 (F3-34)', async () => {
+      // F3-34 : le BackHandler utilise le stack applicatif, pas webViewRef.goBack()
       mockIsFocused = true;
 
       const handlers: Array<() => boolean> = [];
@@ -432,7 +487,7 @@ describe('ArticleScreen', () => {
       renderArticleScreen();
       await act(async () => { await Promise.resolve(); });
 
-      // Signaler que la WebView peut reculer → webViewCanGoBack = true
+      // Simuler un saut forward pour que stackSize > 1
       await act(async () => {
         capturedWebViewProps.onNavigationStateChange?.({
           canGoBack: true,
@@ -442,20 +497,21 @@ describe('ArticleScreen', () => {
         await Promise.resolve();
       });
 
+      await waitFor(() => { expect(mockAddJump).toHaveBeenCalledTimes(1); });
+
+      // Le dernier handler BackHandler a été enregistré avec stackSize > 1
       const lastHandler = handlers[handlers.length - 1];
       expect(lastHandler).toBeDefined();
       const result = lastHandler?.();
-      // webViewCanGoBack === true → webViewRef.goBack() + return true
       expect(result).toBe(true);
-      expect(mockWebViewGoBack).toHaveBeenCalled();
-      // navigation.goBack() ne doit plus être appelé (F3-27)
-      expect(mockGoBack).not.toHaveBeenCalled();
+      // F3-34 : webViewRef.goBack() ne doit plus être appelé
+      expect(mockWebViewGoBack).not.toHaveBeenCalled();
     });
 
-    it('appelle handleAbandon (Alert) et retourne true si webViewCanGoBack === false', async () => {
-      // F3-27 : si la WebView ne peut plus reculer → proposer abandon
+    it('appelle handleAbandon (Alert) et retourne true si stackSize === 1', async () => {
+      // F3-34 : si stack vide (article initial) → proposer abandon
       mockIsFocused = true;
-      // webViewCanGoBack est false par défaut (état initial)
+      // stackSize est 1 par défaut (pas de saut forward)
 
       const alertSpy = jest.spyOn(Alert, 'alert');
 
@@ -473,7 +529,7 @@ describe('ArticleScreen', () => {
       const lastHandler = handlers[handlers.length - 1];
       expect(lastHandler).toBeDefined();
       const result = lastHandler?.();
-      // webViewCanGoBack === false → handleAbandon() + return true
+      // stackSize === 1 → handleAbandon() + return true
       expect(result).toBe(true);
       expect(alertSpy).toHaveBeenCalledWith(
         'Abandonner la partie ?',

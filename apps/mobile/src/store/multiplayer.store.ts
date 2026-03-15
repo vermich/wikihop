@@ -1,5 +1,5 @@
 /**
- * useMultiplayerStore — Store Zustand pour le mode multijoueur local (F3-12, F3-28)
+ * useMultiplayerStore — Store Zustand pour le mode multijoueur local (F3-12, F3-28, F3-32)
  *
  * Gère l'état d'une session multijoueur hot-seat :
  *   - Liste des joueurs et leur résultat individuel
@@ -7,6 +7,7 @@
  *   - Articles (départ + destination) partagés entre tous les joueurs
  *   - isSessionActive : flag pour savoir si une session multijoueur est en cours
  *   - roundCount / currentRound / roundHistory : manches configurables (F3-28)
+ *   - allPairs : paires préchargées pour toutes les manches (F3-32)
  *
  * Pas de persistance AsyncStorage — la session est éphémère (en mémoire uniquement).
  * resetSession() remet tout à zéro (appelée depuis MultiplayerResultScreen).
@@ -59,6 +60,13 @@ export interface MultiplayerState {
    * Rempli par startNextRound() à chaque transition de manche.
    */
   roundHistory: MultiplayerRoundResult[][];
+  /**
+   * Paires préchargées pour toutes les manches — F3-32.
+   * allPairs[i] = paire de la manche i+1.
+   * Rempli par setupSession() depuis MultiplayerSetupScreen.
+   * Utilisé par MultiplayerRoundTransitionScreen pour éviter un fetch dynamique.
+   */
+  allPairs: Array<{ start: Article; target: Article }>;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -66,11 +74,18 @@ export interface MultiplayerState {
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface MultiplayerActions {
-  /** Initialise une session avec les noms de joueurs, la paire, et le nombre de manches. */
+  /**
+   * Initialise une session avec les noms de joueurs, le tableau de paires préchargées,
+   * et le nombre de manches.
+   *
+   * @param players    - Noms des joueurs (2 à 6)
+   * @param pairs      - Tableau de paires préchargées. pairs.length DOIT être égal à roundCount.
+   *                     pairs[0] = paire manche 1, pairs[1] = paire manche 2, etc.
+   * @param roundCount - Nombre de manches configurées (défaut : 1)
+   */
   setupSession(
     players: string[],
-    start: Article,
-    target: Article,
+    pairs: Array<{ start: Article; target: Article }>,
     roundCount?: number,
   ): void;
 
@@ -91,15 +106,17 @@ interface MultiplayerActions {
   startNextRound(start: Article, target: Article): void;
 
   /**
-   * Repart depuis le début avec une nouvelle paire et les mêmes joueurs.
+   * Repart depuis le début avec de nouvelles paires et les mêmes joueurs.
    * Utilisé par F3-29 (bouton Rejouer).
    * - Reset players[].status à 'waiting', jumps/durationMs à null, won à false
    * - currentRound = 1
    * - roundHistory = []
    * - currentPlayerIndex = 0
-   * - Met à jour startArticle et targetArticle
+   * - Met à jour allPairs, startArticle et targetArticle
+   *
+   * @param pairs - Tableau de paires (longueur = roundCount)
    */
-  restartSession(start: Article, target: Article): void;
+  restartSession(pairs: Array<{ start: Article; target: Article }>): void;
 
   /** Réinitialise complètement la session multijoueur. */
   resetSession(): void;
@@ -118,6 +135,7 @@ const initialState: MultiplayerState = {
   roundCount: 1,
   currentRound: 1,
   roundHistory: [],
+  allPairs: [],
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -127,7 +145,8 @@ const initialState: MultiplayerState = {
 export const useMultiplayerStore = create<MultiplayerState & MultiplayerActions>((set) => ({
   ...initialState,
 
-  setupSession: (playerNames, start, target, roundCount = 1) => {
+  setupSession: (playerNames, pairs, roundCount = 1) => {
+    const firstPair = pairs[0];
     set({
       players: playerNames.map((name) => ({
         name,
@@ -137,8 +156,9 @@ export const useMultiplayerStore = create<MultiplayerState & MultiplayerActions>
         won: false,
       })),
       currentPlayerIndex: 0,
-      startArticle: start,
-      targetArticle: target,
+      allPairs: pairs,
+      startArticle: firstPair?.start ?? null,
+      targetArticle: firstPair?.target ?? null,
       isSessionActive: true,
       roundCount,
       currentRound: 1,
@@ -186,7 +206,8 @@ export const useMultiplayerStore = create<MultiplayerState & MultiplayerActions>
     });
   },
 
-  restartSession: (start, target) => {
+  restartSession: (pairs) => {
+    const firstPair = pairs[0];
     set((state) => ({
       players: state.players.map((p) => ({
         ...p,
@@ -198,8 +219,9 @@ export const useMultiplayerStore = create<MultiplayerState & MultiplayerActions>
       currentPlayerIndex: 0,
       currentRound: 1,
       roundHistory: [],
-      startArticle: start,
-      targetArticle: target,
+      allPairs: pairs,
+      startArticle: firstPair?.start ?? null,
+      targetArticle: firstPair?.target ?? null,
     }));
   },
 
