@@ -14,6 +14,18 @@
 import { validatePlayerNames, rankPlayers, rankPlayersGlobal, rankPlayersGlobalWithRank } from '../../src/utils/multiplayer.utils';
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Interface locale pour rankPlayersGlobalWithRank (TDD — implémentation à venir)
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface RankEntryWithRank {
+  name: string;
+  wins: number;
+  totalJumps: number;
+  totalDurationMs: number;
+  rank: number;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Interfaces locales (miroir des types du store — évite import type)
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -319,9 +331,9 @@ describe('rankPlayersGlobalWithRank', () => {
     ];
     const result = rankPlayersGlobalWithRank(roundHistory, ['Alice', 'Bob', 'Charlie']);
     expect(result).toHaveLength(3);
-    const alice = result.find((r) => r.name === 'Alice');
-    const bob = result.find((r) => r.name === 'Bob');
-    const charlie = result.find((r) => r.name === 'Charlie');
+    const alice = result.find((r: RankEntryWithRank) => r.name === 'Alice');
+    const bob = result.find((r: RankEntryWithRank) => r.name === 'Bob');
+    const charlie = result.find((r: RankEntryWithRank) => r.name === 'Charlie');
     expect(alice).toBeDefined();
     expect(bob).toBeDefined();
     expect(charlie).toBeDefined();
@@ -340,8 +352,8 @@ describe('rankPlayersGlobalWithRank', () => {
       ],
     ];
     const result = rankPlayersGlobalWithRank(roundHistory, ['Alice', 'Bob']);
-    const alice = result.find((r) => r.name === 'Alice');
-    const bob = result.find((r) => r.name === 'Bob');
+    const alice = result.find((r: RankEntryWithRank) => r.name === 'Alice');
+    const bob = result.find((r: RankEntryWithRank) => r.name === 'Bob');
     expect(alice).toBeDefined();
     expect(bob).toBeDefined();
     if (!alice || !bob) return;
@@ -365,9 +377,9 @@ describe('rankPlayersGlobalWithRank', () => {
       ],
     ];
     const result = rankPlayersGlobalWithRank(roundHistory, ['Alice', 'Bob', 'Charlie']);
-    const alice = result.find((r) => r.name === 'Alice');
-    const bob = result.find((r) => r.name === 'Bob');
-    const charlie = result.find((r) => r.name === 'Charlie');
+    const alice = result.find((r: RankEntryWithRank) => r.name === 'Alice');
+    const bob = result.find((r: RankEntryWithRank) => r.name === 'Bob');
+    const charlie = result.find((r: RankEntryWithRank) => r.name === 'Charlie');
     expect(alice).toBeDefined();
     expect(bob).toBeDefined();
     expect(charlie).toBeDefined();
@@ -387,7 +399,7 @@ describe('rankPlayersGlobalWithRank', () => {
       ],
     ];
     const result = rankPlayersGlobalWithRank(roundHistory, ['A', 'B', 'C']);
-    result.forEach((r) => {
+    result.forEach((r: RankEntryWithRank) => {
       expect(r.rank).toBe(1);
     });
   });
@@ -401,8 +413,8 @@ describe('rankPlayersGlobalWithRank', () => {
       ],
     ];
     const result = rankPlayersGlobalWithRank(roundHistory, ['Alice', 'Bob']);
-    const alice = result.find((r) => r.name === 'Alice');
-    const bob = result.find((r) => r.name === 'Bob');
+    const alice = result.find((r: RankEntryWithRank) => r.name === 'Alice');
+    const bob = result.find((r: RankEntryWithRank) => r.name === 'Bob');
     expect(alice).toBeDefined();
     expect(bob).toBeDefined();
     if (!alice || !bob) return;
@@ -416,7 +428,7 @@ describe('rankPlayersGlobalWithRank', () => {
     const result = rankPlayersGlobalWithRank([], ['Alice', 'Bob']);
     // Tous wins=0, tous rank=1 (cas défensif)
     expect(result).toHaveLength(2);
-    result.forEach((r) => {
+    result.forEach((r: RankEntryWithRank) => {
       expect(r.wins).toBe(0);
       expect(r.rank).toBe(1);
     });
