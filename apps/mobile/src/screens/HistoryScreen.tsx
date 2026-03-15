@@ -34,7 +34,6 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -46,11 +45,8 @@ import { HistoryItem } from '../components/history/HistoryItem';
 import { useGameHistory } from '../hooks/useGameHistory';
 import { useHistorySort } from '../hooks/useHistorySort';
 import type { RootStackParamList } from '../navigation/RootNavigator';
-import {
-  SORT_CRITERION_LABELS,
-  sortRecords,
-} from '../utils/history-sort.utils';
-import type { SortCriterion } from '../utils/history-sort.utils';
+import { sortRecords } from '../utils/history-sort.utils';
+import type { SortButtonCriterion, SortDirection } from '../utils/history-sort.utils';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -59,19 +55,40 @@ import type { SortCriterion } from '../utils/history-sort.utils';
 type HistoryScreenProps = NativeStackScreenProps<RootStackParamList, 'History'>;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Constantes
+// Constantes — F3-25 : 3 boutons à 3 états cycliques
 // ─────────────────────────────────────────────────────────────────────────────
 
-const SORT_CRITERIA = Object.keys(SORT_CRITERION_LABELS) as SortCriterion[];
+const SORT_BUTTONS: ReadonlyArray<{ criterion: SortButtonCriterion; label: string }> = [
+  { criterion: 'date', label: 'Date' },
+  { criterion: 'jumps', label: 'Sauts' },
+  { criterion: 'duration', label: 'Durée' },
+];
 
-const SORT_CRITERION_A11Y_LABELS: Record<SortCriterion, string> = {
-  date_desc: 'Trier par date, plus récent en premier',
-  date_asc: 'Trier par date, plus ancien en premier',
-  duration_asc: 'Trier par durée, plus court en premier',
-  duration_desc: 'Trier par durée, plus long en premier',
-  jumps_asc: 'Trier par nombre de sauts, moins de sauts en premier',
-  jumps_desc: 'Trier par nombre de sauts, plus de sauts en premier',
-};
+function getSortButtonA11yLabel(
+  criterion: SortButtonCriterion,
+  direction: SortDirection,
+  activeCriterion: SortButtonCriterion,
+): string {
+  const isActive = criterion === activeCriterion && direction !== null;
+  const labelMap: Record<SortButtonCriterion, string> = {
+    date: 'date',
+    jumps: 'sauts',
+    duration: 'durée',
+  };
+  const name = labelMap[criterion];
+  if (!isActive) {
+    return `Trier par ${name} — tap pour trier du plus ancien au plus récent`;
+  }
+  if (direction === 'asc') {
+    return `${name.charAt(0).toUpperCase()}${name.slice(1)}, tri croissant actif — tap pour inverser`;
+  }
+  return `${name.charAt(0).toUpperCase()}${name.slice(1)}, tri décroissant actif — tap pour désactiver`;
+}
+
+function getSortButtonLabel(criterion: SortButtonCriterion, baseLabel: string, activeCriterion: SortButtonCriterion, direction: SortDirection): string {
+  if (criterion !== activeCriterion || direction === null) return baseLabel;
+  return direction === 'asc' ? `${baseLabel} ↑` : `${baseLabel} ↓`;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Composant Header (partagé entre les 3 états)
@@ -94,7 +111,7 @@ function Header({ onBack, onStats }: HeaderProps): React.JSX.Element {
         <Text style={styles.backButtonText}>{'←'}</Text>
       </TouchableOpacity>
       <Text style={styles.headerTitle} accessibilityRole="header">
-        {'Historique'}
+        {'Historique des parties'}
       </Text>
       <TouchableOpacity
         style={styles.statsButton}
@@ -102,51 +119,47 @@ function Header({ onBack, onStats }: HeaderProps): React.JSX.Element {
         accessibilityLabel="Voir mes statistiques"
         accessibilityRole="button"
       >
-        <Text style={styles.statsButtonText}>{'⊞'}</Text>
+        <Text style={styles.statsButtonText}>{'Stats'}</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Composant SortBar
+// Composant SortBar — F3-25 : 3 boutons à 3 états cycliques
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface SortBarProps {
-  activeCriterion: SortCriterion;
+  activeCriterion: SortButtonCriterion;
+  direction: SortDirection;
   isLoading: boolean;
-  onSelect: (c: SortCriterion) => Promise<void>;
+  onSelect: (c: SortButtonCriterion) => Promise<void>;
 }
 
-function SortBar({ activeCriterion, isLoading, onSelect }: SortBarProps): React.JSX.Element {
+function SortBar({ activeCriterion, direction, isLoading, onSelect }: SortBarProps): React.JSX.Element {
   return (
     <View style={[styles.sortBarWrapper, isLoading && styles.sortBarDisabled]}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.sortBarContent}
-        style={styles.sortBarScroll}
-      >
-        {SORT_CRITERIA.map((c) => {
-          const isActive = c === activeCriterion;
+      <View style={styles.sortBarContent}>
+        {SORT_BUTTONS.map(({ criterion, label }) => {
+          const isActive = criterion === activeCriterion && direction !== null;
           return (
             <TouchableOpacity
-              key={c}
+              key={criterion}
               style={[styles.sortChip, isActive && styles.sortChipActive]}
-              onPress={() => { void onSelect(c); }}
+              onPress={() => { void onSelect(criterion); }}
               disabled={isLoading}
               accessibilityRole="button"
-              accessibilityLabel={SORT_CRITERION_A11Y_LABELS[c]}
+              accessibilityLabel={getSortButtonA11yLabel(criterion, direction, activeCriterion)}
               accessibilityState={{ selected: isActive }}
               hitSlop={{ top: 6, bottom: 6, left: 4, right: 4 }}
             >
               <Text style={[styles.sortChipText, isActive && styles.sortChipTextActive]}>
-                {SORT_CRITERION_LABELS[c]}
+                {getSortButtonLabel(criterion, label, activeCriterion, direction)}
               </Text>
             </TouchableOpacity>
           );
         })}
-      </ScrollView>
+      </View>
     </View>
   );
 }
@@ -157,12 +170,12 @@ function SortBar({ activeCriterion, isLoading, onSelect }: SortBarProps): React.
 
 export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Element {
   const { records, isLoading: historyLoading, refresh, deleteAll } = useGameHistory();
-  const { criterion, setCriterion, isLoading: sortLoading } = useHistorySort();
+  const { criterion, direction, legacyCriterion, selectCriterion, isLoading: sortLoading } = useHistorySort();
 
-  // Records triés selon le critère courant
+  // Records triés selon le critère courant (via mapping legacy)
   const sortedRecords = useMemo(
-    () => sortRecords(records, criterion),
-    [records, criterion],
+    () => sortRecords(records, legacyCriterion),
+    [records, legacyCriterion],
   );
 
   // Rafraîchir au focus — garantit que la liste est à jour après une partie
@@ -208,16 +221,14 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
     navigation.navigate('GameDetail', { recordId: record.id });
   }, [navigation]);
 
-  // F3-09 : wrapper haptique autour de setCriterion
-  // Déclenche Haptics.impactAsync uniquement si le critère change (Benjamin F3-09-C)
-  const handleCriterionSelect = useCallback(async (c: SortCriterion): Promise<void> => {
-    if (c !== criterion) {
-      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {
-        // Silencieux — certains appareils n'ont pas de retour haptique
-      });
-    }
-    await setCriterion(c);
-  }, [criterion, setCriterion]);
+  // F3-09 : wrapper haptique autour de selectCriterion
+  // Déclenche Haptics.impactAsync à chaque changement (F3-09-C)
+  const handleCriterionSelect = useCallback(async (c: SortButtonCriterion): Promise<void> => {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {
+      // Silencieux — certains appareils n'ont pas de retour haptique
+    });
+    await selectCriterion(c);
+  }, [selectCriterion]);
 
   // ── keyExtractor ──────────────────────────────────────────────────────────
   const keyExtractor = useCallback((item: GameRecord): string => item.id, []);
@@ -253,7 +264,7 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
         <Header onBack={handleBack} onStats={handleStats} />
         <View style={styles.headerSeparator} />
-        <SortBar activeCriterion={criterion} isLoading={sortLoading} onSelect={handleCriterionSelect} />
+        <SortBar activeCriterion={criterion} direction={direction} isLoading={sortLoading} onSelect={handleCriterionSelect} />
         <ActivityIndicator
           style={styles.loader}
           color="#2563EB"
@@ -269,7 +280,7 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
         <Header onBack={handleBack} onStats={handleStats} />
         <View style={styles.headerSeparator} />
-        <SortBar activeCriterion={criterion} isLoading={sortLoading} onSelect={handleCriterionSelect} />
+        <SortBar activeCriterion={criterion} direction={direction} isLoading={sortLoading} onSelect={handleCriterionSelect} />
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyIcon} accessible={false}>{'📋'}</Text>
           <Text style={styles.emptyText}>
@@ -285,7 +296,7 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <Header onBack={handleBack} onStats={handleStats} />
       <View style={styles.headerSeparator} />
-      <SortBar activeCriterion={criterion} isLoading={sortLoading} onSelect={handleCriterionSelect} />
+      <SortBar activeCriterion={criterion} direction={direction} isLoading={sortLoading} onSelect={handleCriterionSelect} />
 
       {/* FlatList — éco-conception : windowSize, maxToRenderPerBatch, initialNumToRender */}
       <FlatList<GameRecord>
@@ -334,7 +345,8 @@ const styles = StyleSheet.create({
     color: '#1E293B',
   },
   headerTitle: {
-    fontSize: 24,
+    // F3-25 : réduit à 20 pour accommoder "Historique des parties" + bouton "Stats" sans chevauchement
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#1E293B',
     textAlign: 'center',
@@ -342,14 +354,16 @@ const styles = StyleSheet.create({
   statsButton: {
     position: 'absolute',
     right: 16,
-    width: 44,
+    minWidth: 44,
     height: 44,
+    paddingHorizontal: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
   statsButtonText: {
-    fontSize: 20,
-    color: '#1E293B',
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#2563EB',
   },
   headerSeparator: {
     height: 1,
@@ -365,9 +379,7 @@ const styles = StyleSheet.create({
   sortBarDisabled: {
     opacity: 0.5,
   },
-  sortBarScroll: {
-    flex: 1,
-  },
+  // F3-25 : View horizontale (remplace ScrollView horizontal — 3 boutons fixes)
   sortBarContent: {
     flexDirection: 'row',
     alignItems: 'center',
