@@ -25,7 +25,7 @@ appId: com.wikihop.app
 - assertVisible: "Jouer"
 
 # Démarrer une partie solo
-- tapOn: "Nouvelle partie"
+- tapOn: "Jouer"
 - waitForAnimationToEnd
 
 # GameScreen : vérifier que le GameHUD est visible (article chargé)

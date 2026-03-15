@@ -23,7 +23,7 @@ appId: com.wikihop.app
 - assertVisible: "Jouer"
 
 # Démarrer une partie
-- tapOn: "Nouvelle partie"
+- tapOn: "Jouer"
 - waitForAnimationToEnd
 
 # GameScreen : GameHUD doit être visible
