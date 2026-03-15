@@ -1,11 +1,17 @@
 /**
- * MultiplayerResultScreen — WikiHop Mobile — Multijoueur local (F3-12, F3-29)
+ * MultiplayerResultScreen — WikiHop Mobile — Multijoueur local (F3-12, F3-29, F3-33)
  *
  * Écran de résultats final du mode multijoueur hot-seat.
  * Affiche le classement de tous les joueurs après que chacun a joué son tour.
  *
  * F3-29 : ajout du bouton "Rejouer" qui charge une nouvelle paire silencieusement
  * au montage et lance une nouvelle session avec les mêmes joueurs.
+ *
+ * F3-33 :
+ *   - Section "PAR MANCHE" conditionnelle (si roundHistory.length > 1)
+ *   - MancheSummaryRow : chips victoire/abandon par joueur pour chaque manche
+ *   - rankPlayersGlobalWithRank : rangs partagés (médaille d'or partagée)
+ *   - Label "CLASSEMENT FINAL" ajouté
  *
  * gestureEnabled: false défini dans RootNavigator (pas de swipe back).
  * PAS de bouton retour dans le header.
@@ -16,14 +22,10 @@
  *   └── ScrollView
  *       ├── Bloc paire jouée
  *       ├── Séparateur
- *       ├── Liste classement rankPlayers(players)
+ *       ├── [Si roundHistory.length > 1 : Section "PAR MANCHE" + MancheSummaryRows]
+ *       ├── Label "CLASSEMENT FINAL"
+ *       ├── Liste classement rankPlayersGlobalWithRank(players)
  *       └── Zone bouton fixe bas : [Rejouer] + [Retour à l'accueil]
- *
- * Navigation "Retour à l'accueil" :
- *   resetSession() + navigation.reset({ index: 0, routes: [{ name: 'Home' }] })
- *
- * Navigation "Rejouer" :
- *   restartSession(start, target) + startSession + navigate PassPhone joueur 1
  *
  * Conventions :
  *   - Export nommé MultiplayerResultScreen
@@ -47,7 +49,9 @@ import { useRandomPair } from '../hooks/useRandomPair';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useGameStore } from '../store/game.store';
 import { useMultiplayerStore } from '../store/multiplayer.store';
-import { rankPlayersGlobal } from '../utils/multiplayer.utils';
+import type { MultiplayerRoundResult } from '../store/multiplayer.store';
+import { rankPlayersGlobalWithRank } from '../utils/multiplayer.utils';
+import type { GlobalRankEntryWithRank } from '../utils/multiplayer.utils';
 
 import { formatElapsed } from './VictoryScreen';
 
@@ -64,28 +68,90 @@ type MultiplayerResultScreenProps = NativeStackScreenProps<RootStackParamList, '
 const RANK_MEDALS = ['🥇', '🥈', '🥉'] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Types internes
+// Composant MancheSummaryRow (interne) — F3-33
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface GlobalRankEntry {
-  name: string;
-  wins: number;
-  totalJumps: number;
-  totalDurationMs: number;
+interface MancheSummaryRowProps {
+  /** Numéro de manche (1-indexed) */
+  mancheNumber: number;
+  /** Résultats des joueurs pour cette manche — dans l'ordre de leurs index */
+  results: MultiplayerRoundResult[];
+  /** Noms des joueurs dans l'ordre de leurs index */
+  playerNames: string[];
+}
+
+function MancheSummaryRow({
+  mancheNumber,
+  results,
+  playerNames,
+}: MancheSummaryRowProps): React.JSX.Element {
+  // Construction du résumé textuel pour l'accessibilité
+  const a11ySummary = results.map((r, i) => {
+    const name = playerNames[i] ?? `Joueur ${String(i + 1)}`;
+    if (r.won) {
+      const jumps = r.jumps ?? 0;
+      return `${name} victoire en ${String(jumps)} ${jumps <= 1 ? 'saut' : 'sauts'}`;
+    }
+    return `${name} abandonné`;
+  }).join(', ');
+
+  return (
+    <View
+      style={styles.mancheRow}
+      accessible={true}
+      accessibilityLabel={`Manche ${String(mancheNumber)} : ${a11ySummary}.`}
+    >
+      {/* Label manche */}
+      <Text style={styles.mancheLabel} accessible={false}>
+        {`Manche ${String(mancheNumber)}`}
+      </Text>
+
+      {/* Zone chips */}
+      <View style={styles.mancheChipsZone} accessible={false}>
+        {results.map((r, i) => {
+          const name = playerNames[i] ?? `J${String(i + 1)}`;
+          if (r.won) {
+            const jumps = r.jumps ?? 0;
+            const jumpsText = jumps <= 1 ? `${String(jumps)} saut` : `${String(jumps)} sauts`;
+            return (
+              <View key={String(i)} style={styles.chipVictoire}>
+                <Text style={styles.chipVictoireText} numberOfLines={1}>
+                  {`${name} ✓ ${jumpsText}`}
+                </Text>
+              </View>
+            );
+          }
+          return (
+            <View key={String(i)} style={styles.chipAbandon}>
+              <Text style={styles.chipAbandonText} numberOfLines={1}>
+                {`${name} ✗`}
+              </Text>
+            </View>
+          );
+        })}
+      </View>
+    </View>
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Composant PlayerResultRow (interne)
+// Composant PlayerResultRow (interne) — F3-33 : utilise entry.rank
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface PlayerResultRowProps {
-  entry: GlobalRankEntry;
-  rank: number;
+  entry: GlobalRankEntryWithRank;
+  /** Tous les joueurs classés — pour détecter les ex-aequo (accessibilité) */
+  allRanked: GlobalRankEntryWithRank[];
 }
 
-function PlayerResultRow({ entry, rank }: PlayerResultRowProps): React.JSX.Element {
+function PlayerResultRow({ entry, allRanked }: PlayerResultRowProps): React.JSX.Element {
+  const rank = entry.rank;
   const isFirstAndLeading = rank === 1 && entry.wins > 0;
+  // medal basé sur entry.rank — pas sur la position dans le tableau
   const medal = rank <= 3 ? RANK_MEDALS[rank - 1] : undefined;
+
+  // Détection ex-aequo au même rang
+  const isSharedRank = allRanked.filter((r) => r.rank === rank).length > 1;
 
   // Stats texte globales
   let statsText: string;
@@ -103,10 +169,11 @@ function PlayerResultRow({ entry, rank }: PlayerResultRowProps): React.JSX.Eleme
     rank === 3 ? 'Troisième place' :
     `${String(rank)}e place`;
 
+  const exAequoSuffix = isSharedRank ? ', ex-aequo' : '';
   const winsLabel = entry.wins === 1 ? '1 victoire' : `${String(entry.wins)} victoires`;
   const a11yLabel = entry.wins > 0
-    ? `${rankWord} : ${entry.name} — ${winsLabel}, ${statsText}`
-    : `${rankWord} : ${entry.name} — 0 victoire`;
+    ? `${rankWord}${exAequoSuffix} : ${entry.name} — ${winsLabel}, ${statsText}`
+    : `${rankWord}${exAequoSuffix} : ${entry.name} — 0 victoire`;
 
   return (
     <View
@@ -154,6 +221,7 @@ function PlayerResultRow({ entry, rank }: PlayerResultRowProps): React.JSX.Eleme
 export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenProps): React.JSX.Element {
   const players = useMultiplayerStore((s) => s.players);
   const roundHistory = useMultiplayerStore((s) => s.roundHistory);
+  const roundCount = useMultiplayerStore((s) => s.roundCount);
   const startArticle = useMultiplayerStore((s) => s.startArticle);
   const targetArticle = useMultiplayerStore((s) => s.targetArticle);
   const resetSession = useMultiplayerStore((s) => s.resetSession);
@@ -162,22 +230,23 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
   const startSession = useGameStore((s) => s.startSession);
 
   // Chargement silencieux d'une nouvelle paire en arrière-plan (F3-29)
-  // Le bouton Rejouer est activé dès que pairState.status === 'success'
   const { state: pairState } = useRandomPair('normal');
 
   const playerNames = players.map((p) => p.name);
-  const rankedPlayers = rankPlayersGlobal(roundHistory, playerNames);
+  // F3-33 : utilisation de rankPlayersGlobalWithRank au lieu de rankPlayersGlobal
+  const rankedPlayers = rankPlayersGlobalWithRank(roundHistory, playerNames);
 
   const handleHome = useCallback((): void => {
     resetSession();
     navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
   }, [resetSession, navigation]);
 
-  // F3-29 : lancer une nouvelle session avec les mêmes joueurs + nouvelle paire
+  // F3-29 / F3-33 : lancer une nouvelle session avec les mêmes joueurs + nouvelle paire
+  // Compromis documenté : le Rejouer charge une seule paire et la duplique pour N manches.
+  // TODO F3-35 : précharger N paires distinctes pour le Rejouer si nécessaire.
   const handleReplay = useCallback(async (): Promise<void> => {
     if (pairState.status !== 'success') return;
 
-    // Construction explicite Article — pas de spread depuis ArticleSummary
     const newStartArticle: Article = {
       id: pairState.start.id,
       title: pairState.start.title,
@@ -191,18 +260,21 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
       language: pairState.target.language,
     };
 
-    // Réinitialiser le store multijoueur avec la nouvelle paire
-    restartSession(newStartArticle, newTargetArticle);
+    // Construire N paires identiques (même paire pour toutes les manches du Rejouer)
+    // Compromis F3-33 : une seule paire chargée, dupliquée N fois
+    const pairs = Array.from({ length: roundCount }, () => ({
+      start: newStartArticle,
+      target: newTargetArticle,
+    }));
 
-    // Démarrer la session de jeu pour le joueur 1
+    restartSession(pairs);
     await clearSession();
     // F3-30 : isMultiplayer: true → non enregistré dans l'historique solo
     await startSession(newStartArticle, newTargetArticle, { isMultiplayer: true });
 
     const firstPlayer = players[0];
-    // navigate (pas replace) — Home est toujours accessible en bas du stack
     navigation.navigate('PassPhone', { playerName: firstPlayer?.name ?? '' });
-  }, [pairState, players, restartSession, clearSession, startSession, navigation]);
+  }, [pairState, players, roundCount, restartSession, clearSession, startSession, navigation]);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -233,13 +305,52 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
         {/* Séparateur */}
         <View style={styles.separator} />
 
+        {/* Section PAR MANCHE — F3-33 — conditionnelle si > 1 manche */}
+        {roundHistory.length > 1 && (
+          <>
+            <Text
+              style={styles.sectionLabel}
+              accessible={true}
+              accessibilityRole="header"
+              accessibilityLabel="Section par manche"
+            >
+              {'PAR MANCHE'}
+            </Text>
+            {roundHistory.map((mancheResults, mancheIndex) => (
+              <React.Fragment key={String(mancheIndex)}>
+                <MancheSummaryRow
+                  mancheNumber={mancheIndex + 1}
+                  results={mancheResults}
+                  playerNames={playerNames}
+                />
+                {mancheIndex < roundHistory.length - 1 && (
+                  <View style={styles.mancheSeparator} />
+                )}
+              </React.Fragment>
+            ))}
+            <View style={styles.separator} />
+          </>
+        )}
+
+        {/* Label CLASSEMENT FINAL — F3-33 */}
+        <Text
+          style={styles.sectionLabel}
+          accessible={true}
+          accessibilityRole="header"
+          accessibilityLabel="Classement final"
+        >
+          {'CLASSEMENT FINAL'}
+        </Text>
+
         {/* Classement */}
-        {rankedPlayers.map((entry, index) => (
-          <PlayerResultRow
-            key={entry.name}
-            entry={entry}
-            rank={index + 1}
-          />
+        {rankedPlayers.map((entry) => (
+          <React.Fragment key={entry.name}>
+            <PlayerResultRow
+              entry={entry}
+              allRanked={rankedPlayers}
+            />
+            <View style={styles.resultSeparator} />
+          </React.Fragment>
         ))}
       </ScrollView>
 
@@ -305,7 +416,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 16,
+    paddingBottom: 24,
   },
   pairBlock: {
     paddingHorizontal: 16,
@@ -325,7 +436,66 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#E2E8F0',
     marginHorizontal: 16,
+    marginVertical: 8,
   },
+  // ── Section labels ────────────────────────────────────────────────────────────
+  sectionLabel: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#64748B',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    paddingHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  // ── MancheSummaryRow ─────────────────────────────────────────────────────────
+  mancheRow: {
+    minHeight: 44,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  mancheLabel: {
+    fontSize: 13,
+    color: '#64748B',
+    minWidth: 72,
+    alignSelf: 'flex-start',
+    marginTop: 2,
+  },
+  mancheChipsZone: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    flex: 1,
+  },
+  chipVictoire: {
+    backgroundColor: '#DCFCE7',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  chipVictoireText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#16A34A',
+  },
+  chipAbandon: {
+    backgroundColor: '#F1F5F9',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  chipAbandonText: {
+    fontSize: 12,
+    color: '#64748B',
+  },
+  mancheSeparator: {
+    height: 1,
+    backgroundColor: '#E2E8F0',
+  },
+  // ── PlayerResultRow ──────────────────────────────────────────────────────────
   resultRow: {
     minHeight: 64,
     paddingHorizontal: 16,
@@ -392,6 +562,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#64748B',
   },
+  resultSeparator: {
+    height: 1,
+    backgroundColor: '#E2E8F0',
+    marginHorizontal: 16,
+  },
+  // ── Zone bas ─────────────────────────────────────────────────────────────────
   bottomZone: {
     paddingHorizontal: 16,
     paddingVertical: 12,
