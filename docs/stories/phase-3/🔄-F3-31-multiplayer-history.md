@@ -4,7 +4,7 @@ title: Historique des parties multijoueur
 phase: 3-Features
 priority: Could
 agents: [Tech Lead, UX/UI, Frontend Dev]
-status: pending
+status: in-progress
 created: 2026-03-14
 completed:
 depends_on: [F3-12, F3-30]
@@ -30,4 +30,4 @@ En tant que groupe de joueurs, je veux consulter l'historique de nos sessions mu
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending
+pending → in-progress

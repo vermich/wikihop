@@ -4,7 +4,7 @@ title: Refonte UX/UI globale (vague dédiée)
 phase: 3-Features
 priority: Should
 agents: [UX/UI, Frontend Dev]
-status: pending
+status: in-progress
 created: 2026-03-14
 completed:
 depends_on: [F3-08, F3-10]
@@ -35,4 +35,4 @@ En tant que joueur, je veux une interface cohérente, intuitive et sans friction
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending
+pending → in-progress
