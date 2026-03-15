@@ -224,4 +224,37 @@ describe('buildGameRecord', () => {
     expect(result?.startedAt).toBe(START_DATE.toISOString());
     expect(result?.completedAt).toBe(COMPLETED_DATE.toISOString());
   });
+
+  // F3-24 : path dans GameRecord
+  it('buildGameRecord avec path non vide → record.path égal à session.path', () => {
+    const path = [ARTICLE_PARIS, ARTICLE_TOUR_EIFFEL];
+    const session = makeWonSession({ path });
+    const result = buildGameRecord(session);
+
+    expect(result).not.toBeNull();
+    expect(result?.path).toEqual(path);
+  });
+
+  it('buildGameRecord avec path vide → record.path absent ou []', () => {
+    const session = makeWonSession({ path: [] });
+    const result = buildGameRecord(session);
+
+    expect(result).not.toBeNull();
+    // path absent ou vide — pas de path inutile stocké
+    const pathIsAbsentOrEmpty =
+      result?.path === undefined || (Array.isArray(result.path) && result.path.length === 0);
+    expect(pathIsAbsentOrEmpty).toBe(true);
+  });
+
+  it('buildGameRecord — les champs existants sont inchangés quand path est fourni', () => {
+    const path = [ARTICLE_PARIS, ARTICLE_TOUR_EIFFEL];
+    const session = makeWonSession({ path, jumps: 1 });
+    const result = buildGameRecord(session);
+
+    expect(result?.id).toBe(session.id);
+    expect(result?.startArticle).toEqual(session.startArticle);
+    expect(result?.targetArticle).toEqual(session.targetArticle);
+    expect(result?.jumps).toBe(1);
+    expect(result?.status).toBe('won');
+  });
 });
