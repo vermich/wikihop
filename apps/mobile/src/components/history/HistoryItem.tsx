@@ -3,6 +3,8 @@
  *
  * Affiche les informations essentielles d'une partie terminée :
  *   - Badge statut (Victoire vert / Abandonné gris)
+ *   - Badge DÉFI (F3-23) — visible si isDailyChallenge === true
+ *   - Badge DIFF (F3-35) — visible si difficulty === 'hard'
  *   - Trajet : "[départ] → [destination]"
  *   - Date : formatRecordDate(completedAt)
  *   - Stats : "[N] saut(s) · formatDuration(durationMs)"
@@ -25,6 +27,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { formatDuration, formatRecordDate } from '../../utils/history.utils';
+import { isHardMode } from '../../utils/difficulty.utils';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props
@@ -48,9 +51,12 @@ export function HistoryItem({ record, onPress }: HistoryItemProps): React.JSX.El
   const jumpLabel = record.jumps <= 1 ? 'saut' : 'sauts';
 
   // Label d'accessibilité complet (badge, date et stats sont accessible={false})
+  // F3-35 : préfixe "Mode difficile." si difficulty === 'hard' (avant le préfixe défi)
   // F3-23 : préfixe "Défi du jour." si isDailyChallenge === true (=== true car champ optionnel)
+  // Ordre : "Mode difficile. [si hard]" + "Défi du jour. [si daily]" + info article
+  const hardModePrefix = isHardMode(record.difficulty) ? 'Mode difficile. ' : '';
   const dailyChallengePrefix = record.isDailyChallenge === true ? 'Défi du jour. ' : '';
-  const accessibilityLabel = `${isVictory ? 'Victoire' : 'Abandonné'}. ${dailyChallengePrefix}${record.startArticle.title} vers ${record.targetArticle.title}. ${String(record.jumps)} ${jumpLabel}. ${formattedDuration}. Le ${formattedDate}.`;
+  const accessibilityLabel = `${isVictory ? 'Victoire' : 'Abandonné'}. ${hardModePrefix}${dailyChallengePrefix}${record.startArticle.title} vers ${record.targetArticle.title}. ${String(record.jumps)} ${jumpLabel}. ${formattedDuration}. Le ${formattedDate}.`;
 
   return (
     <TouchableOpacity
@@ -60,7 +66,7 @@ export function HistoryItem({ record, onPress }: HistoryItemProps): React.JSX.El
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
     >
-      {/* Ligne 1 : Badge statut + Badge défi (conditionnel) + Trajet + Icône navigation */}
+      {/* Ligne 1 : Badge statut + Badge défi (conditionnel) + Badge DIFF (conditionnel) + Trajet + Icône navigation */}
       <View style={styles.row}>
         <View
           style={[styles.badge, isVictory ? styles.badgeVictory : styles.badgeAbandoned]}
@@ -75,6 +81,13 @@ export function HistoryItem({ record, onPress }: HistoryItemProps): React.JSX.El
         {record.isDailyChallenge === true && (
           <View style={styles.badgeDaily} accessible={false}>
             <Text style={styles.badgeDailyText}>{'DÉFI'}</Text>
+          </View>
+        )}
+
+        {/* Badge mode difficile (F3-35) — conditionnel via isHardMode */}
+        {isHardMode(record.difficulty) && (
+          <View style={styles.diffBadge} accessible={false}>
+            <Text style={styles.diffBadgeText}>{'DIFF'}</Text>
           </View>
         )}
 
@@ -148,6 +161,19 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: 'bold',
     color: '#FFFFFF',
+  },
+  // Badge mode difficile (F3-35) — rouge pâle, cohérent avec GameHUD hardModePill
+  diffBadge: {
+    backgroundColor: '#FEE2E2',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    marginLeft: 4,
+  },
+  diffBadgeText: {
+    fontSize: 11,
+    fontWeight: 'bold' as const,
+    color: '#991B1B',
   },
   trajet: {
     flex: 1,
