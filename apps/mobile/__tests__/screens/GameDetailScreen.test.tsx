@@ -218,8 +218,35 @@ describe('GameDetailScreen — partie trouvée', () => {
     });
   });
 
-  it('affiche le message "Détail du parcours non disponible"', async () => {
+  it('affiche le message "Détail du parcours non disponible" quand record.path est absent', async () => {
     const { getByText } = renderScreen('record-uuid-1');
+    await waitFor(() => {
+      expect(getByText('Détail du parcours non disponible')).toBeTruthy();
+    });
+  });
+
+  it('affiche les titres du chemin quand record.path est défini et non vide (F3-24)', async () => {
+    const recordWithPath: GameRecord = {
+      ...MOCK_RECORD,
+      id: 'record-uuid-path',
+      path: [ARTICLE_PARIS, ARTICLE_ROME],
+    };
+    mockedGetAll.mockResolvedValueOnce([recordWithPath]);
+    const { getByText } = renderScreen('record-uuid-path');
+    await waitFor(() => {
+      expect(getByText('Paris')).toBeTruthy();
+      expect(getByText('Rome')).toBeTruthy();
+    });
+  });
+
+  it('affiche le fallback quand record.path est vide [] (F3-24)', async () => {
+    const recordWithEmptyPath: GameRecord = {
+      ...MOCK_RECORD,
+      id: 'record-uuid-empty-path',
+      path: [],
+    };
+    mockedGetAll.mockResolvedValueOnce([recordWithEmptyPath]);
+    const { getByText } = renderScreen('record-uuid-empty-path');
     await waitFor(() => {
       expect(getByText('Détail du parcours non disponible')).toBeTruthy();
     });

@@ -232,12 +232,21 @@ export function GameDetailScreen({ navigation, route }: GameDetailScreenProps): 
 
         <View style={styles.sectionSeparator} />
 
-        {/* Section chemin parcouru */}
+        {/* Section chemin parcouru (F3-24) */}
         <View style={styles.sectionChemin}>
           <Text style={styles.sectionCheminTitle}>{'CHEMIN PARCOURU'}</Text>
-          <Text style={styles.sectionCheminMessage}>
-            {'Détail du parcours non disponible'}
-          </Text>
+          {Array.isArray(record.path) && record.path.length > 0 ? (
+            record.path.map((article, index) => (
+              <View key={article.id} style={styles.pathItem}>
+                <Text style={styles.pathIndex}>{`${String(index + 1)}.`}</Text>
+                <Text style={styles.pathTitle}>{article.title}</Text>
+              </View>
+            ))
+          ) : (
+            <Text style={styles.sectionCheminMessage}>
+              {'Détail du parcours non disponible'}
+            </Text>
+          )}
         </View>
       </ScrollView>
 
@@ -426,6 +435,23 @@ const styles = StyleSheet.create({
   sectionCheminMessage: {
     fontSize: 15,
     color: '#64748B',
+  },
+  // Éléments du chemin parcouru (F3-24)
+  pathItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  pathIndex: {
+    fontSize: 14,
+    color: '#64748B',
+    width: 24,
+    marginTop: 1,
+  },
+  pathTitle: {
+    fontSize: 15,
+    color: '#1E293B',
+    flex: 1,
   },
   // Zone boutons
   zoneBoutons: {
