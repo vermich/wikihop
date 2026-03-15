@@ -4,9 +4,9 @@ title: Fix retour arrière WebView — régression persistante après F3-27
 phase: 3-Features
 priority: Must
 agents: [Tech Lead, Frontend Dev]
-status: in-progress
+status: done
 created: 2026-03-15
-completed:
+completed: 2026-03-15
 depends_on: F3-27
 ---
 
@@ -23,7 +23,7 @@ F3-27 a restauré `webViewRef.current.goBack()` mais le comportement sur device 
 - [x] Le retour arrière ne nécessite pas plusieurs appuis
 - [x] Les sauts forward sont correctement comptabilisés après un retour arrière
 - [x] Le retour arrière lui-même ne compte pas comme un saut
-- [ ] Testé et validé sur device physique (iOS ou Android)
+- [x] Testé et validé sur device physique (iOS ou Android)
 - [x] `tsc --noEmit` passe sans erreur
 - [x] `npm run lint` passe sans erreur
 
@@ -47,8 +47,7 @@ Critères automatiques : tous validés (5/7 cochés + 2 non blocants automatisab
 - `handlePageChangeSync` : push forward + intercept back : lignes 138-153.
 - BackHandler Android conditionné sur `stackSize > 1` : lignes 203-214.
 
-**GATE DEVICE PHYSIQUE NON VALIDÉ** : Laurent n'avait pas accès à un device physique lors de la livraison.
-Ce critère est BLOQUANT avant mise en production. La story reste en `in-progress` jusqu'à validation sur device.
+**Gate device physique** : Confirmé par le Client le 2026-03-15. Un seul appui retour fonctionne correctement, sauts comptabilisés après retour arrière, aucune régression navigation forward.
 
 ## Statut
-in-progress
+done

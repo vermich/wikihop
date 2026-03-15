@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-15 | **Version** : 3.9
+**PM** : Gauderic | **Mis à jour** : 2026-03-15 | **Version** : 4.2
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -86,7 +86,7 @@
 | [F3-06](stories/phase-3/✅-F3-06-about-screen.md) | Écran "À propos" et crédits | Should | Frontend Dev, UX/UI, DPO | ✅ done |
 | [F3-07](stories/phase-3/⬜-F3-07-integration-tests.md) | Tests d'intégration — parcours de jeu complet | Should | QA | ⬜ pending |
 | [F3-08](stories/phase-3/✅-F3-08-personal-stats.md) | Statistiques personnelles | Could | Frontend Dev, UX/UI | ✅ done |
-| [F3-09](stories/phase-3/🔄-F3-09-animations-haptics.md) | Animations et feedback haptique | Could | Frontend Dev, UX/UI | 🔄 in-progress |
+| [F3-09](stories/phase-3/✅-F3-09-animations-haptics.md) | Animations et feedback haptique | Could | Frontend Dev, UX/UI | ✅ done |
 | [F3-10](stories/phase-3/✅-F3-10-history-sort.md) | Tri multi-critères dans l'historique des parties | Should | Frontend Dev, UX/UI | ✅ done |
 | [F3-11](stories/phase-3/✅-F3-11-game-detail-screen.md) | Vue détail d'une partie — parcours, suppression et rejouer | Should | Frontend Dev, UX/UI | ✅ done |
 | [F3-12](stories/phase-3/✅-F3-12-local-multiplayer.md) | Multijoueur local hot-seat (passage du téléphone) | Should | Frontend Dev, UX/UI | ✅ done |
@@ -96,21 +96,21 @@
 | [F3-16](stories/phase-3/✅-F3-16-daily-challenge-completion-indicator.md) | Indicateur de complétion du défi quotidien | Should | Frontend Dev, UX/UI | ✅ done |
 | [F3-17](stories/phase-3/🔄-F3-17-daily-challenge-once-only.md) | Défi quotidien — une seule tentative par jour | Should | Frontend Dev | ✅ done |
 | [F3-19](stories/phase-3/🔄-F3-19-daily-challenge-new-badge.md) | Badge « New » sur le défi non encore réalisé | Could | Frontend Dev, UX/UI | ✅ done |
-| [F3-20](stories/phase-3/🔄-F3-20-fix-history-duplicate-keys.md) | Fix doublon de clés dans HistoryScreen | Must | Frontend Dev | 🔄 in-progress |
+| [F3-20](stories/phase-3/✅-F3-20-fix-history-duplicate-keys.md) | Fix doublon de clés dans HistoryScreen | Must | Frontend Dev | ✅ done |
 | [F3-21](stories/phase-3/✅-F3-21-fix-daily-challenge-button-visual-state.md) | Fix état visuel bouton défi du jour complété | Must | Frontend Dev | ✅ done |
-| [F3-22](stories/phase-3/🔄-F3-22-fix-back-navigation-article.md) | Fix retour arrière dans la partie | Must | Frontend Dev | 🔄 in-progress |
-| [F3-23](stories/phase-3/🔄-F3-23-daily-challenge-badge-history.md) | Badge "défi du jour" dans l'historique des parties | Should | Frontend Dev, UX/UI | 🔄 in-progress |
+| [F3-22](stories/phase-3/✅-F3-22-fix-back-navigation-article.md) | Fix retour arrière dans la partie | Must | Frontend Dev | ✅ done |
+| [F3-23](stories/phase-3/✅-F3-23-daily-challenge-badge-history.md) | Badge "défi du jour" dans l'historique des parties | Should | Frontend Dev, UX/UI | ✅ done |
 | [F3-24](stories/phase-3/⬜-F3-24-game-detail-full-path.md) | Parcours complet dans GameDetailScreen | Could | Tech Lead, Frontend Dev | ⬜ pending |
 | [F3-25](stories/phase-3/⬜-F3-25-ux-ui-global-rework.md) | Refonte UX/UI globale (vague dédiée) | Should | UX/UI, Frontend Dev | ⬜ pending |
 | [F3-26](stories/phase-3/⬜-F3-26-internationalization.md) | Internationalisation des interfaces | Should | Tech Lead, Frontend Dev, Backend Dev | ⬜ pending |
-| [F3-27](stories/phase-3/🔄-F3-27-fix-back-navigation-regression.md) | Fix retour arrière — régression F3-22 | Must | Tech Lead, Frontend Dev | 🔄 in-progress |
-| [F3-28](stories/phase-3/🔄-F3-28-multiplayer-configurable-rounds.md) | Multijoueur — nombre de manches configurable | Should | Tech Lead, Frontend Dev | 🔄 in-progress |
-| [F3-29](stories/phase-3/🔄-F3-29-multiplayer-replay-button.md) | Multijoueur — bouton Rejouer sur l'écran résultats | Should | Frontend Dev | 🔄 in-progress |
-| [F3-30](stories/phase-3/🔄-F3-30-fix-multiplayer-history-isolation.md) | Fix — parties multijoueur exclues de l'historique solo | Must | Tech Lead, Frontend Dev | 🔄 in-progress |
+| [F3-27](stories/phase-3/✅-F3-27-fix-back-navigation-regression.md) | Fix retour arrière — régression F3-22 | Must | Tech Lead, Frontend Dev | ✅ done |
+| [F3-28](stories/phase-3/✅-F3-28-multiplayer-configurable-rounds.md) | Multijoueur — nombre de manches configurable | Should | Tech Lead, Frontend Dev | ✅ done |
+| [F3-29](stories/phase-3/✅-F3-29-multiplayer-replay-button.md) | Multijoueur — bouton Rejouer sur l'écran résultats | Should | Frontend Dev | ✅ done |
+| [F3-30](stories/phase-3/✅-F3-30-fix-multiplayer-history-isolation.md) | Fix — parties multijoueur exclues de l'historique solo | Must | Tech Lead, Frontend Dev | ✅ done |
 | [F3-31](stories/phase-3/⬜-F3-31-multiplayer-history.md) | Historique des parties multijoueur | Could | Tech Lead, UX/UI, Frontend Dev | ⬜ pending |
 | [F3-32](stories/phase-3/✅-F3-32-multiplayer-pairs-per-round.md) | Multijoueur — paires préchargées par manche | Should | Tech Lead, UX/UI, Frontend Dev | ✅ done |
 | [F3-33](stories/phase-3/✅-F3-33-multiplayer-results-per-round.md) | Multijoueur — résultats par manche + médaille partagée | Should | Tech Lead, UX/UI, Frontend Dev | ✅ done |
-| [F3-34](stories/phase-3/🔄-F3-34-fix-back-navigation-webview.md) | Fix retour arrière WebView — régression persistante après F3-27 | Must | Tech Lead, Frontend Dev | 🔄 in-progress |
+| [F3-34](stories/phase-3/✅-F3-34-fix-back-navigation-webview.md) | Fix retour arrière WebView — régression persistante après F3-27 | Must | Tech Lead, Frontend Dev | ✅ done |
 
 ---
 
@@ -212,4 +212,7 @@
 *v3.7 : Vague D mergée PR #25 — F3-27/28/29/30 in-progress (2026-03-14)*
 *v3.8 : F3-32/33/34 créées — vague E lancée (2026-03-15)*
 *v3.9 : Vague E mergée PR #26 — F3-32/33 done (QA Halim 2026-03-15) — F3-34 in-progress (gate device requis) (2026-03-15)*
+*v4.0 : Gate device physique confirmé par le Client — F3-27/28/29/30/34 passées en done (2026-03-15)*
+*v4.1 : Cohérence backlog — F3-20/22/23 passées en done (frontmatter + icônes corrigés) (2026-03-15)*
+*v4.2 : F3-09 done (rétro), F3-01/F3-05 in-progress — lancement vague F (2026-03-15)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
