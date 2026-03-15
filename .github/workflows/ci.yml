@@ -201,6 +201,35 @@ jobs:
           retention-days: 7
 
   # ─────────────────────────────────────────────
+  # E2E Mobile (Maestro) — non-bloquant Phase 3
+  # Nécessite iOS Simulator (macos-latest).
+  # continue-on-error: true — ce job est informatif en Phase 3.
+  # Il ne fait pas partie du gate ci-success.
+  # La promotion en gate bloquant est décidée en Phase 4 (P-XX).
+  # Référence : docs/stories/phase-3/🔄-F3-07-integration-tests.md — Section 5
+  # ─────────────────────────────────────────────
+  e2e-mobile:
+    name: E2E Mobile (Maestro)
+    runs-on: macos-latest
+    needs: [mobile]
+    continue-on-error: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install Maestro CLI
+        run: curl -Ls "https://get.maestro.mobile.dev" | bash
+
+      - name: Run Maestro flows
+        run: ~/.maestro/bin/maestro test apps/mobile/.maestro/flows/
+
+  # ─────────────────────────────────────────────
   # Gate final — tous les jobs doivent passer.
   # Configurer la branch protection rule sur CE job uniquement.
   # ─────────────────────────────────────────────

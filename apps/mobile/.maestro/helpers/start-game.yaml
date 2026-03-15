@@ -1,0 +1,16 @@
+# Maestro — Helper réutilisable : démarrage d'une partie
+#
+# Utilisé par : F3-07-solo-victory.yaml, F3-07-abandon-game.yaml
+#
+# Précondition : l'app est déjà lancée sur HomeScreen (après launchApp)
+# Postcondition : GameScreen visible avec GameHUD affiché
+#
+# Dépendance testID (Laurent) :
+#   - GameHUD : testID="game-hud" sur le conteneur racine du composant GameHUD
+#   Ces testID seront ajoutés dans la PR feat/laurent-f3-35-f3-24.
+#   Ce flow sera exécutable après merge de cette PR.
+---
+- tapOn: "Nouvelle partie"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "game-hud"

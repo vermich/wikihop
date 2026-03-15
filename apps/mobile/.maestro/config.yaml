@@ -1,0 +1,13 @@
+# Maestro — Configuration globale WikiHop
+#
+# Référence : docs/stories/phase-3/🔄-F3-07-integration-tests.md — Section 1
+# Framework E2E retenu : Maestro (compatible managed workflow Expo SDK 54)
+#
+# Installation CLI (hors npm) :
+#   curl -Ls "https://get.maestro.mobile.dev" | bash
+#
+# Exécution locale :
+#   maestro test apps/mobile/.maestro/flows/
+
+appId: com.wikihop.app
+---

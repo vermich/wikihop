@@ -59,6 +59,9 @@ docker-compose.override.local.yml
 # EAS / Expo
 eas-build-*.tar.gz
 
+# Maestro E2E — screenshots et vidéos de debug (générés localement)
+apps/mobile/.maestro/videos/
+
 # PostgreSQL local data
 postgres-data/
 
