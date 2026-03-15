@@ -118,5 +118,7 @@ export function buildGameRecord(session: GameSession): GameRecord | null {
     ...(session.dailyChallengeDate !== undefined
       ? { dailyChallengeDate: session.dailyChallengeDate }
       : {}),
+    // F3-24 : chemin parcouru — stocké uniquement si non vide (éco-stockage)
+    ...(session.path.length > 0 ? { path: session.path } : {}),
   };
 }

@@ -83,6 +83,7 @@ export const GameHUD = React.memo(function GameHUD({
       style={styles.container}
       accessibilityLabel={containerAccessibilityLabel}
       accessibilityRole="text"
+      testID="game-hud"
     >
       {/* Pill "DIFF" — mode difficile (F3-05) */}
       {isHardMode && (

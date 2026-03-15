@@ -132,6 +132,11 @@ export interface GameRecord {
   dailyChallengeDate?: string;
   /** Difficulté de la partie (F3-05). Absent = 'normal' pour rétrocompatibilité. */
   difficulty?: GameDifficulty;
+  /**
+   * Chemin complet parcouru (F3-24).
+   * Optionnel — absent pour les parties enregistrées avant F3-24 (rétrocompatibilité).
+   */
+  path?: Article[];
 }
 
 // ─────────────────────────────────────────────
