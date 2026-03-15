@@ -1,7 +1,7 @@
 /**
- * ArticleScreen Tests — WikiHop Mobile — Fix retour arrière (F3-34)
+ * ArticleScreen Tests — WikiHop Mobile — Hotfix boucle de sauts (F3-34)
  *
- * Teste la nouvelle architecture stack applicatif (F3-34) :
+ * Teste la nouvelle architecture deux états (webViewSource / currentTitle) :
  *
  *   Navigation :
  *     - onPageChange est connecté à WikipediaWebView via onNavigationStateChange
@@ -10,20 +10,26 @@
  *     - Navigation header : bouton "← Retour" visible si stackSize > 1
  *       (stack applicatif, pas webViewCanGoBack)
  *
+ *   Architecture deux états (hotfix boucle de sauts) :
+ *     - webViewSource : pilote la source de WikipediaWebView, ne change QUE lors d'un retour
+ *     - currentTitle : affichage header uniquement, ne déclenche pas de rechargement WebView
+ *     - Forward nav : setCurrentTitle + push + setStackSize dans le même call synchrone
+ *       → un seul render → webViewSource inchangé → pas de boucle de rechargement
+ *
  *   BackHandler Android (F3-34) :
  *     - Enregistré quand isFocused === true
- *     - stackSize > 1 → handleGoBack() (pop stack + setCurrentTitle) → return true
+ *     - stackSize > 1 → handleGoBack() (pop stack + setWebViewSource) → return true
  *     - stackSize === 1 → handleAbandon() (Alert) + return true
  *     - mockWebViewGoBack ne doit PLUS être appelé (architecture F3-34)
  *
  *   Retour arrière via bouton header :
  *     - isBackNavigation flag distingue pop stack d'un saut forward
- *     - pop stack → setCurrentTitle(prevTitle) → onNavigationStateChange déclenché
+ *     - pop stack → setWebViewSource(prevTitle) → onNavigationStateChange déclenché
  *     - Ne compte PAS de saut (pas addJump)
  *
  *   État d'erreur :
  *     - onError de WikipediaWebView → affichage écran erreur + bouton Réessayer
- *     - Bouton Réessayer réinitialise currentTitle et webViewError
+ *     - Bouton Réessayer réinitialise webViewSource, currentTitle et webViewError
  *
  * Mocks : react-native-webview (WikipediaWebView), stores Zustand, navigation, BackHandler
  *
@@ -332,7 +338,8 @@ describe('ArticleScreen', () => {
     });
 
     it('ne déclenche pas addJump lors d\'un retour arrière (isBackNavigation flag — F3-34)', async () => {
-      // F3-34 : quand handleGoBack() est appelé, isBackNavigation.current = true
+      // F3-34 hotfix : quand handleGoBack() est appelé, isBackNavigation.current = true
+      // + setWebViewSource(prevTitle) déclenche le rechargement
       // Le prochain onNavigationStateChange doit être ignoré (pas de addJump)
       const { queryByText } = renderArticleScreen('Tour Eiffel');
       await act(async () => { await Promise.resolve(); });
@@ -474,6 +481,7 @@ describe('ArticleScreen', () => {
 
     it('appelle handleGoBack (pop stack) et retourne true si stackSize > 1 (F3-34)', async () => {
       // F3-34 : le BackHandler utilise le stack applicatif, pas webViewRef.goBack()
+      // Hotfix : handleGoBack appelle setWebViewSource (pas setCurrentTitle) pour recharger la WebView
       mockIsFocused = true;
 
       const handlers: Array<() => boolean> = [];
@@ -502,7 +510,14 @@ describe('ArticleScreen', () => {
       // Le dernier handler BackHandler a été enregistré avec stackSize > 1
       const lastHandler = handlers[handlers.length - 1];
       expect(lastHandler).toBeDefined();
-      const result = lastHandler?.();
+
+      // Encapsuler dans act car handleGoBack déclenche plusieurs setState (webViewSource, currentTitle, stackSize)
+      let result: boolean | undefined;
+      await act(async () => {
+        result = lastHandler?.();
+        await Promise.resolve();
+      });
+
       expect(result).toBe(true);
       // F3-34 : webViewRef.goBack() ne doit plus être appelé
       expect(mockWebViewGoBack).not.toHaveBeenCalled();
@@ -692,8 +707,8 @@ describe('ArticleScreen', () => {
     });
 
     it('ne comptabilise pas de saut lors du retour (isBackNavigation flag)', async () => {
-      // F3-34 : handleGoBack pose isBackNavigation.current = true
-      // Le prochain onPageChange (déclenché par setCurrentTitle) ne doit PAS appeler addJump
+      // F3-34 hotfix : handleGoBack pose isBackNavigation.current = true + setWebViewSource(prevTitle)
+      // Le prochain onPageChange (déclenché par le rechargement WebView via webViewSource) ne doit PAS appeler addJump
       const { queryByText } = renderArticleScreen('Tour Eiffel');
       await act(async () => { await Promise.resolve(); });
 
