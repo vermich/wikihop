@@ -19,6 +19,7 @@ import { DonationScreen } from '../screens/DonationScreen';
 import { GameDetailScreen } from '../screens/GameDetailScreen';
 import { HistoryScreen } from '../screens/HistoryScreen';
 import { HomeScreen } from '../screens/HomeScreen';
+import { MultiplayerHistoryScreen } from '../screens/MultiplayerHistoryScreen';
 import { MultiplayerResultScreen } from '../screens/MultiplayerResultScreen';
 import { MultiplayerRoundTransitionScreen } from '../screens/MultiplayerRoundTransitionScreen';
 import { MultiplayerSetupScreen } from '../screens/MultiplayerSetupScreen';
@@ -123,6 +124,11 @@ export type RootStackParamList = {
    * gestureEnabled: false — empêche tout retour accidentel.
    */
   MultiplayerRoundTransition: undefined;
+  /**
+   * Route MultiplayerHistory : historique des sessions multijoueur (F3-31).
+   * Accessible depuis MultiplayerSetupScreen.
+   */
+  MultiplayerHistory: undefined;
 };
 
 /** Type NavigationProp pour le stack racine — exporté pour usage dans les écrans */
@@ -205,6 +211,11 @@ export function RootNavigator(): React.JSX.Element {
           name="MultiplayerRoundTransition"
           component={MultiplayerRoundTransitionScreen}
           options={{ headerShown: false, gestureEnabled: false }}
+        />
+        <Stack.Screen
+          name="MultiplayerHistory"
+          component={MultiplayerHistoryScreen}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>
