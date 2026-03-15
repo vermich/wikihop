@@ -26,8 +26,8 @@ import type { GameRecord } from '@wikihop/shared';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { formatDuration, formatRecordDate } from '../../utils/history.utils';
 import { isHardMode } from '../../utils/difficulty.utils';
+import { formatDuration, formatRecordDate } from '../../utils/history.utils';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props
