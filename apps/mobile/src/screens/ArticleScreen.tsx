@@ -281,6 +281,7 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
             onPress={handleAbandon}
             accessibilityLabel="Abandonner la partie"
             accessibilityRole="button"
+            testID="abandon-button"
           >
             <Text style={styles.homeButtonText}>{'Abandonner'}</Text>
           </TouchableOpacity>

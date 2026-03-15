@@ -429,6 +429,7 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
               accessibilityLabel={dailyButtonLabel}
               accessibilityRole="button"
               accessibilityState={{ disabled: true }}
+              testID="daily-completed-indicator"
             >
               {showDailyBadge && (
                 <View style={styles.dailyBadge} accessible={false}>
@@ -571,6 +572,7 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
             accessibilityLabel={dailyButtonLabel}
             accessibilityRole="button"
             accessibilityState={{ disabled: isDailyButtonDisabled }}
+            testID="daily-completed-indicator"
           >
             {showDailyBadge && (
               <View style={styles.dailyBadge} accessible={false}>
