@@ -472,25 +472,15 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
                 </Animated.Text>
               </Animated.View>
             </TouchableOpacity>
-            {/* Toggle Mode difficile (F3-05) — visible même en loading */}
-            <View style={styles.difficultyToggleRow}>
-              <Text style={styles.difficultyToggleLabel}>{'Mode difficile'}</Text>
-              <Switch
-                value={isDifficultyHard}
-                onValueChange={handleDifficultyToggle}
-                accessibilityLabel={isDifficultyHard ? 'Mode difficile activé' : 'Mode difficile désactivé'}
-                accessibilityState={{ checked: isDifficultyHard }}
-                trackColor={{ false: '#E2E8F0', true: '#FECACA' }}
-                thumbColor={isDifficultyHard ? '#EF4444' : '#FFFFFF'}
-              />
-            </View>
+            {/* F3-25 critère 8 : séparateur + liens secondaires juste après Refresh */}
+            <View style={styles.secondaryLinksSeparator} />
             <TouchableOpacity
               style={styles.secondaryTextButton}
               onPress={() => { navigation.navigate('History'); }}
               accessibilityLabel="Voir mon historique de parties"
               accessibilityRole="button"
             >
-              <Text style={styles.secondaryTextButtonText}>{'Historique'}</Text>
+              <Text style={styles.secondaryTextButtonText}>{'Historique des parties'}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.secondaryTextButton}
@@ -608,25 +598,15 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
               <Text style={styles.refreshIcon}>{'↺'}</Text>
             </View>
           </TouchableOpacity>
-          {/* Toggle Mode difficile (F3-05) — visible en loading et en success */}
-          <View style={styles.difficultyToggleRow}>
-            <Text style={styles.difficultyToggleLabel}>{'Mode difficile'}</Text>
-            <Switch
-              value={isDifficultyHard}
-              onValueChange={handleDifficultyToggle}
-              accessibilityLabel={isDifficultyHard ? 'Mode difficile activé' : 'Mode difficile désactivé'}
-              accessibilityState={{ checked: isDifficultyHard }}
-              trackColor={{ false: '#E2E8F0', true: '#FECACA' }}
-              thumbColor={isDifficultyHard ? '#EF4444' : '#FFFFFF'}
-            />
-          </View>
+          {/* F3-25 critère 8 : séparateur + liens secondaires juste après Refresh */}
+          <View style={styles.secondaryLinksSeparator} />
           <TouchableOpacity
             style={styles.secondaryTextButton}
             onPress={() => { navigation.navigate('History'); }}
             accessibilityLabel="Voir mon historique de parties"
             accessibilityRole="button"
           >
-            <Text style={styles.secondaryTextButtonText}>{'Historique'}</Text>
+            <Text style={styles.secondaryTextButtonText}>{'Historique des parties'}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.secondaryTextButton}
@@ -653,6 +633,18 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
+        {/* F3-25 critère 2 : Toggle mode difficile dans le header, position absolute left:16 */}
+        {/* Ordre JSX : Switch en premier pour VoiceOver (lu avant le titre "WikiHop") */}
+        <View style={styles.difficultyHeaderToggle}>
+          <Switch
+            value={isDifficultyHard}
+            onValueChange={handleDifficultyToggle}
+            trackColor={{ false: '#E2E8F0', true: '#FECACA' }}
+            thumbColor={isDifficultyHard ? '#EF4444' : '#FFFFFF'}
+            accessibilityLabel={isDifficultyHard ? 'Mode difficile activé — désactiver' : 'Mode difficile désactivé — activer'}
+            accessibilityState={{ checked: isDifficultyHard }}
+          />
+        </View>
         <Text
           style={styles.headerTitle}
           accessibilityRole="header"
@@ -813,18 +805,20 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginRight: 8,
   },
-  // Toggle Mode difficile (F3-05)
-  difficultyToggleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    minHeight: 44,
-    paddingHorizontal: 16,
-    marginTop: 8,
+  // F3-25 critère 2 : Toggle mode difficile dans le header, position absolute left:16
+  difficultyHeaderToggle: {
+    position: 'absolute',
+    left: 16,
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
   },
-  difficultyToggleLabel: {
-    fontSize: 16,
-    color: '#1E293B',
+  // F3-25 critère 8 : séparateur visuel avant les liens secondaires
+  secondaryLinksSeparator: {
+    height: 1,
+    backgroundColor: '#E2E8F0',
+    marginTop: 16,
+    marginBottom: 4,
   },
   playButton: {
     height: 52,

@@ -381,6 +381,33 @@ describe('VictoryScreen', () => {
     });
   });
 
+  describe('F3-25 — Zone sticky refactorisée', () => {
+    it('affiche le bouton Lire dans la zone sticky (accessible sans scroll)', () => {
+      renderVictoryScreen();
+      expect(screen.getByLabelText("Lire l'article Louvre")).toBeTruthy();
+    });
+
+    it('le bouton Partager est présent avec le texte "Partager  ↑"', () => {
+      renderVictoryScreen();
+      expect(screen.getByText('Partager  ↑')).toBeTruthy();
+    });
+
+    it('le lien "Voir l\'historique" n\'existe plus', () => {
+      renderVictoryScreen();
+      expect(screen.queryByText("Voir l'historique")).toBeNull();
+    });
+
+    it('le bouton Lire navigue vers ArticleViewer', () => {
+      const { getByLabelText } = renderVictoryScreen();
+      const readButton = getByLabelText("Lire l'article Louvre");
+      fireEvent.press(readButton);
+      expect(mockNavigate).toHaveBeenCalledWith('ArticleViewer', {
+        url: 'https://fr.wikipedia.org/wiki/Louvre',
+        title: 'Louvre',
+      });
+    });
+  });
+
   describe('Guard completedAt manquant', () => {
     it('rend sans crash si completedAt est absent (stats null → rendu vide)', () => {
       // Construire la session sans completedAt

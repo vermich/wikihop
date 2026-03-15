@@ -468,10 +468,11 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
           })}
         </View>
 
-        {/* Séparateur */}
-        <View style={styles.sectionSeparator} />
+      </ScrollView>
 
-        {/* Bouton "Lire [titre cible]" — ouvre ArticleViewer en in-app */}
+      {/* Zone boutons sticky (F3-12 : gestion mode multijoueur) */}
+      <View style={styles.stickyButtons}>
+        {/* F3-25 critère 3 : bouton "Lire [titre cible]" remonté dans la zone sticky */}
         <TouchableOpacity
           style={styles.readButton}
           onPress={handleReadArticle}
@@ -480,10 +481,6 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
         >
           <Text style={styles.readButtonText}>{`Lire "${truncatedTargetTitle}"`}</Text>
         </TouchableOpacity>
-      </ScrollView>
-
-      {/* Zone boutons sticky (F3-12 : gestion mode multijoueur) */}
-      <View style={styles.stickyButtons}>
         <View style={styles.primaryButtonsRow}>
           {/* Bouton principal : "Tour suivant" en multijoueur, "Nouvelle partie" sinon */}
           <TouchableOpacity
@@ -511,25 +508,15 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
             </TouchableOpacity>
           )}
         </View>
+        {/* F3-25 critère 5 : Partager promu en couleur bleue */}
         <TouchableOpacity
           style={styles.shareButton}
           onPress={handleShare}
           accessibilityLabel="Partager mon résultat"
           accessibilityRole="button"
         >
-          <Text style={styles.shareButtonText}>{'Partager'}</Text>
+          <Text style={styles.shareButtonText}>{'Partager  ↑'}</Text>
         </TouchableOpacity>
-        {/* Bouton historique masqué en mode multijoueur */}
-        {!isMultiplayerActive && (
-          <TouchableOpacity
-            style={styles.historyButton}
-            onPress={() => { navigation.navigate('History'); }}
-            accessibilityLabel="Voir l'historique de mes parties"
-            accessibilityRole="button"
-          >
-            <Text style={styles.historyButtonText}>{"Voir l'historique"}</Text>
-          </TouchableOpacity>
-        )}
       </View>
     </SafeAreaView>
   );
@@ -680,11 +667,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
     marginLeft: 52,
   },
-  sectionSeparator: {
-    height: 1,
-    backgroundColor: '#E2E8F0',
-    marginBottom: 16,
-  },
+  // F3-25 critère 3 : readButton déplacé dans la zone sticky (sectionSeparator supprimé)
   readButton: {
     height: 48,
     flexDirection: 'row',
@@ -694,7 +677,7 @@ const styles = StyleSheet.create({
     borderColor: '#2563EB',
     borderRadius: 8,
     paddingHorizontal: 16,
-    marginBottom: 24,
+    marginBottom: 12,
   },
   readButtonText: {
     fontSize: 16,
@@ -711,6 +694,7 @@ const styles = StyleSheet.create({
   primaryButtonsRow: {
     flexDirection: 'row',
     marginBottom: 8,
+    marginTop: 0,
   },
   primaryButton: {
     flex: 1,
@@ -748,18 +732,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // F3-25 critère 5 : couleur promue de #64748B → #2563EB
   shareButtonText: {
     fontSize: 16,
-    color: '#64748B',
-  },
-  historyButton: {
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  historyButtonText: {
-    fontSize: 16,
-    color: '#64748B',
+    color: '#2563EB',
   },
   // Badges F3-01 / F3-05 — composant BadgePill (réutilisable)
   badgePill: {

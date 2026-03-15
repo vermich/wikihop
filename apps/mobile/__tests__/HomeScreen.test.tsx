@@ -279,6 +279,38 @@ describe('HomeScreen', () => {
     });
   });
 
+  describe('F3-25 — Refonte UX', () => {
+    it('affiche "Historique des parties" (pas "Historique") en état loading', () => {
+      mockPairState = { status: 'loading' };
+      renderHomeScreen();
+      expect(screen.getByText('Historique des parties')).toBeTruthy();
+    });
+
+    it('affiche "Historique des parties" en état success', () => {
+      mockPairState = {
+        status: 'success',
+        start: { id: '1', title: 'A', url: 'https://fr.wikipedia.org/wiki/A', language: 'fr', extract: 'A' },
+        target: { id: '2', title: 'B', url: 'https://fr.wikipedia.org/wiki/B', language: 'fr', extract: 'B' },
+      };
+      renderHomeScreen();
+      expect(screen.getByText('Historique des parties')).toBeTruthy();
+    });
+
+    it('n\'affiche plus le texte "Mode difficile" dans le contenu scrollable', () => {
+      mockPairState = { status: 'loading' };
+      renderHomeScreen();
+      // Le label "Mode difficile" dans la ScrollView a été supprimé (critère 2)
+      expect(screen.queryByText('Mode difficile')).toBeNull();
+    });
+
+    it('le Switch mode difficile est dans le header (accessibilityLabel incluant état)', () => {
+      mockPairState = { status: 'loading' };
+      renderHomeScreen();
+      // Le Switch dans le header a un accessibilityLabel dynamique
+      expect(screen.getByLabelText('Mode difficile désactivé — activer')).toBeTruthy();
+    });
+  });
+
   describe('Sélecteur de langue', () => {
     it('affiche les options FR et EN quand isLanguageHydrated est true', () => {
       mockIsLanguageHydrated = true;
