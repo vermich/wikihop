@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-15 | **Version** : 4.5
+**PM** : Gauderic | **Mis à jour** : 2026-03-15 | **Version** : 4.6
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -219,4 +219,5 @@
 *v4.3 : F3-01/F3-05 passées en done — gate device physique confirmé par le Client (2026-03-15)*
 *v4.4 : F3-35 créée — badge "Mode difficile" dans l'historique des parties (Should / Frontend Dev, UX/UI) (2026-03-15)*
 *v4.5 : Vague G lancée — F3-35/F3-24/F3-07 in-progress (2026-03-15)*
+*v4.6 : Vague G done — F3-35/F3-24/F3-07 validés QA (2026-03-15)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
