@@ -4,7 +4,8 @@
  * Couvre :
  * - 200 avec lang=fr (défaut)
  * - 200 avec lang=en
- * - 400 pour un lang invalide (validation Zod)
+ * - 400 pour un lang invalide (hors des 8 langues supportées F3-26 — validation Zod)
+ * - 200 pour lang=de et lang=es (F3-26 — nouvelles langues supportées)
  * - 503 après 5 tentatives infructueuses (tous les articles sont des ébauches)
  * - Retry sur ébauche : la route re-tente jusqu'à trouver deux articles valides
  * - Timeout Wikipedia : AbortController comptabilisé comme tentative échouée
@@ -313,16 +314,62 @@ describe('GET /api/game/random-pair', () => {
   // Validation du paramètre lang
   // ─────────────────────────────────────────────
 
-  it("retourne 400 pour un lang invalide (de)", async () => {
-    const response = await supertest(app.server).get('/api/game/random-pair?lang=de');
+  it("retourne 400 pour un lang invalide (zh — hors des 8 langues supportees F3-26)", async () => {
+    const response = await supertest(app.server).get('/api/game/random-pair?lang=zh');
 
     expect(response.status).toBe(400);
   });
 
-  it("retourne 400 pour un lang invalide (es)", async () => {
-    const response = await supertest(app.server).get('/api/game/random-pair?lang=es');
+  it("retourne 400 pour un lang invalide (xx — code inexistant)", async () => {
+    const response = await supertest(app.server).get('/api/game/random-pair?lang=xx');
 
     expect(response.status).toBe(400);
+  });
+
+  it("retourne 200 avec lang=de (F3-26 — allemand maintenant supporte)", async () => {
+    mockGetPopularPages.mockResolvedValue({
+      articles: MOCK_ARTICLES_FR,
+      language: 'de',
+      source: 'wikimedia',
+    });
+
+    fetchSpy
+      .mockResolvedValueOnce(
+        new Response(buildWikipediaSummary({ pageid: 1, title: 'Albert Einstein' }), { status: 200 }),
+      )
+      .mockResolvedValueOnce(
+        new Response(buildWikipediaSummary({ pageid: 2, title: 'Marie Curie' }), { status: 200 }),
+      );
+
+    const response = await supertest(app.server).get('/api/game/random-pair?lang=de');
+
+    expect(response.status).toBe(200);
+    const body = response.body as { start: Record<string, unknown>; target: Record<string, unknown> };
+    expect(body.start['language']).toBe('de');
+    expect(body.target['language']).toBe('de');
+  });
+
+  it("retourne 200 avec lang=es (F3-26 — espagnol maintenant supporte)", async () => {
+    mockGetPopularPages.mockResolvedValue({
+      articles: MOCK_ARTICLES_FR,
+      language: 'es',
+      source: 'wikimedia',
+    });
+
+    fetchSpy
+      .mockResolvedValueOnce(
+        new Response(buildWikipediaSummary({ pageid: 1, title: 'Albert Einstein' }), { status: 200 }),
+      )
+      .mockResolvedValueOnce(
+        new Response(buildWikipediaSummary({ pageid: 2, title: 'Marie Curie' }), { status: 200 }),
+      );
+
+    const response = await supertest(app.server).get('/api/game/random-pair?lang=es');
+
+    expect(response.status).toBe(200);
+    const body = response.body as { start: Record<string, unknown>; target: Record<string, unknown> };
+    expect(body.start['language']).toBe('es');
+    expect(body.target['language']).toBe('es');
   });
 
   // ─────────────────────────────────────────────

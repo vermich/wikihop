@@ -22,6 +22,8 @@ import type { FastifyInstance } from 'fastify';
 import type { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { z } from 'zod/v4';
 
+import { SUPPORTED_LANGUAGES } from '@wikihop/shared';
+
 import { getPopularPages } from '../services/popular-pages.service';
 import { computeDailyIndices, djb2Hash, getTodayUTC } from '../utils/daily-challenge.utils';
 import { getHardModePool } from '../utils/hard-mode.utils';
@@ -64,7 +66,10 @@ function isWikipediaSummaryResponse(value: unknown): value is WikipediaSummaryRe
 // Schemas Zod
 // ---------------------------------------------------------------------------
 
-const langSchema = z.enum(['fr', 'en']).default('fr');
+/** Langues Wikipedia supportées — F3-26 (doit rester synchronisé avec Language dans packages/shared) */
+type SupportedLang = (typeof SUPPORTED_LANGUAGES)[number];
+
+const langSchema = z.enum(SUPPORTED_LANGUAGES).default('fr');
 
 const randomPairQuerySchema = z.object({
   lang: langSchema,
@@ -79,7 +84,7 @@ const articleSummarySchema = z.object({
   id: z.string(),
   title: z.string(),
   url: z.string().url(),
-  language: z.enum(['fr', 'en']),
+  language: z.enum(SUPPORTED_LANGUAGES),
   extract: z.string(),
   thumbnailUrl: z.string().url().optional(),
 });
@@ -120,7 +125,7 @@ export type DailyResponse = z.infer<typeof dailyResponseSchema>;
  */
 async function fetchArticleSummary(
   title: string,
-  lang: 'fr' | 'en',
+  lang: SupportedLang,
 ): Promise<ArticleSummaryResponse | null> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => {

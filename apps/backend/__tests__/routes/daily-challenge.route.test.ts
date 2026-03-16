@@ -276,14 +276,14 @@ describe('GET /api/game/daily', () => {
   // Validation querystring
   // ─────────────────────────────────────────────
 
-  it("retourne 400 pour un lang invalide (de)", async () => {
-    const response = await supertest(app.server).get('/api/game/daily?lang=de');
+  it("retourne 400 pour un lang invalide (zh — hors des 8 langues supportees F3-26)", async () => {
+    const response = await supertest(app.server).get('/api/game/daily?lang=zh');
 
     expect(response.status).toBe(400);
   });
 
-  it("retourne 400 pour un lang invalide (es)", async () => {
-    const response = await supertest(app.server).get('/api/game/daily?lang=es');
+  it("retourne 400 pour un lang invalide (xx — code inexistant)", async () => {
+    const response = await supertest(app.server).get('/api/game/daily?lang=xx');
 
     expect(response.status).toBe(400);
   });
