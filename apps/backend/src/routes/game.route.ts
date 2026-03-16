@@ -64,7 +64,11 @@ function isWikipediaSummaryResponse(value: unknown): value is WikipediaSummaryRe
 // Schemas Zod
 // ---------------------------------------------------------------------------
 
-const langSchema = z.enum(['fr', 'en']).default('fr');
+/** Langues Wikipedia supportées — F3-26 (doit rester synchronisé avec Language dans packages/shared) */
+const SUPPORTED_LANGS = ['fr', 'en', 'es', 'de', 'pt', 'it', 'nl', 'pl'] as const;
+type SupportedLang = (typeof SUPPORTED_LANGS)[number];
+
+const langSchema = z.enum(SUPPORTED_LANGS).default('fr');
 
 const randomPairQuerySchema = z.object({
   lang: langSchema,
@@ -79,7 +83,7 @@ const articleSummarySchema = z.object({
   id: z.string(),
   title: z.string(),
   url: z.string().url(),
-  language: z.enum(['fr', 'en']),
+  language: z.enum(SUPPORTED_LANGS),
   extract: z.string(),
   thumbnailUrl: z.string().url().optional(),
 });
@@ -120,7 +124,7 @@ export type DailyResponse = z.infer<typeof dailyResponseSchema>;
  */
 async function fetchArticleSummary(
   title: string,
-  lang: 'fr' | 'en',
+  lang: SupportedLang,
 ): Promise<ArticleSummaryResponse | null> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => {

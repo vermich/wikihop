@@ -11,8 +11,8 @@
 // Primitives
 // ─────────────────────────────────────────────
 
-/** Langues supportées par WikiHop (ISO 639-1) */
-export type Language = 'fr' | 'en';
+/** Langues supportées par WikiHop (ISO 639-1) — F3-26 */
+export type Language = 'fr' | 'en' | 'es' | 'de' | 'pt' | 'it' | 'nl' | 'pl';
 
 // ─────────────────────────────────────────────
 // Entités Wikipedia
