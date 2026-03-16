@@ -50,7 +50,7 @@ export function HistoryItem({ record, onPress }: HistoryItemProps): React.JSX.El
 
   const formattedDuration = formatDuration(record.durationMs);
   const formattedDate = formatRecordDate(record.completedAt);
-  const jumpLabel = t('history_item.jumps_one', { count: record.jumps });
+  const jumpLabel = t('history_item.jumps', { count: record.jumps });
 
   const statusLabel = isVictory ? t('history_item.badge_won') : t('history_item.badge_abandoned');
   const dailyBadgeLabel = t('history_item.badge_daily');
