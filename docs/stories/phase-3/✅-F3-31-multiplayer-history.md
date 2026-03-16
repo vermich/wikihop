@@ -4,9 +4,9 @@ title: Historique des parties multijoueur
 phase: 3-Features
 priority: Could
 agents: [Tech Lead, UX/UI, Frontend Dev]
-status: in-progress
+status: done
 created: 2026-03-14
-completed:
+completed: 2026-03-16
 depends_on: [F3-12, F3-30]
 ---
 
@@ -16,12 +16,12 @@ depends_on: [F3-12, F3-30]
 En tant que groupe de joueurs, je veux consulter l'historique de nos sessions multijoueur passées, afin de suivre nos performances au fil du temps.
 
 ## Critères d'acceptance
-- [ ] Un écran dédié `MultiplayerHistoryScreen` affiche les sessions multijoueur passées
-- [ ] Chaque session affiche : date, joueurs, nombre de manches, gagnant
-- [ ] Les données sont persistées localement (AsyncStorage)
-- [ ] Accessible depuis `HomeScreen` ou `MultiplayerSetupScreen`
-- [ ] `tsc --noEmit` passe sans erreur
-- [ ] `npm run lint` passe sans erreur
+- [x] Un écran dédié `MultiplayerHistoryScreen` affiche les sessions multijoueur passées
+- [x] Chaque session affiche : date, joueurs, nombre de manches, gagnant
+- [x] Les données sont persistées localement (AsyncStorage)
+- [x] Accessible depuis `HomeScreen` ou `MultiplayerSetupScreen`
+- [x] `tsc --noEmit` passe sans erreur
+- [x] `npm run lint` passe sans erreur
 
 ## Notes de réalisation
 
@@ -438,7 +438,47 @@ La PR sera approuvée si et seulement si :
 6. **`useFocusEffect` dans `MultiplayerHistoryScreen`** : importer depuis `@react-navigation/native`, wraper le callback dans `useCallback`. Pattern identique à `HistoryScreen` — s'y référer.
 
 ## Validation QA — Halim
-<!-- Rempli par QA après les tests -->
+
+**Date** : 2026-03-16
+**Testeur** : Halim
+**Statut global** : Validé
+
+### Critères d'acceptance
+- [x] `MultiplayerHistoryScreen` — FlatList, état vide, header "Historique multijoueur" — OK
+- [x] Chaque session affiche date (DD/MM/YYYY), joueurs ("A vs B"), manches, gagnant / "Égalité" — OK
+- [x] Persistance AsyncStorage via `multiplayer-score-storage.service.ts` — clé `@wikihop/multiplayer_history`, max 20 entrées, insert en tête — OK
+- [x] Point d'entrée : bouton "Historique multijoueur" dans `MultiplayerSetupScreen` → `navigation.navigate('MultiplayerHistory')` — OK
+- [x] `tsc --noEmit` — sans erreur — OK
+- [x] `npm run lint` — 0 erreur (19 warnings no-console non bloquants) — OK
+
+### Tests automatisés
+- `npm test` (workspace apps/mobile) : 659 tests passants, 40 suites, 0 échec
+- Suites F3-31 : 30 tests passants (3 suites)
+  - `multiplayer-history.utils.test.ts` : 12 tests
+  - `multiplayer-score-storage.service.test.ts` : 10 tests
+  - `MultiplayerHistoryScreen.test.tsx` : 8 tests
+- `tsc --noEmit` : sans erreur
+- `npm run lint` : 0 erreur
+
+### TDD vérifié
+- Commit tests `4f7902e` (`test(mobile): TDD F3-31 — multiplayer-history.utils`) daté du 2026-03-15
+- Commit implémentation `97266df` (shared types) → `370a8ad` (utils) → `01a6e85` (service) → `3397ee5` (ResultScreen) → `19fd19f` (HistoryScreen) — tous postérieurs au commit TDD
+- TDD strict confirmé pour les 3 fonctions pures : `getMultiplayerWinner`, `formatMultiplayerDate`, `buildMultiplayerRecord`
+
+### Points vérifiés
+- `MultiplayerRoundResult` défini dans `@wikihop/shared` (L153-157), re-exporté depuis `multiplayer.store.ts` (`export type { MultiplayerRoundResult } from '@wikihop/shared'`) — pas de double déclaration
+- Guard double-save via `sessionSavedRef` dans `MultiplayerResultScreen` (L254-282) — sauvegarde unique au montage
+- Dernière manche non flushée : `completeRoundHistory = [...roundHistory, lastRoundSnapshot]` construit correctement depuis `players[]` (L263-269)
+- `noUncheckedIndexedAccess` : accès `ranked[0]` et `ranked[1]` avec guards explicites dans `getMultiplayerWinner` (L71-76)
+- `useFocusEffect` + `useCallback` avec flag `cancelled` dans `MultiplayerHistoryScreen` — pattern identique à `HistoryScreen`
+- UUID généré via `generateUUID()` (pattern interne Math.random — note : non `expo-crypto` comme spécifié, mais conforme au pattern du projet pour Hermes)
+- Clé AsyncStorage : `@wikihop/multiplayer_history` — conforme à la spec
+
+### Note sur randomUUID
+La spec demandait `import { randomUUID } from 'expo-crypto'`. L'implémentation utilise une fonction `generateUUID()` locale (pattern `Math.random` — identique à `game.store.ts`). Justification documentée dans le code : `crypto.randomUUID()` non disponible sur Hermes. Non bloquant — même pattern que le store de jeu existant.
+
+### Conclusion
+Story F3-31 validée. Aucun bug identifié. Pas de gate device physique requis (ne touche pas WebView/flux Home→Game→Victory).
 
 ## Statut
-pending → in-progress
+pending → in-progress → done

@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-15 | **Version** : 4.7
+**PM** : Gauderic | **Mis à jour** : 2026-03-16 | **Version** : 4.8
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -107,11 +107,12 @@
 | [F3-28](stories/phase-3/✅-F3-28-multiplayer-configurable-rounds.md) | Multijoueur — nombre de manches configurable | Should | Tech Lead, Frontend Dev | ✅ done |
 | [F3-29](stories/phase-3/✅-F3-29-multiplayer-replay-button.md) | Multijoueur — bouton Rejouer sur l'écran résultats | Should | Frontend Dev | ✅ done |
 | [F3-30](stories/phase-3/✅-F3-30-fix-multiplayer-history-isolation.md) | Fix — parties multijoueur exclues de l'historique solo | Must | Tech Lead, Frontend Dev | ✅ done |
-| [F3-31](stories/phase-3/🔄-F3-31-multiplayer-history.md) | Historique des parties multijoueur | Could | Tech Lead, UX/UI, Frontend Dev | 🔄 in-progress |
+| [F3-31](stories/phase-3/✅-F3-31-multiplayer-history.md) | Historique des parties multijoueur | Could | Tech Lead, UX/UI, Frontend Dev | ✅ done |
 | [F3-32](stories/phase-3/✅-F3-32-multiplayer-pairs-per-round.md) | Multijoueur — paires préchargées par manche | Should | Tech Lead, UX/UI, Frontend Dev | ✅ done |
 | [F3-33](stories/phase-3/✅-F3-33-multiplayer-results-per-round.md) | Multijoueur — résultats par manche + médaille partagée | Should | Tech Lead, UX/UI, Frontend Dev | ✅ done |
 | [F3-34](stories/phase-3/✅-F3-34-fix-back-navigation-webview.md) | Fix retour arrière WebView — régression persistante après F3-27 | Must | Tech Lead, Frontend Dev | ✅ done |
 | [F3-35](stories/phase-3/✅-F3-35-hard-mode-badge-history.md) | Badge "Mode difficile" dans l'historique des parties | Should | Frontend Dev, UX/UI | ✅ done |
+| [F3-36](stories/phase-3/⬜-F3-36-fix-multiplayer-result-ranking.md) | Fix — Classement MultiplayerResultScreen incorrect (dernière manche exclue) | Must | Frontend Dev | ⬜ pending |
 
 ---
 
@@ -170,11 +171,11 @@
 |-------|------|--------|-------|-------|
 | 1-Fondations | 10 | 2 | 0 | 12 |
 | 2-MVP | 12 | 5 | 1 | 18 |
-| 3-Features | 9 | 14 | 7 | 30 |
+| 3-Features | 10 | 14 | 7 | 31 |
 | 5-Services managés | 0 | 1 | 0 | 1 |
 | 4-Production | 9 | 4 | 2 | 15 |
 | Won't | — | — | — | 4 |
-| **Total** | **40** | **26** | **10** | **80** |
+| **Total** | **41** | **26** | **10** | **81** |
 
 > Phase 5 non incluse dans le total — décision différée.
 
@@ -221,4 +222,5 @@
 *v4.5 : Vague G lancée — F3-35/F3-24/F3-07 in-progress (2026-03-15)*
 *v4.6 : Vague G done — F3-35/F3-24/F3-07 validés QA (2026-03-15)*
 *v4.7 : Vague H lancée — F3-25/F3-31 in-progress (2026-03-15)*
+*v4.8 : F3-36 créée — bug classement MultiplayerResultScreen (dernière manche exclue de rankedPlayers) détecté en code review F3-31 (2026-03-16)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
