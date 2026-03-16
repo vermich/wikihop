@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-16 | **Version** : 4.9
+**PM** : Gauderic | **Mis à jour** : 2026-03-16 | **Version** : 5.1
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -101,8 +101,8 @@
 | [F3-22](stories/phase-3/✅-F3-22-fix-back-navigation-article.md) | Fix retour arrière dans la partie | Must | Frontend Dev | ✅ done |
 | [F3-23](stories/phase-3/✅-F3-23-daily-challenge-badge-history.md) | Badge "défi du jour" dans l'historique des parties | Should | Frontend Dev, UX/UI | ✅ done |
 | [F3-24](stories/phase-3/✅-F3-24-game-detail-full-path.md) | Parcours complet dans GameDetailScreen | Could | Tech Lead, Frontend Dev | ✅ done |
-| [F3-25](stories/phase-3/🔄-F3-25-ux-ui-global-rework.md) | Refonte UX/UI globale (vague dédiée) | Should | UX/UI, Frontend Dev | 🔄 in-progress |
-| [F3-26](stories/phase-3/⬜-F3-26-internationalization.md) | Internationalisation des interfaces | Should | Tech Lead, Frontend Dev, Backend Dev | ⬜ pending |
+| [F3-25](stories/phase-3/🔄-F3-25-ux-ui-global-rework.md) | Refonte UX/UI globale (vague dédiée) | Should | UX/UI, Frontend Dev | ✅ done |
+| [F3-26](stories/phase-3/🔄-F3-26-internationalization.md) | Internationalisation des interfaces | Should | Tech Lead, Frontend Dev, Backend Dev | 🔄 in-progress |
 | [F3-27](stories/phase-3/✅-F3-27-fix-back-navigation-regression.md) | Fix retour arrière — régression F3-22 | Must | Tech Lead, Frontend Dev | ✅ done |
 | [F3-28](stories/phase-3/✅-F3-28-multiplayer-configurable-rounds.md) | Multijoueur — nombre de manches configurable | Should | Tech Lead, Frontend Dev | ✅ done |
 | [F3-29](stories/phase-3/✅-F3-29-multiplayer-replay-button.md) | Multijoueur — bouton Rejouer sur l'écran résultats | Should | Frontend Dev | ✅ done |
@@ -225,4 +225,5 @@
 *v4.8 : F3-36 créée — bug classement MultiplayerResultScreen (dernière manche exclue de rankedPlayers) détecté en code review F3-31 (2026-03-16)*
 *v4.9 : F3-36 in-progress — fix classement dernière manche (2026-03-16)*
 *v5.0 : F3-36 done — 18/18 tests passants, tsc et lint propres, tests obsolètes mis à jour (2026-03-16)*
+*v5.1 : F3-26 passée en in-progress — langues cibles validées par le PO (fr, en, es, de, pt, it, nl, pl) (2026-03-16)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
