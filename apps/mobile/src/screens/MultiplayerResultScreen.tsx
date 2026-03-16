@@ -43,6 +43,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useRandomPair } from '../hooks/useRandomPair';
@@ -102,25 +103,27 @@ function MancheSummaryRow({
   results,
   playerNames,
 }: MancheSummaryRowProps): React.JSX.Element {
+  const { t } = useTranslation();
   // Construction du résumé textuel pour l'accessibilité
   const a11ySummary = results.map((r, i) => {
-    const name = playerNames[i] ?? `Joueur ${String(i + 1)}`;
+    const name = playerNames[i] ?? t('multiplayer_result.player_default_name', { number: i + 1 });
     if (r.won) {
       const jumps = r.jumps ?? 0;
-      return `${name} victoire en ${String(jumps)} ${jumps <= 1 ? 'saut' : 'sauts'}`;
+      const key = jumps <= 1 ? 'manche_victory_a11y' : 'manche_victory_a11y_plural';
+      return t(`multiplayer_result.${key}`, { name, jumps });
     }
-    return `${name} abandonné`;
+    return t('multiplayer_result.manche_abandoned_a11y', { name });
   }).join(', ');
 
   return (
     <View
       style={styles.mancheRow}
       accessible={true}
-      accessibilityLabel={`Manche ${String(mancheNumber)} : ${a11ySummary}.`}
+      accessibilityLabel={t('multiplayer_result.round_a11y', { number: mancheNumber, summary: a11ySummary })}
     >
       {/* Label manche */}
       <Text style={styles.mancheLabel} accessible={false}>
-        {`Manche ${String(mancheNumber)}`}
+        {t('multiplayer_result.round_label', { number: mancheNumber })}
       </Text>
 
       {/* Zone chips */}
@@ -129,7 +132,7 @@ function MancheSummaryRow({
           const name = playerNames[i] ?? `J${String(i + 1)}`;
           if (r.won) {
             const jumps = r.jumps ?? 0;
-            const jumpsText = jumps <= 1 ? `${String(jumps)} saut` : `${String(jumps)} sauts`;
+            const jumpsText = t('multiplayer_result.win_chip_jumps', { count: jumps, jumps });
             return (
               <View key={String(i)} style={styles.chipVictoire}>
                 <Text style={styles.chipVictoireText} numberOfLines={1}>
@@ -162,6 +165,7 @@ interface PlayerResultRowProps {
 }
 
 function PlayerResultRow({ entry, allRanked }: PlayerResultRowProps): React.JSX.Element {
+  const { t } = useTranslation();
   const rank = entry.rank;
   const isFirstAndLeading = rank === 1 && entry.wins > 0;
   // medal basé sur entry.rank — pas sur la position dans le tableau
@@ -174,23 +178,33 @@ function PlayerResultRow({ entry, allRanked }: PlayerResultRowProps): React.JSX.
   let statsText: string;
   if (entry.wins > 0) {
     const elapsedSeconds = Math.floor(entry.totalDurationMs / 1000);
-    statsText = `${String(entry.totalJumps)} saut${entry.totalJumps <= 1 ? '' : 's'} · ${formatElapsed(elapsedSeconds)}`;
+    statsText = `${t('multiplayer_result.stat_jumps', { count: entry.totalJumps })} · ${formatElapsed(elapsedSeconds)}`;
   } else {
     statsText = '—';
   }
 
   // Accessibilité
   const rankWord =
-    rank === 1 ? 'Première place' :
-    rank === 2 ? 'Deuxième place' :
-    rank === 3 ? 'Troisième place' :
-    `${String(rank)}e place`;
+    rank === 1 ? t('multiplayer_result.rank_1st') :
+    rank === 2 ? t('multiplayer_result.rank_2nd') :
+    rank === 3 ? t('multiplayer_result.rank_3rd') :
+    t('multiplayer_result.rank_nth', { rank });
 
-  const exAequoSuffix = isSharedRank ? ', ex-aequo' : '';
-  const winsLabel = entry.wins === 1 ? '1 victoire' : `${String(entry.wins)} victoires`;
+  const exAequoSuffix = isSharedRank ? t('multiplayer_result.ex_aequo_suffix') : '';
+  const winsLabel = t('multiplayer_result.wins', { count: entry.wins });
   const a11yLabel = entry.wins > 0
-    ? `${rankWord}${exAequoSuffix} : ${entry.name} — ${winsLabel}, ${statsText}`
-    : `${rankWord}${exAequoSuffix} : ${entry.name} — 0 victoire`;
+    ? t('multiplayer_result.player_row_a11y_won', {
+        rankWord,
+        exAequo: exAequoSuffix,
+        name: entry.name,
+        wins: winsLabel,
+        stats: statsText,
+      })
+    : t('multiplayer_result.player_row_a11y_lost', {
+        rankWord,
+        exAequo: exAequoSuffix,
+        name: entry.name,
+      });
 
   return (
     <View
@@ -203,7 +217,7 @@ function PlayerResultRow({ entry, allRanked }: PlayerResultRowProps): React.JSX.
         {medal !== undefined ? (
           <Text style={styles.rankMedal} accessible={false}>{medal}</Text>
         ) : (
-          <Text style={styles.rankNumber} accessible={false}>{`${String(rank)}.`}</Text>
+          <Text style={styles.rankNumber} accessible={false}>{t('multiplayer_result.rank_label', { rank })}</Text>
         )}
       </View>
 
@@ -219,7 +233,7 @@ function PlayerResultRow({ entry, allRanked }: PlayerResultRowProps): React.JSX.
               styles.statusBadgeText,
               entry.wins > 0 ? styles.statusBadgeTextWon : styles.statusBadgeTextAbandoned,
             ]}>
-              {entry.wins === 1 ? '1 victoire' : `${String(entry.wins)} victoires`}
+              {t('multiplayer_result.wins', { count: entry.wins })}
             </Text>
           </View>
           {entry.wins > 0 && (
@@ -236,6 +250,7 @@ function PlayerResultRow({ entry, allRanked }: PlayerResultRowProps): React.JSX.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenProps): React.JSX.Element {
+  const { t } = useTranslation();
   const players = useMultiplayerStore((s) => s.players);
   const roundHistory = useMultiplayerStore((s) => s.roundHistory);
   const roundCount = useMultiplayerStore((s) => s.roundCount);
@@ -331,7 +346,7 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle} accessibilityRole="header">
-          {'Résultats'}
+          {t('multiplayer_result.header_title')}
         </Text>
       </View>
       <View style={styles.headerSeparator} />
@@ -345,7 +360,7 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
         {/* Bloc paire jouée */}
         {startArticle !== null && targetArticle !== null && (
           <View style={styles.pairBlock}>
-            <Text style={styles.pairLabel}>{'Paire jouée :'}</Text>
+            <Text style={styles.pairLabel}>{t('multiplayer_result.pair_label')}</Text>
             <Text style={styles.pairArticles} numberOfLines={2}>
               {`${startArticle.title} → ${targetArticle.title}`}
             </Text>
@@ -362,9 +377,9 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
               style={styles.sectionLabel}
               accessible={true}
               accessibilityRole="header"
-              accessibilityLabel="Section par manche"
+              accessibilityLabel={t('multiplayer_result.section_by_round_a11y')}
             >
-              {'PAR MANCHE'}
+              {t('multiplayer_result.section_by_round')}
             </Text>
             {completeRoundHistory.map((mancheResults, mancheIndex) => (
               <React.Fragment key={String(mancheIndex)}>
@@ -387,9 +402,9 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
           style={styles.sectionLabel}
           accessible={true}
           accessibilityRole="header"
-          accessibilityLabel="Classement final"
+          accessibilityLabel={t('multiplayer_result.section_final_ranking_a11y')}
         >
-          {'CLASSEMENT FINAL'}
+          {t('multiplayer_result.section_final_ranking')}
         </Text>
 
         {/* Classement */}
@@ -411,7 +426,7 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
             style={[styles.replayButton, pairState.status !== 'success' && styles.replayButtonDisabled]}
             onPress={() => { void handleReplay(); }}
             disabled={pairState.status !== 'success'}
-            accessibilityLabel="Rejouer avec les mêmes joueurs"
+            accessibilityLabel={t('multiplayer_result.replay_button_a11y')}
             accessibilityRole="button"
             accessibilityState={{ disabled: pairState.status !== 'success' }}
           >
@@ -419,16 +434,16 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
               styles.replayButtonText,
               pairState.status !== 'success' && styles.replayButtonTextDisabled,
             ]}>
-              {'Rejouer'}
+              {t('multiplayer_result.replay_button')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.homeButton}
             onPress={handleHome}
-            accessibilityLabel="Retour à l'accueil"
+            accessibilityLabel={t('multiplayer_result.home_button_a11y')}
             accessibilityRole="button"
           >
-            <Text style={styles.homeButtonText}>{"Retour à l'accueil"}</Text>
+            <Text style={styles.homeButtonText}>{t('multiplayer_result.home_button')}</Text>
           </TouchableOpacity>
         </View>
       </View>

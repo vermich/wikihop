@@ -49,6 +49,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { RootStackParamList } from '../navigation/RootNavigator';
@@ -104,6 +105,7 @@ export function formatElapsed(seconds: number): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Element {
+  const { t } = useTranslation();
   const currentSession = useGameStore((state) => state.currentSession);
   const clearSession = useGameStore((state) => state.clearSession);
   const startSession = useGameStore((state) => state.startSession);
@@ -209,7 +211,13 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
     if (stats === null) return;
 
     void AccessibilityInfo.announceForAccessibility(
-      `Victoire ! ${String(stats.jumps)} saut${stats.jumps <= 1 ? '' : 's'} en ${formatElapsed(stats.elapsedSeconds)}. De ${stats.startTitle} à ${stats.targetTitle}.`,
+      t('victory.a11y_stats', {
+        jumps: stats.jumps,
+        plural: stats.jumps <= 1 ? '' : 's',
+        duration: formatElapsed(stats.elapsedSeconds),
+        start: stats.startTitle,
+        target: stats.targetTitle,
+      }),
     );
   }, [stats]);
 
@@ -359,7 +367,7 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
           style={styles.headerTitle}
           accessibilityRole="header"
         >
-          {'Victoire !'}
+          {t('victory.header_title')}
         </Text>
       </View>
       <View style={styles.headerSeparator} />
@@ -374,17 +382,23 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
         <Animated.View
           style={[styles.statsBlock, { transform: [{ scale: scaleAnim }] }]}
           accessible={true}
-          accessibilityLabel={`${String(stats.jumps)} saut${stats.jumps <= 1 ? '' : 's'} effectué${stats.jumps <= 1 ? '' : 's'} en ${formatElapsed(stats.elapsedSeconds)}. De ${stats.startTitle} vers ${stats.targetTitle}.`}
+          accessibilityLabel={t('victory.a11y_stats_block', {
+            jumps: stats.jumps,
+            plural: stats.jumps <= 1 ? '' : 's',
+            duration: formatElapsed(stats.elapsedSeconds),
+            start: stats.startTitle,
+            target: stats.targetTitle,
+          })}
         >
           {/* Badge Défi du jour (F3-01) */}
           {currentSession?.isDailyChallenge === true && currentSession.dailyChallengeDate !== undefined && (
             <View
               style={[styles.badgePill, styles.badgePillDaily]}
               accessible={true}
-              accessibilityLabel={`Partie jouée dans le cadre du défi du jour du ${formatDailyChallengeDate(currentSession.dailyChallengeDate)}`}
+              accessibilityLabel={t('victory.a11y_daily_badge', { date: formatDailyChallengeDate(currentSession.dailyChallengeDate) })}
             >
               <Text style={[styles.badgePillText, styles.badgePillTextDaily]} accessible={false}>
-                {`Défi du jour — ${formatDailyChallengeDate(currentSession.dailyChallengeDate)}`}
+                {t('victory.badge_daily_challenge', { date: formatDailyChallengeDate(currentSession.dailyChallengeDate) })}
               </Text>
             </View>
           )}
@@ -394,10 +408,10 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
             <View
               style={[styles.badgePill, styles.badgePillHard]}
               accessible={true}
-              accessibilityLabel="Partie jouée en mode difficile"
+              accessibilityLabel={t('victory.a11y_hard_badge')}
             >
               <Text style={[styles.badgePillText, styles.badgePillTextHard]} accessible={false}>
-                {'Mode difficile'}
+                {t('victory.badge_hard_mode')}
               </Text>
             </View>
           )}
@@ -405,19 +419,19 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
           {/* Sous-éléments accessibles={false} pour éviter la double lecture */}
           <View style={styles.congratsRow} accessible={false}>
             <Text style={styles.checkIcon}>{'✓'}</Text>
-            <Text style={styles.congratsText}>{'Félicitations !'}</Text>
+            <Text style={styles.congratsText}>{t('victory.congrats_text')}</Text>
           </View>
           <View style={styles.statsRow} accessible={false}>
             <View style={styles.statCell}>
               <Text style={styles.statValue}>{String(stats.jumps)}</Text>
               <Text style={styles.statLabel}>
-                {stats.jumps <= 1 ? 'saut' : 'sauts'}
+                {t('victory.stat_jump', { count: stats.jumps })}
               </Text>
             </View>
             <View style={styles.statSeparator} />
             <View style={styles.statCell}>
               <Text style={styles.statValue}>{formatElapsed(stats.elapsedSeconds)}</Text>
-              <Text style={styles.statLabel}>{'durée'}</Text>
+              <Text style={styles.statLabel}>{t('victory.stat_duration_label')}</Text>
             </View>
           </View>
           <Text
@@ -434,7 +448,7 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
         <View style={styles.pathSection}>
           <View style={styles.pathTitleRow}>
             <View style={styles.pathTitleLine} />
-            <Text style={styles.pathTitleText}>{'CHEMIN PARCOURU'}</Text>
+            <Text style={styles.pathTitleText}>{t('victory.path_section_title')}</Text>
             <View style={styles.pathTitleLine} />
           </View>
 
@@ -442,8 +456,8 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
             const isLast = index === stats.path.length - 1;
             const itemNumber = index + 1;
             const a11yLabel = isLast
-              ? `${String(itemNumber)}. ${article.title}, article de destination. Voir sur Wikipedia`
-              : `${String(itemNumber)}. ${article.title}. Voir sur Wikipedia`;
+              ? t('victory.path_item_destination_a11y', { number: itemNumber, title: article.title })
+              : t('victory.path_item_a11y', { number: itemNumber, title: article.title });
 
             return (
               <View key={`${article.title}-${String(index)}`}>
@@ -476,10 +490,10 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
         <TouchableOpacity
           style={styles.readButton}
           onPress={handleReadArticle}
-          accessibilityLabel={`Lire l'article ${stats.targetTitle}`}
+          accessibilityLabel={t('victory.a11y_read', { title: stats.targetTitle })}
           accessibilityRole="button"
         >
-          <Text style={styles.readButtonText}>{`Lire "${truncatedTargetTitle}"`}</Text>
+          <Text style={styles.readButtonText}>{t('victory.read_button', { title: truncatedTargetTitle })}</Text>
         </TouchableOpacity>
         <View style={styles.primaryButtonsRow}>
           {/* Bouton principal : "Tour suivant" en multijoueur, "Nouvelle partie" sinon */}
@@ -490,21 +504,21 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
               (isDaily || isMultiplayerActive) && styles.newGameButtonFull,
             ]}
             onPress={isMultiplayerActive ? () => { void handleNextTurn(); } : handleNewGame}
-            accessibilityLabel={isMultiplayerActive ? 'Tour du joueur suivant' : 'Démarrer une nouvelle partie'}
+            accessibilityLabel={isMultiplayerActive ? t('victory.a11y_next_turn') : t('victory.a11y_new_game')}
             accessibilityRole="button"
           >
             <Text style={styles.newGameButtonText}>
-              {isMultiplayerActive ? 'Tour suivant →' : 'Nouvelle partie'}
+              {isMultiplayerActive ? t('victory.next_turn_button') : t('victory.new_game_button')}
             </Text>
           </TouchableOpacity>
           {!isDaily && !isMultiplayerActive && (
             <TouchableOpacity
               style={[styles.primaryButton, styles.replayButton]}
               onPress={() => { void handleReplay(); }}
-              accessibilityLabel="Rejouer avec les mêmes articles"
+              accessibilityLabel={t('victory.a11y_replay')}
               accessibilityRole="button"
             >
-              <Text style={styles.replayButtonText}>{'Rejouer'}</Text>
+              <Text style={styles.replayButtonText}>{t('victory.replay_button')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -512,10 +526,10 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
         <TouchableOpacity
           style={styles.shareButton}
           onPress={handleShare}
-          accessibilityLabel="Partager mon résultat"
+          accessibilityLabel={t('victory.a11y_share')}
           accessibilityRole="button"
         >
-          <Text style={styles.shareButtonText}>{'Partager  ↑'}</Text>
+          <Text style={styles.shareButtonText}>{t('victory.share_button')}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

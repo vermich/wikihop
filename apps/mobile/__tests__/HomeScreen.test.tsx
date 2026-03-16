@@ -27,6 +27,15 @@ import type { RandomPairState } from '../src/hooks/useRandomPair';
 // Mocks
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Mock react-native-safe-area-context (requis par LanguageSelectionSheet via useSafeAreaInsets)
+jest.mock('react-native-safe-area-context', () => {
+  const { View } = jest.requireActual<typeof import('react-native')>('react-native');
+  return {
+    SafeAreaView: View,
+    useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+  };
+});
+
 const mockRefresh = jest.fn();
 let mockPairState: RandomPairState = { status: 'loading' };
 
@@ -266,14 +275,16 @@ describe('HomeScreen', () => {
     it('affiche le bouton Réessayer', () => {
       mockPairState = { status: 'error', message: 'Erreur réseau' };
       const { getByLabelText } = renderHomeScreen();
-      const retryButton = getByLabelText('Réessayer de charger les articles');
+      // Le label a11y est t('home.retry_button') = 'Réessayer' (F3-26 i18n)
+      const retryButton = getByLabelText('Réessayer');
       expect(retryButton).toBeTruthy();
     });
 
     it('appuyer sur Réessayer appelle refresh', () => {
       mockPairState = { status: 'error', message: 'Erreur réseau' };
       const { getByLabelText } = renderHomeScreen();
-      const retryButton = getByLabelText('Réessayer de charger les articles');
+      // Le label a11y est t('home.retry_button') = 'Réessayer' (F3-26 i18n)
+      const retryButton = getByLabelText('Réessayer');
       fireEvent.press(retryButton);
       expect(mockRefresh).toHaveBeenCalledTimes(1);
     });
@@ -311,29 +322,28 @@ describe('HomeScreen', () => {
     });
   });
 
-  describe('Sélecteur de langue', () => {
-    it('affiche les options FR et EN quand isLanguageHydrated est true', () => {
+  describe('Sélecteur de langue (F3-26)', () => {
+    it('affiche le code de la langue active (FR) quand isLanguageHydrated est true', () => {
       mockIsLanguageHydrated = true;
+      mockLanguage = 'fr';
       renderHomeScreen();
+      // Le bouton affiche language.toUpperCase() = 'FR'
       expect(screen.getByText('FR')).toBeTruthy();
-      expect(screen.getByText('EN')).toBeTruthy();
     });
 
-    it('appuyer sur EN appelle setLanguage("en")', () => {
-      mockIsLanguageHydrated = true;
-      const { getByLabelText } = renderHomeScreen();
-      const enButton = getByLabelText('Langue anglaise');
-      fireEvent.press(enButton);
-      expect(mockSetLanguage).toHaveBeenCalledWith('en');
+    it('n\'affiche pas le sélecteur de langue quand isLanguageHydrated est false', () => {
+      mockIsLanguageHydrated = false;
+      renderHomeScreen();
+      // Le bouton n'est pas rendu avant hydratation
+      expect(screen.queryByText('FR')).toBeNull();
     });
 
-    it('appuyer sur FR appelle setLanguage("fr")', () => {
+    it('le bouton sélecteur a un accessibilityLabel dans la langue active', () => {
       mockIsLanguageHydrated = true;
-      mockLanguage = 'en';
-      const { getByLabelText } = renderHomeScreen();
-      const frButton = getByLabelText('Langue française');
-      fireEvent.press(frButton);
-      expect(mockSetLanguage).toHaveBeenCalledWith('fr');
+      mockLanguage = 'fr';
+      renderHomeScreen();
+      // LANGUAGE_BUTTON_A11Y_LABELS['fr'] = 'Langue active : Français — ouvrir le sélecteur de langue'
+      expect(screen.getByLabelText('Langue active : Français — ouvrir le sélecteur de langue')).toBeTruthy();
     });
   });
 });

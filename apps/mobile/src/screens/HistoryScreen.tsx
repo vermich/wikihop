@@ -10,9 +10,9 @@
  *
  * Layout :
  *   [SafeAreaView top+bottom]
- *   ├── Header fixe : "← Historique" + "⊞" (stats)
+ *   ├── Header fixe : "← Historique" + "Stats" (stats)
  *   ├── Séparateur
- *   ├── SortBar (52px fixe, ScrollView horizontal)
+ *   ├── SortBar (52px fixe, 3 boutons à 3 états)
  *   └── [loading]   ActivityIndicator centré
  *       [empty]     Message "Aucune partie jouée"
  *       [default]   FlatList + bouton Effacer en ListFooterComponent
@@ -40,6 +40,8 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 import { HistoryItem } from '../components/history/HistoryItem';
 import { useGameHistory } from '../hooks/useGameHistory';
@@ -55,37 +57,43 @@ import type { SortButtonCriterion, SortDirection } from '../utils/history-sort.u
 type HistoryScreenProps = NativeStackScreenProps<RootStackParamList, 'History'>;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Constantes — F3-25 : 3 boutons à 3 états cycliques
+// Constantes — critères de tri (pas de label hardcodé — calculé via t() au rendu)
 // ─────────────────────────────────────────────────────────────────────────────
 
-const SORT_BUTTONS: ReadonlyArray<{ criterion: SortButtonCriterion; label: string }> = [
-  { criterion: 'date', label: 'Date' },
-  { criterion: 'jumps', label: 'Sauts' },
-  { criterion: 'duration', label: 'Durée' },
-];
+const SORT_CRITERIA: ReadonlyArray<SortButtonCriterion> = ['date', 'jumps', 'duration'];
+
+function getCriterionTranslationKey(criterion: SortButtonCriterion): string {
+  switch (criterion) {
+    case 'date': return 'history.sort_date_label';
+    case 'jumps': return 'history.sort_jumps_label';
+    case 'duration': return 'history.sort_duration_label';
+  }
+}
 
 function getSortButtonA11yLabel(
   criterion: SortButtonCriterion,
   direction: SortDirection,
   activeCriterion: SortButtonCriterion,
+  t: TFunction,
 ): string {
   const isActive = criterion === activeCriterion && direction !== null;
-  const labelMap: Record<SortButtonCriterion, string> = {
-    date: 'date',
-    jumps: 'sauts',
-    duration: 'durée',
-  };
-  const name = labelMap[criterion];
+  const criterionLabel = t(getCriterionTranslationKey(criterion)).toLowerCase();
   if (!isActive) {
-    return `Trier par ${name} — tap pour trier du plus ancien au plus récent`;
+    return t('history.sort_a11y_inactive', { criterion: criterionLabel });
   }
   if (direction === 'asc') {
-    return `${name.charAt(0).toUpperCase()}${name.slice(1)}, tri croissant actif — tap pour inverser`;
+    return t('history.sort_a11y_asc', { criterion: criterionLabel });
   }
-  return `${name.charAt(0).toUpperCase()}${name.slice(1)}, tri décroissant actif — tap pour désactiver`;
+  return t('history.sort_a11y_desc', { criterion: criterionLabel });
 }
 
-function getSortButtonLabel(criterion: SortButtonCriterion, baseLabel: string, activeCriterion: SortButtonCriterion, direction: SortDirection): string {
+function getSortButtonLabel(
+  criterion: SortButtonCriterion,
+  activeCriterion: SortButtonCriterion,
+  direction: SortDirection,
+  t: TFunction,
+): string {
+  const baseLabel = t(getCriterionTranslationKey(criterion));
   if (criterion !== activeCriterion || direction === null) return baseLabel;
   return direction === 'asc' ? `${baseLabel} ↑` : `${baseLabel} ↓`;
 }
@@ -97,26 +105,27 @@ function getSortButtonLabel(criterion: SortButtonCriterion, baseLabel: string, a
 interface HeaderProps {
   onBack: () => void;
   onStats: () => void;
+  t: TFunction;
 }
 
-function Header({ onBack, onStats }: HeaderProps): React.JSX.Element {
+function Header({ onBack, onStats, t }: HeaderProps): React.JSX.Element {
   return (
     <View style={styles.header}>
       <TouchableOpacity
         style={styles.backButton}
         onPress={onBack}
-        accessibilityLabel="Retour"
+        accessibilityLabel={t('history.header_title')}
         accessibilityRole="button"
       >
         <Text style={styles.backButtonText}>{'←'}</Text>
       </TouchableOpacity>
       <Text style={styles.headerTitle} accessibilityRole="header">
-        {'Historique des parties'}
+        {t('history.header_title')}
       </Text>
       <TouchableOpacity
         style={styles.statsButton}
         onPress={onStats}
-        accessibilityLabel="Voir mes statistiques"
+        accessibilityLabel={t('history.stats_button_a11y')}
         accessibilityRole="button"
       >
         <Text style={styles.statsButtonText}>{'Stats'}</Text>
@@ -134,13 +143,14 @@ interface SortBarProps {
   direction: SortDirection;
   isLoading: boolean;
   onSelect: (c: SortButtonCriterion) => Promise<void>;
+  t: TFunction;
 }
 
-function SortBar({ activeCriterion, direction, isLoading, onSelect }: SortBarProps): React.JSX.Element {
+function SortBar({ activeCriterion, direction, isLoading, onSelect, t }: SortBarProps): React.JSX.Element {
   return (
     <View style={[styles.sortBarWrapper, isLoading && styles.sortBarDisabled]}>
       <View style={styles.sortBarContent}>
-        {SORT_BUTTONS.map(({ criterion, label }) => {
+        {SORT_CRITERIA.map((criterion) => {
           const isActive = criterion === activeCriterion && direction !== null;
           return (
             <TouchableOpacity
@@ -149,12 +159,12 @@ function SortBar({ activeCriterion, direction, isLoading, onSelect }: SortBarPro
               onPress={() => { void onSelect(criterion); }}
               disabled={isLoading}
               accessibilityRole="button"
-              accessibilityLabel={getSortButtonA11yLabel(criterion, direction, activeCriterion)}
+              accessibilityLabel={getSortButtonA11yLabel(criterion, direction, activeCriterion, t)}
               accessibilityState={{ selected: isActive }}
               hitSlop={{ top: 6, bottom: 6, left: 4, right: 4 }}
             >
               <Text style={[styles.sortChipText, isActive && styles.sortChipTextActive]}>
-                {getSortButtonLabel(criterion, label, activeCriterion, direction)}
+                {getSortButtonLabel(criterion, activeCriterion, direction, t)}
               </Text>
             </TouchableOpacity>
           );
@@ -169,6 +179,7 @@ function SortBar({ activeCriterion, direction, isLoading, onSelect }: SortBarPro
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Element {
+  const { t } = useTranslation();
   const { records, isLoading: historyLoading, refresh, deleteAll } = useGameHistory();
   const { criterion, direction, legacyCriterion, selectCriterion, isLoading: sortLoading } = useHistorySort();
 
@@ -195,26 +206,26 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
 
   const handleDeleteAll = useCallback((): void => {
     Alert.alert(
-      'Effacer l\'historique',
-      'Cette action supprimera définitivement toutes les parties. Continuer ?',
+      t('history.clear_confirm_title'),
+      t('history.clear_confirm_message'),
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: t('history.clear_cancel_action'), style: 'cancel' },
         {
-          text: 'Effacer tout',
+          text: t('history.clear_confirm_action'),
           style: 'destructive',
           onPress: () => { void deleteAll(); },
         },
       ],
     );
-  }, [deleteAll]);
+  }, [deleteAll, t]);
 
   // Annonce accessibilité lors du chargement — dans useEffect pour éviter les appels
   // répétés en cas de re-render pendant que historyLoading est vrai
   useEffect(() => {
     if (historyLoading) {
-      void AccessibilityInfo.announceForAccessibility("Chargement de l'historique");
+      void AccessibilityInfo.announceForAccessibility(t('history.loading_a11y'));
     }
-  }, [historyLoading]);
+  }, [historyLoading, t]);
 
   // F3-11 — navigation vers GameDetail au tap sur un item
   const handleItemPress = useCallback((record: GameRecord): void => {
@@ -251,20 +262,20 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
     <TouchableOpacity
       style={styles.deleteButton}
       onPress={handleDeleteAll}
-      accessibilityLabel="Effacer tout l'historique"
+      accessibilityLabel={t('history.clear_button')}
       accessibilityRole="button"
     >
-      <Text style={styles.deleteButtonText}>{'Effacer l\'historique'}</Text>
+      <Text style={styles.deleteButtonText}>{t('history.clear_button')}</Text>
     </TouchableOpacity>
-  ), [handleDeleteAll]);
+  ), [handleDeleteAll, t]);
 
   // ── État loading ──────────────────────────────────────────────────────────
   if (historyLoading) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-        <Header onBack={handleBack} onStats={handleStats} />
+        <Header onBack={handleBack} onStats={handleStats} t={t} />
         <View style={styles.headerSeparator} />
-        <SortBar activeCriterion={criterion} direction={direction} isLoading={sortLoading} onSelect={handleCriterionSelect} />
+        <SortBar activeCriterion={criterion} direction={direction} isLoading={sortLoading} onSelect={handleCriterionSelect} t={t} />
         <ActivityIndicator
           style={styles.loader}
           color="#2563EB"
@@ -278,13 +289,13 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
   if (records.length === 0) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-        <Header onBack={handleBack} onStats={handleStats} />
+        <Header onBack={handleBack} onStats={handleStats} t={t} />
         <View style={styles.headerSeparator} />
-        <SortBar activeCriterion={criterion} direction={direction} isLoading={sortLoading} onSelect={handleCriterionSelect} />
+        <SortBar activeCriterion={criterion} direction={direction} isLoading={sortLoading} onSelect={handleCriterionSelect} t={t} />
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyIcon} accessible={false}>{'📋'}</Text>
           <Text style={styles.emptyText}>
-            {'Aucune partie jouée\npour l\'instant.'}
+            {t('history.empty_message')}
           </Text>
         </View>
       </SafeAreaView>
@@ -294,9 +305,9 @@ export function HistoryScreen({ navigation }: HistoryScreenProps): React.JSX.Ele
   // ── État par défaut — liste ───────────────────────────────────────────────
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      <Header onBack={handleBack} onStats={handleStats} />
+      <Header onBack={handleBack} onStats={handleStats} t={t} />
       <View style={styles.headerSeparator} />
-      <SortBar activeCriterion={criterion} direction={direction} isLoading={sortLoading} onSelect={handleCriterionSelect} />
+      <SortBar activeCriterion={criterion} direction={direction} isLoading={sortLoading} onSelect={handleCriterionSelect} t={t} />
 
       {/* FlatList — éco-conception : windowSize, maxToRenderPerBatch, initialNumToRender */}
       <FlatList<GameRecord>

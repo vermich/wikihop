@@ -40,6 +40,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import * as ScoreStorage from '../services/score-storage.service';
@@ -59,6 +60,7 @@ type GameDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'GameDet
 export function GameDetailScreen({ navigation, route }: GameDetailScreenProps): React.JSX.Element {
   const { recordId } = route.params;
   const [record, setRecord] = useState<GameRecord | null | undefined>(undefined);
+  const { t } = useTranslation();
 
   const clearSession = useGameStore((state) => state.clearSession);
   const startSession = useGameStore((state) => state.startSession);
@@ -98,12 +100,12 @@ export function GameDetailScreen({ navigation, route }: GameDetailScreenProps): 
     if (record === null || record === undefined) return;
 
     Alert.alert(
-      'Supprimer cette partie',
-      'Cette action est irréversible.',
+      t('game_detail.delete_confirm_title'),
+      t('game_detail.delete_confirm_message'),
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: t('game_detail.delete_cancel_action'), style: 'cancel' },
         {
-          text: 'Supprimer',
+          text: t('game_detail.delete_confirm_action'),
           style: 'destructive',
           onPress: () => {
             void (async () => {
@@ -114,7 +116,7 @@ export function GameDetailScreen({ navigation, route }: GameDetailScreenProps): 
         },
       ],
     );
-  }, [record, navigation]);
+  }, [record, navigation, t]);
 
   // ── Header commun ─────────────────────────────────────────────────────────
   const headerEl = (
@@ -122,13 +124,13 @@ export function GameDetailScreen({ navigation, route }: GameDetailScreenProps): 
       <TouchableOpacity
         style={styles.backButton}
         onPress={handleBack}
-        accessibilityLabel="Retour"
+        accessibilityLabel={t('game_detail.back_button_a11y')}
         accessibilityRole="button"
       >
         <Text style={styles.backButtonText}>{'←'}</Text>
       </TouchableOpacity>
       <Text style={styles.headerTitle} accessibilityRole="header">
-        {'Détail de la partie'}
+        {t('game_detail.header_title')}
       </Text>
     </View>
   );
@@ -151,14 +153,14 @@ export function GameDetailScreen({ navigation, route }: GameDetailScreenProps): 
         {headerEl}
         <View style={styles.headerSeparator} />
         <View style={styles.notFoundContainer}>
-          <Text style={styles.notFoundText}>{'Partie introuvable.'}</Text>
+          <Text style={styles.notFoundText}>{t('game_detail.not_found')}</Text>
           <TouchableOpacity
             style={styles.notFoundButton}
             onPress={handleBack}
             accessibilityRole="button"
-            accessibilityLabel="Retour à l'historique"
+            accessibilityLabel={t('game_detail.back_button_a11y')}
           >
-            <Text style={styles.notFoundButtonText}>{'Retour'}</Text>
+            <Text style={styles.notFoundButtonText}>{t('game_detail.back_button')}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -167,7 +169,7 @@ export function GameDetailScreen({ navigation, route }: GameDetailScreenProps): 
 
   // ── Partie trouvée ────────────────────────────────────────────────────────
   const isVictory = record.status === 'won';
-  const jumpLabel = record.jumps <= 1 ? 'saut' : 'sauts';
+  const jumpLabel = t('game_detail.stat_jumps_label');
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -187,7 +189,7 @@ export function GameDetailScreen({ navigation, route }: GameDetailScreenProps): 
             accessible={false}
           >
             <Text style={[styles.badgeText, isVictory ? styles.badgeTextVictory : styles.badgeTextAbandoned]}>
-              {isVictory ? 'Victoire' : 'Abandonné'}
+              {isVictory ? t('game_detail.badge_won') : t('game_detail.badge_abandoned')}
             </Text>
           </View>
           <Text style={styles.trajetTitle} numberOfLines={2}>
@@ -204,9 +206,9 @@ export function GameDetailScreen({ navigation, route }: GameDetailScreenProps): 
             <View
               style={styles.metriqueCell}
               accessible={true}
-              accessibilityLabel={`Durée : ${formatDuration(record.durationMs)}`}
+              accessibilityLabel={`${t('game_detail.stat_duration_label')} : ${formatDuration(record.durationMs)}`}
             >
-              <Text style={styles.metriqueLabelText}>{'DURÉE'}</Text>
+              <Text style={styles.metriqueLabelText}>{t('game_detail.stat_duration_label').toUpperCase()}</Text>
               <Text style={styles.metriqueValueText}>{formatDuration(record.durationMs)}</Text>
             </View>
             <View style={styles.metriqueVerticalSeparator} />
@@ -215,7 +217,7 @@ export function GameDetailScreen({ navigation, route }: GameDetailScreenProps): 
               accessible={true}
               accessibilityLabel={`${String(record.jumps)} ${jumpLabel}`}
             >
-              <Text style={styles.metriqueLabelText}>{'SAUTS'}</Text>
+              <Text style={styles.metriqueLabelText}>{jumpLabel.toUpperCase()}</Text>
               <Text style={styles.metriqueValueText}>{String(record.jumps)}</Text>
             </View>
           </View>
@@ -223,9 +225,9 @@ export function GameDetailScreen({ navigation, route }: GameDetailScreenProps): 
           <View
             style={[styles.metriqueCell, styles.metriqueDateRow]}
             accessible={true}
-            accessibilityLabel={`Date : ${formatRecordDate(record.completedAt)}`}
+            accessibilityLabel={`${t('game_detail.stat_date_label')} : ${formatRecordDate(record.completedAt)}`}
           >
-            <Text style={styles.metriqueLabelText}>{'DATE'}</Text>
+            <Text style={styles.metriqueLabelText}>{t('game_detail.stat_date_label').toUpperCase()}</Text>
             <Text style={styles.metriqueValueDateText}>{formatRecordDate(record.completedAt)}</Text>
           </View>
         </View>
@@ -234,7 +236,7 @@ export function GameDetailScreen({ navigation, route }: GameDetailScreenProps): 
 
         {/* Section chemin parcouru (F3-24) */}
         <View style={styles.sectionChemin}>
-          <Text style={styles.sectionCheminTitle}>{'CHEMIN PARCOURU'}</Text>
+          <Text style={styles.sectionCheminTitle}>{t('game_detail.path_section_title')}</Text>
           {Array.isArray(record.path) && record.path.length > 0 ? (
             record.path.map((article, index) => (
               <View key={article.id} style={styles.pathItem}>
@@ -244,7 +246,7 @@ export function GameDetailScreen({ navigation, route }: GameDetailScreenProps): 
             ))
           ) : (
             <Text style={styles.sectionCheminMessage}>
-              {'Détail du parcours non disponible'}
+              {t('game_detail.path_not_available')}
             </Text>
           )}
         </View>
@@ -256,17 +258,17 @@ export function GameDetailScreen({ navigation, route }: GameDetailScreenProps): 
           style={styles.boutonRejouer}
           onPress={handleReplay}
           accessibilityRole="button"
-          accessibilityLabel="Rejouer cette partie depuis le début"
+          accessibilityLabel={t('game_detail.replay_button_a11y')}
         >
-          <Text style={styles.boutonRejouerText}>{'Rejouer'}</Text>
+          <Text style={styles.boutonRejouerText}>{t('game_detail.replay_button')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.boutonSupprimer}
           onPress={handleDelete}
           accessibilityRole="button"
-          accessibilityLabel="Supprimer définitivement cette partie"
+          accessibilityLabel={t('game_detail.delete_button_a11y')}
         >
-          <Text style={styles.boutonSupprimerText}>{'Supprimer cette partie'}</Text>
+          <Text style={styles.boutonSupprimerText}>{t('game_detail.delete_button')}</Text>
         </TouchableOpacity>
       </SafeAreaView>
     </SafeAreaView>

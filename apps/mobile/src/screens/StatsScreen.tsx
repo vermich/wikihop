@@ -30,6 +30,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { MiniBarChart } from '../components/stats/MiniBarChart';
 import type { RootStackParamList } from '../navigation/RootNavigator';
@@ -81,6 +82,7 @@ function BlocStat({
 export function StatsScreen({ navigation }: StatsScreenProps): React.JSX.Element {
   const [records, setRecords] = useState<ReadonlyArray<GameRecord>>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useTranslation();
 
   // Chargement au montage
   useEffect(() => {
@@ -120,13 +122,13 @@ export function StatsScreen({ navigation }: StatsScreenProps): React.JSX.Element
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => { navigation.goBack(); }}
-            accessibilityLabel="Retour à l'historique"
+            accessibilityLabel={t('stats.back_button_a11y')}
             accessibilityRole="button"
           >
             <Text style={styles.backButtonText}>{'←'}</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle} accessibilityRole="header">
-            {'Mes statistiques'}
+            {t('stats.header_title')}
           </Text>
         </View>
         <View style={styles.headerSeparator} />
@@ -142,13 +144,13 @@ export function StatsScreen({ navigation }: StatsScreenProps): React.JSX.Element
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => { navigation.goBack(); }}
-          accessibilityLabel="Retour à l'historique"
+          accessibilityLabel={t('stats.back_button_a11y')}
           accessibilityRole="button"
         >
           <Text style={styles.backButtonText}>{'←'}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle} accessibilityRole="header">
-          {'Mes statistiques'}
+          {t('stats.header_title')}
         </Text>
       </View>
       <View style={styles.headerSeparator} />
@@ -162,10 +164,10 @@ export function StatsScreen({ navigation }: StatsScreenProps): React.JSX.Element
         <View style={styles.grilleMetriques}>
           {/* Ligne 1 : Parties jouées (pleine largeur) */}
           <BlocStat
-            label="PARTIES JOUÉES"
+            label={t('stats.total_games_label')}
             value={totalGamesDisplay}
             valueFontSize={36}
-            accessibilityLabel={`Parties jouées : ${totalGamesDisplay}`}
+            accessibilityLabel={t('stats.a11y_total_games', { value: totalGamesDisplay })}
           />
 
           {/* Séparateur horizontal */}
@@ -174,14 +176,14 @@ export function StatsScreen({ navigation }: StatsScreenProps): React.JSX.Element
           {/* Ligne 2 : Taux de victoire + Moyenne sauts */}
           <View style={styles.grilleRow}>
             <BlocStat
-              label="TAUX DE VICTOIRE"
+              label={t('stats.win_rate_label')}
               value={winRateDisplay}
-              accessibilityLabel={`Taux de victoire : ${winRateDisplay}`}
+              accessibilityLabel={t('stats.a11y_win_rate', { value: winRateDisplay })}
             />
             <BlocStat
-              label="MOYENNE SAUTS"
+              label={t('stats.avg_jumps_label')}
               value={avgJumpsDisplay}
-              accessibilityLabel={`Moyenne de sauts en victoire : ${avgJumpsDisplay}`}
+              accessibilityLabel={t('stats.a11y_avg_jumps', { value: avgJumpsDisplay })}
               borderLeft={true}
             />
           </View>
@@ -191,18 +193,18 @@ export function StatsScreen({ navigation }: StatsScreenProps): React.JSX.Element
 
           {/* Ligne 3 : Meilleur temps (pleine largeur) */}
           <BlocStat
-            label="MEILLEUR TEMPS"
+            label={t('stats.best_time_label')}
             value={bestTimeDisplay}
-            accessibilityLabel={`Meilleur temps : ${bestTimeDisplay}`}
+            accessibilityLabel={t('stats.a11y_best_time', { value: bestTimeDisplay })}
           />
         </View>
 
         {/* Section graphique */}
         <View style={styles.sectionGraphique}>
-          <Text style={styles.sectionGraphiqueTitle}>{'7 DERNIÈRES PARTIES'}</Text>
+          <Text style={styles.sectionGraphiqueTitle}>{t('stats.chart_title')}</Text>
           {isEmpty ? (
             <Text style={styles.emptyChartMessage}>
-              {'Jouez votre première partie pour voir votre progression ici.'}
+              {t('stats.chart_empty_message')}
             </Text>
           ) : (
             <MiniBarChart data={chartData} />

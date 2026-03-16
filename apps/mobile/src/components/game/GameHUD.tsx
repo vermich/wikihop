@@ -25,6 +25,7 @@
 
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { useGameTimer } from '../../hooks/useGameTimer';
 
@@ -61,10 +62,11 @@ export const GameHUD = React.memo(function GameHUD({
   targetTitle,
   isHardMode = false,
 }: GameHUDProps): React.JSX.Element {
+  const { t } = useTranslation();
   const { formattedTime, elapsedSeconds } = useGameTimer();
 
-  // Pluriel saut/sauts
-  const jumpsLabel = `${jumps} ${jumps <= 1 ? 'saut' : 'sauts'}`;
+  // Pluriel saut/sauts via i18next count
+  const jumpsLabel = `${jumps} ${t('game_hud.jumps_label', { count: jumps })}`;
 
   // Label accessibilité calculé depuis elapsedSeconds (pas depuis la chaîne formatée)
   const minutes = Math.floor(elapsedSeconds / 60);
@@ -76,7 +78,7 @@ export const GameHUD = React.memo(function GameHUD({
 
   // Préfixe "Mode difficile." ajouté au label si applicable (F3-05 spec accessibilité)
   const difficultyPrefix = isHardMode ? 'Mode difficile. ' : '';
-  const containerAccessibilityLabel = `${difficultyPrefix}Progression : ${jumpsLabel}, ${timeAccessibilityLabel} écoulé${elapsedSeconds !== 1 ? 's' : ''}, cible ${targetTitle}`;
+  const containerAccessibilityLabel = `${difficultyPrefix}Progression : ${jumpsLabel}, ${t('game_hud.timer_a11y', { time: timeAccessibilityLabel })}, ${t('game_hud.target_label')} ${targetTitle}`;
 
   return (
     <View
@@ -129,7 +131,7 @@ export const GameHUD = React.memo(function GameHUD({
           {'→'}
         </Text>
         <Text style={styles.targetLabel} accessible={false}>
-          {'Cible :'}
+          {`${t('game_hud.target_label')} :`}
         </Text>
         <Text style={styles.targetTitle} numberOfLines={1} accessible={false}>
           {targetTitle}

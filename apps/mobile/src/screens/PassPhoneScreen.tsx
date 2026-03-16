@@ -27,6 +27,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useMultiplayerStore } from '../store/multiplayer.store';
@@ -43,6 +44,7 @@ type PassPhoneScreenProps = NativeStackScreenProps<RootStackParamList, 'PassPhon
 
 export function PassPhoneScreen({ route, navigation }: PassPhoneScreenProps): React.JSX.Element {
   const { playerName } = route.params;
+  const { t } = useTranslation();
 
   const handleReady = (): void => {
     const startArticle = useMultiplayerStore.getState().startArticle;
@@ -55,19 +57,19 @@ export function PassPhoneScreen({ route, navigation }: PassPhoneScreenProps): Re
       <View style={styles.content}>
         <Text style={styles.phoneIcon} accessible={false}>{'📱'}</Text>
         <Text style={styles.title} accessibilityRole="header">
-          {'À toi de jouer !'}
+          {t('pass_phone.title')}
         </Text>
-        <Text style={styles.subtitle}>{'Passe le téléphone à'}</Text>
+        <Text style={styles.subtitle}>{t('pass_phone.instruction', { playerName })}</Text>
         <Text style={styles.playerName} numberOfLines={1}>
           {playerName}
         </Text>
         <TouchableOpacity
           style={styles.readyButton}
           onPress={handleReady}
-          accessibilityLabel="Je suis prêt à jouer"
+          accessibilityLabel={t('pass_phone.ready_button')}
           accessibilityRole="button"
         >
-          <Text style={styles.readyButtonText}>{'Prêt !'}</Text>
+          <Text style={styles.readyButtonText}>{t('pass_phone.ready_button')}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

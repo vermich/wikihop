@@ -1,12 +1,12 @@
 /**
- * HomeScreen — WikiHop Mobile — Wave 4 (M-01)
+ * HomeScreen — WikiHop Mobile — Wave 4 (M-01) — i18n F3-26
  *
  * Écran d'accueil. Affiche une paire d'articles (départ + destination)
  * chargée depuis le backend et permet de démarrer une partie.
  *
  * Layout :
  *   [SafeAreaView top+bottom]
- *   ├── Header fixe : "WikiHop" + sélecteur FR/EN
+ *   ├── Header fixe : "WikiHop" + LanguageSelectorButton (F3-26, remplace FR/EN toggle)
  *   ├── Zone centrale (flex:1) :
  *   │   ├── [loading]  Skeleton animé pour les 2 cartes
  *   │   ├── [error]    Message d'erreur + bouton "Réessayer"
@@ -29,7 +29,7 @@
  */
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { Article } from '@wikihop/shared';
+import type { Article, Language } from '@wikihop/shared';
 import { Image } from 'expo-image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -43,8 +43,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { LanguageSelectionSheet } from '../components/LanguageSelectionSheet';
 import { useDailyChallenge } from '../hooks/useDailyChallenge';
 import { useDailyCompletionStatus } from '../hooks/useDailyCompletionStatus';
 import { useRandomPair } from '../hooks/useRandomPair';
@@ -52,6 +54,26 @@ import type { RootStackParamList } from '../navigation/RootNavigator';
 import * as DifficultyStorage from '../services/difficulty-storage.service';
 import { useGameStore } from '../store/game.store';
 import { useLanguageStore } from '../store/language.store';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Constantes d'accessibilité (F3-26)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Labels a11y du LanguageSelectorButton dans le header.
+ * Dans la langue de l'interface (spec UX F3-26 — tableau accessibilityLabel).
+ * Invariants — pas traduits via i18next (labels natifs par langue).
+ */
+const LANGUAGE_BUTTON_A11Y_LABELS: Record<Language, string> = {
+  fr: 'Langue active : Français — ouvrir le sélecteur de langue',
+  en: 'Active language: English — open language selector',
+  es: 'Idioma activo: Español — abrir el selector de idioma',
+  de: 'Aktive Sprache: Deutsch — Sprachauswahl öffnen',
+  pt: 'Idioma ativo: Português — abrir o seletor de idioma',
+  it: 'Lingua attiva: Italiano — apri il selettore di lingua',
+  nl: 'Actieve taal: Nederlands — taalkiezer openen',
+  pl: 'Aktywny język: Polski — otwórz wybór języka',
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -71,9 +93,12 @@ interface ArticleCardProps {
 }
 
 function ArticleCard({ variant, title, extract, thumbnailUrl }: ArticleCardProps): React.JSX.Element {
-  const label = variant === 'start' ? 'DÉPART' : 'DESTINATION';
+  const { t } = useTranslation();
+  const label = variant === 'start' ? t('home.card_label_start') : t('home.card_label_target');
   const labelStyle = variant === 'start' ? cardStyles.labelStart : cardStyles.labelTarget;
-  const accessibilityPrefix = variant === 'start' ? 'Article de départ' : 'Article destination';
+  const accessibilityPrefix = variant === 'start'
+    ? t('home.accessibility_start_prefix')
+    : t('home.accessibility_target_prefix');
   const accessibilityText = `${accessibilityPrefix} : ${title}. ${extract.slice(0, 100)}`;
   const [imageError, setImageError] = useState(false);
 
@@ -145,8 +170,13 @@ function SkeletonCard({ shimmerAnim }: SkeletonCardProps): React.JSX.Element {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
+  const { t } = useTranslation();
+
   // ── État mode difficile (F3-05) — état local, non persisté dans le store ──
   const [isDifficultyHard, setIsDifficultyHard] = useState(false);
+
+  // ── État sélecteur de langue (F3-26) ─────────────────────────────────────
+  const [isLanguageSheetOpen, setIsLanguageSheetOpen] = useState(false);
 
   // ── Lecture préférence difficulté au montage ──────────────────────────────
   // Intentionnellement limité à [] — lecture unique au montage
@@ -170,6 +200,9 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
   const language = useLanguageStore((state) => state.language);
   const setLanguage = useLanguageStore((state) => state.setLanguage);
   const isLanguageHydrated = useLanguageStore((state) => state.isLanguageHydrated);
+
+  // isLanguageLocked : sélecteur calculé (ADR-007) — session in_progress bloque le changement de langue
+  const isLanguageLocked = useGameStore((s) => s.currentSession?.status === 'in_progress');
 
   const startSession = useGameStore((s) => s.startSession);
   const clearSession = useGameStore((s) => s.clearSession);
@@ -235,14 +268,14 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
   useEffect(() => {
     if (state.status === 'success') {
       void AccessibilityInfo.announceForAccessibility(
-        `Articles chargés. Départ : ${state.start.title}. Destination : ${state.target.title}.`,
+        t('home.accessibility_loaded', { start: state.start.title, target: state.target.title }),
       );
     } else if (state.status === 'error') {
       void AccessibilityInfo.announceForAccessibility(
-        `Erreur de chargement. ${state.message}.`,
+        t('home.accessibility_error', { message: state.message }),
       );
     }
-  }, [state]);
+  }, [state, t]);
 
   // ── Session résiduelle — déclenchée une seule fois après hydratation ────
   // Note : les deps sont limitées à [isHydrated] intentionnellement,
@@ -257,15 +290,15 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
       ?? currentSession.startArticle.title;
 
     Alert.alert(
-      'Partie en cours',
-      `Tu as une partie en cours vers "${currentSession.targetArticle.title}". Veux-tu la reprendre ?`,
+      t('home.session_resume_title'),
+      t('home.session_resume_message', { target: currentSession.targetArticle.title }),
       [
         {
-          text: 'Reprendre',
+          text: t('home.session_resume_action'),
           onPress: () => { navigation.navigate('Game', { articleTitle: lastTitle }); },
         },
         {
-          text: 'Nouvelle partie',
+          text: t('home.session_new_game_action'),
           style: 'destructive',
           onPress: () => { void clearSession(); },
         },
@@ -315,7 +348,7 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
     } catch (e: unknown) {
       // eslint-disable-next-line no-console
       console.error('[HomeScreen] handlePlayDaily — erreur inattendue :', e);
-      Alert.alert('Indisponible', 'Le défi du jour est momentanément indisponible.');
+      Alert.alert(t('home.daily_error_title'), t('home.daily_error_message'));
     }
   }, [dailyChallengeState, clearSession, startSession, navigation]);
 
@@ -351,10 +384,7 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
     } catch (e: unknown) {
       // eslint-disable-next-line no-console
       console.error('[HomeScreen] handlePlay — erreur inattendue :', e);
-      Alert.alert(
-        'Erreur',
-        'Impossible de démarrer la partie. Réessayez.',
-      );
+      Alert.alert(t('home.error_start_title'), t('home.error_start_message'));
     }
   }, [state, clearSession, startSession, navigation, isDifficultyHard]);
 
@@ -385,12 +415,12 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
 
   const dailyButtonLabel =
     showDailyBadge
-      ? 'Nouveau défi du jour disponible — jouer le défi quotidien'
+      ? t('home.daily_button_new_a11y')
       : isDailyButtonCompleted
-        ? 'Défi du jour déjà complété aujourd\'hui'
+        ? t('home.daily_button_completed_a11y')
         : dailyChallengeState.status !== 'success'
-          ? 'Défi du jour — chargement en cours'
-          : 'Jouer le défi du jour';
+          ? t('home.daily_button_loading_a11y')
+          : t('home.daily_button_default_a11y');
 
   // F3-21 : opacité réduite quand le bouton est désactivé
   // TouchableOpacity ne gère pas automatiquement l'opacity sur disabled=true
@@ -414,11 +444,11 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
             <TouchableOpacity
               style={[styles.playButton, styles.playButtonDisabled]}
               disabled={true}
-              accessibilityLabel="Jouer"
+              accessibilityLabel={t('home.play_button')}
               accessibilityRole="button"
               accessibilityState={{ disabled: true }}
             >
-              <Text style={[styles.playButtonText, styles.playButtonTextDisabled]}>{'Jouer'}</Text>
+              <Text style={[styles.playButtonText, styles.playButtonTextDisabled]}>{t('home.play_button')}</Text>
             </TouchableOpacity>
             {/* Bouton Défi du jour (F3-01 / F3-16 / F3-17 / F3-19) — en dessous du bouton Jouer */}
             {/* F3-21 : opacity et activeOpacity gérés explicitement (disabled ne gère pas opacity) */}
@@ -433,17 +463,17 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
             >
               {showDailyBadge && (
                 <View style={styles.dailyBadge} accessible={false}>
-                  <Text style={styles.dailyBadgeText} accessible={false}>{'NEW'}</Text>
+                  <Text style={styles.dailyBadgeText} accessible={false}>{t('home.daily_badge_new')}</Text>
                 </View>
               )}
               {isDailyButtonCompleted ? (
                 <>
                   <Text style={styles.dailyButtonCheckIcon} accessible={false}>{'✓'}</Text>
-                  <Text style={styles.dailyButtonTextCompleted}>{'Défi du jour complété'}</Text>
+                  <Text style={styles.dailyButtonTextCompleted}>{t('home.daily_challenge_completed')}</Text>
                 </>
               ) : (
                 <Text style={[styles.dailyButtonText, styles.dailyButtonTextDisabled]}>
-                  {'Défi du jour'}
+                  {t('home.daily_challenge_button')}
                 </Text>
               )}
             </TouchableOpacity>
@@ -451,20 +481,20 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
             <TouchableOpacity
               style={styles.multiplayerButton}
               onPress={() => { navigation.navigate('MultiplayerSetup'); }}
-              accessibilityLabel="Multijoueur — jouer à plusieurs sur cet appareil"
+              accessibilityLabel={t('home.multiplayer_a11y')}
               accessibilityRole="button"
             >
-              <Text style={styles.multiplayerButtonText}>{'Multijoueur'}</Text>
+              <Text style={styles.multiplayerButtonText}>{t('home.multiplayer_button')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.refreshButton}
               disabled={true}
               onPress={refresh}
-              accessibilityLabel="Tirer de nouveaux articles"
+              accessibilityLabel={t('home.refresh_a11y')}
               accessibilityRole="button"
             >
               <Animated.View style={[styles.refreshButtonInner, styles.refreshButtonDisabled]}>
-                <Text style={styles.refreshButtonText}>{'Nouveaux articles'}</Text>
+                <Text style={styles.refreshButtonText}>{t('home.new_articles_button')}</Text>
                 <Animated.Text
                   style={[styles.refreshIcon, { transform: [{ rotate: rotateInterpolated }] }]}
                 >
@@ -477,26 +507,26 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
             <TouchableOpacity
               style={styles.secondaryTextButton}
               onPress={() => { navigation.navigate('History'); }}
-              accessibilityLabel="Voir mon historique de parties"
+              accessibilityLabel={t('home.history_a11y')}
               accessibilityRole="button"
             >
-              <Text style={styles.secondaryTextButtonText}>{'Historique des parties'}</Text>
+              <Text style={styles.secondaryTextButtonText}>{t('home.history_link')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.secondaryTextButton}
               onPress={() => { navigation.navigate('Donation'); }}
-              accessibilityLabel="Soutenir Wikipedia — faire un don à Wikimedia"
+              accessibilityLabel={t('home.donation_a11y')}
               accessibilityRole="button"
             >
-              <Text style={styles.secondaryTextButtonText}>{'Soutenir Wikipedia'}</Text>
+              <Text style={styles.secondaryTextButtonText}>{t('home.support_wikipedia_link')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.secondaryTextButton}
               onPress={() => { navigation.navigate('About'); }}
-              accessibilityLabel="À propos de WikiHop"
+              accessibilityLabel={t('home.about_a11y')}
               accessibilityRole="button"
             >
-              <Text style={styles.secondaryTextButtonText}>{'À propos'}</Text>
+              <Text style={styles.secondaryTextButtonText}>{t('home.about_link')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -506,15 +536,15 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
     if (state.status === 'error') {
       return (
         <View style={styles.errorContainer}>
-          <Text style={styles.errorTitle}>{'Impossible de charger les articles.'}</Text>
-          <Text style={styles.errorSubtext}>{'Vérifiez votre connexion internet.'}</Text>
+          <Text style={styles.errorTitle}>{t('home.error_load_title')}</Text>
+          <Text style={styles.errorSubtext}>{t('home.error_load_subtitle')}</Text>
           <TouchableOpacity
             style={styles.retryButton}
             onPress={refresh}
-            accessibilityLabel="Réessayer de charger les articles"
+            accessibilityLabel={t('home.retry_button')}
             accessibilityRole="button"
           >
-            <Text style={styles.retryButtonText}>{'Réessayer'}</Text>
+            <Text style={styles.retryButtonText}>{t('home.retry_button')}</Text>
           </TouchableOpacity>
         </View>
       );
@@ -546,11 +576,11 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
           <TouchableOpacity
             style={styles.playButton}
             onPress={() => { void handlePlay(); }}
-            accessibilityLabel="Jouer"
+            accessibilityLabel={t('home.play_button')}
             accessibilityRole="button"
             accessibilityState={{ disabled: false }}
           >
-            <Text style={styles.playButtonText}>{'Jouer'}</Text>
+            <Text style={styles.playButtonText}>{t('home.play_button')}</Text>
           </TouchableOpacity>
           {/* Bouton Défi du jour (F3-01 / F3-16 / F3-17 / F3-19) — en dessous du bouton Jouer */}
           {/* F3-21 : opacity et activeOpacity gérés explicitement (disabled ne gère pas opacity) */}
@@ -566,35 +596,35 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
           >
             {showDailyBadge && (
               <View style={styles.dailyBadge} accessible={false}>
-                <Text style={styles.dailyBadgeText} accessible={false}>{'NEW'}</Text>
+                <Text style={styles.dailyBadgeText} accessible={false}>{t('home.daily_badge_new')}</Text>
               </View>
             )}
             {isDailyButtonCompleted ? (
               <>
                 <Text style={styles.dailyButtonCheckIcon} accessible={false}>{'✓'}</Text>
-                <Text style={styles.dailyButtonTextCompleted}>{'Défi du jour complété'}</Text>
+                <Text style={styles.dailyButtonTextCompleted}>{t('home.daily_challenge_completed')}</Text>
               </>
             ) : (
-              <Text style={styles.dailyButtonText}>{'Défi du jour'}</Text>
+              <Text style={styles.dailyButtonText}>{t('home.daily_challenge_button')}</Text>
             )}
           </TouchableOpacity>
           {/* Bouton Multijoueur (F3-12) */}
           <TouchableOpacity
             style={styles.multiplayerButton}
             onPress={() => { navigation.navigate('MultiplayerSetup'); }}
-            accessibilityLabel="Multijoueur — jouer à plusieurs sur cet appareil"
+            accessibilityLabel={t('home.multiplayer_a11y')}
             accessibilityRole="button"
           >
-            <Text style={styles.multiplayerButtonText}>{'Multijoueur'}</Text>
+            <Text style={styles.multiplayerButtonText}>{t('home.multiplayer_button')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.refreshButton}
             onPress={refresh}
-            accessibilityLabel="Tirer de nouveaux articles"
+            accessibilityLabel={t('home.refresh_a11y')}
             accessibilityRole="button"
           >
             <View style={styles.refreshButtonInner}>
-              <Text style={styles.refreshButtonText}>{'Nouveaux articles'}</Text>
+              <Text style={styles.refreshButtonText}>{t('home.new_articles_button')}</Text>
               <Text style={styles.refreshIcon}>{'↺'}</Text>
             </View>
           </TouchableOpacity>
@@ -603,26 +633,26 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
           <TouchableOpacity
             style={styles.secondaryTextButton}
             onPress={() => { navigation.navigate('History'); }}
-            accessibilityLabel="Voir mon historique de parties"
+            accessibilityLabel={t('home.history_a11y')}
             accessibilityRole="button"
           >
-            <Text style={styles.secondaryTextButtonText}>{'Historique des parties'}</Text>
+            <Text style={styles.secondaryTextButtonText}>{t('home.history_link')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.secondaryTextButton}
             onPress={() => { navigation.navigate('Donation'); }}
-            accessibilityLabel="Soutenir Wikipedia — faire un don à Wikimedia"
+            accessibilityLabel={t('home.donation_a11y')}
             accessibilityRole="button"
           >
-            <Text style={styles.secondaryTextButtonText}>{'Soutenir Wikipedia'}</Text>
+            <Text style={styles.secondaryTextButtonText}>{t('home.support_wikipedia_link')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.secondaryTextButton}
             onPress={() => { navigation.navigate('About'); }}
-            accessibilityLabel="À propos de WikiHop"
+            accessibilityLabel={t('home.about_a11y')}
             accessibilityRole="button"
           >
-            <Text style={styles.secondaryTextButtonText}>{'À propos'}</Text>
+            <Text style={styles.secondaryTextButtonText}>{t('home.about_link')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -641,7 +671,7 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
             onValueChange={handleDifficultyToggle}
             trackColor={{ false: '#E2E8F0', true: '#FECACA' }}
             thumbColor={isDifficultyHard ? '#EF4444' : '#FFFFFF'}
-            accessibilityLabel={isDifficultyHard ? 'Mode difficile activé — désactiver' : 'Mode difficile désactivé — activer'}
+            accessibilityLabel={isDifficultyHard ? t('home.difficulty_toggle_on_a11y') : t('home.difficulty_toggle_off_a11y')}
             accessibilityState={{ checked: isDifficultyHard }}
           />
         </View>
@@ -652,30 +682,22 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
         >
           {'WikiHop'}
         </Text>
+        {/* F3-26 : LanguageSelectorButton remplace le toggle FR/EN */}
         {isLanguageHydrated && (
-          <View style={styles.languageSelector}>
-            <TouchableOpacity
-              style={styles.languageOption}
-              onPress={() => { void setLanguage('fr'); }}
-              accessibilityLabel={language === 'fr' ? 'Langue française, sélectionnée' : 'Langue française'}
-              accessibilityState={{ selected: language === 'fr' }}
-            >
-              <Text style={[styles.languageText, language === 'fr' && styles.languageTextActive]}>
-                {'FR'}
-              </Text>
-            </TouchableOpacity>
-            <Text style={styles.languageSeparator}>{'|'}</Text>
-            <TouchableOpacity
-              style={styles.languageOption}
-              onPress={() => { void setLanguage('en'); }}
-              accessibilityLabel={language === 'en' ? 'Langue anglaise, sélectionnée' : 'Langue anglaise'}
-              accessibilityState={{ selected: language === 'en' }}
-            >
-              <Text style={[styles.languageText, language === 'en' && styles.languageTextActive]}>
-                {'EN'}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={[
+              styles.languageSelectorButton,
+              isLanguageLocked === true && styles.languageSelectorDisabled,
+            ]}
+            onPress={() => { setIsLanguageSheetOpen(true); }}
+            disabled={isLanguageLocked === true}
+            accessibilityLabel={LANGUAGE_BUTTON_A11Y_LABELS[language]}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: isLanguageLocked === true }}
+          >
+            <Text style={styles.languageCode}>{language.toUpperCase()}</Text>
+            <Text style={styles.languageChevron} accessible={false}>{'⌄'}</Text>
+          </TouchableOpacity>
         )}
       </View>
       <View style={styles.headerSeparator} />
@@ -684,6 +706,14 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
       <View style={[styles.content, isLoading || state.status === 'error' ? styles.contentCentered : null]}>
         {renderContent()}
       </View>
+
+      {/* F3-26 : LanguageSelectionSheet — modal de sélection de langue */}
+      <LanguageSelectionSheet
+        visible={isLanguageSheetOpen}
+        currentLanguage={language}
+        onSelect={(lang) => { void setLanguage(lang); setIsLanguageSheetOpen(false); }}
+        onClose={() => { setIsLanguageSheetOpen(false); }}
+      />
     </SafeAreaView>
   );
 }
@@ -715,30 +745,29 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#E2E8F0',
   },
-  languageSelector: {
+  // F3-26 : LanguageSelectorButton — remplace le toggle FR/EN
+  languageSelectorButton: {
     position: 'absolute',
     right: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  languageOption: {
     minWidth: 44,
-    minHeight: 44,
+    height: 44,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 8,
+    gap: 3,
   },
-  languageText: {
+  languageSelectorDisabled: {
+    opacity: 0.4,
+  },
+  languageCode: {
     fontSize: 13,
-    color: '#64748B',
-  },
-  languageTextActive: {
     fontWeight: 'bold',
     color: '#2563EB',
   },
-  languageSeparator: {
-    fontSize: 13,
-    color: '#E2E8F0',
+  languageChevron: {
+    fontSize: 11,
+    color: '#2563EB',
   },
   content: {
     flex: 1,

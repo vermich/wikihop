@@ -5,7 +5,7 @@
  * Utilisé depuis VictoryScreen pour lire l'article cible sans quitter l'app.
  *
  * Layout :
- *   [Header : titre + bouton "Accueil"]
+ *   [Header : titre + bouton "Retour"]
  *   [WebView — flex:1]
  *
  * Conventions :
@@ -24,6 +24,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { WebView } from 'react-native-webview';
 
 import { CSS_INJECTION_SCRIPT } from '../components/game/WikipediaWebView';
@@ -34,6 +35,7 @@ type ArticleViewerScreenProps = NativeStackScreenProps<RootStackParamList, 'Arti
 export function ArticleViewerScreen({ route, navigation }: ArticleViewerScreenProps): React.JSX.Element {
   const { url, title } = route.params;
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useTranslation();
 
   return (
     <View style={styles.screen}>
@@ -45,7 +47,7 @@ export function ArticleViewerScreen({ route, navigation }: ArticleViewerScreenPr
           <TouchableOpacity
             style={styles.homeButton}
             onPress={() => { navigation.goBack(); }}
-            accessibilityLabel="Retour"
+            accessibilityLabel={t('article_viewer.back_button_a11y')}
             accessibilityRole="button"
           >
             <Text style={styles.homeButtonText}>{'← Retour'}</Text>
@@ -59,6 +61,7 @@ export function ArticleViewerScreen({ route, navigation }: ArticleViewerScreenPr
         injectedJavaScript={CSS_INJECTION_SCRIPT}
         onLoadStart={() => { setIsLoading(true); }}
         onLoadEnd={() => { setIsLoading(false); }}
+        accessibilityLabel={t('article_viewer.loading_a11y')}
       />
       {isLoading && (
         <View style={styles.loadingOverlay} pointerEvents="none">

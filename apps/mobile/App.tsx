@@ -15,6 +15,10 @@
  * Tous les autres composants utilisent des exports nommés.
  */
 
+// i18n doit être importé en premier — initialise i18next de façon synchrone
+// avant que les composants ne rendent et n'appellent useTranslation()
+import './src/i18n/i18n';
+
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 

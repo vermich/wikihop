@@ -29,6 +29,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { RootStackParamList } from '../navigation/RootNavigator';
@@ -51,6 +52,7 @@ type MultiplayerRoundTransitionScreenProps = NativeStackScreenProps<
 export function MultiplayerRoundTransitionScreen(
   { navigation }: MultiplayerRoundTransitionScreenProps,
 ): React.JSX.Element {
+  const { t } = useTranslation();
   // F3-32 : lecture des paires préchargées depuis le store — plus de useRandomPair
   const allPairs = useMultiplayerStore((s) => s.allPairs);
   const currentRound = useMultiplayerStore((s) => s.currentRound);
@@ -113,7 +115,7 @@ export function MultiplayerRoundTransitionScreen(
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#2563EB" />
         <Text style={styles.loadingText}>
-          {`Chargement de la manche ${String(currentRound)}/${String(roundCount)}...`}
+          {t('multiplayer_transition.loading_text', { current: currentRound, total: roundCount })}
         </Text>
       </View>
     </SafeAreaView>

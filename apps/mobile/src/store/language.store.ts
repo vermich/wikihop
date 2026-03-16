@@ -27,6 +27,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Language } from '@wikihop/shared';
 import { create } from 'zustand';
 
+import { i18next } from '../i18n/i18n';
+import { isSupportedLanguage } from '../utils/language.utils';
 import { useGameStore } from './game.store';
 
 /** Clé AsyncStorage de la préférence de langue (ADR-005) */
@@ -106,6 +108,9 @@ export const useLanguageStore = create<LanguageSlice>()((set, get) => ({
       console.error('[language.store] Erreur AsyncStorage.setItem :', e);
     }
 
+    // Synchronisation i18next avec la nouvelle langue
+    void i18next.changeLanguage(lang);
+
     // Invalidation du cache popularPages si la langue a changé (ADR-007)
     if (previousLang !== lang) {
       // TODO M-16 frontend : remplacer par usePopularPagesStore.getState().invalidatePopularPages()
@@ -122,12 +127,13 @@ export const useLanguageStore = create<LanguageSlice>()((set, get) => ({
       if (raw !== null) {
         const parsed = JSON.parse(raw) as unknown;
 
-        // Validation stricte : uniquement 'fr' ou 'en' acceptés (exactOptionalPropertyTypes)
-        // Ne pas caster `parsed as Language` directement — vérification explicite requise
-        if (parsed === 'fr' || parsed === 'en') {
+        // Validation via isSupportedLanguage — accepte les 8 langues supportées (F3-26)
+        // Ne pas caster `parsed as Language` directement — type guard explicite requis
+        if (isSupportedLanguage(parsed)) {
           set({ language: parsed });
+          void i18next.changeLanguage(parsed);
         }
-        // Valeur invalide en AsyncStorage (ex: 'es', 'de', valeur corrompue) :
+        // Valeur invalide en AsyncStorage (valeur corrompue, langue inconnue) :
         // on conserve le défaut 'fr'. Pas de clearItem — sera écrasé au prochain setLanguage.
       }
       // Clé absente (null) : on conserve le défaut 'fr'
