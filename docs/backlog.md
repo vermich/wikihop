@@ -112,7 +112,7 @@
 | [F3-33](stories/phase-3/✅-F3-33-multiplayer-results-per-round.md) | Multijoueur — résultats par manche + médaille partagée | Should | Tech Lead, UX/UI, Frontend Dev | ✅ done |
 | [F3-34](stories/phase-3/✅-F3-34-fix-back-navigation-webview.md) | Fix retour arrière WebView — régression persistante après F3-27 | Must | Tech Lead, Frontend Dev | ✅ done |
 | [F3-35](stories/phase-3/✅-F3-35-hard-mode-badge-history.md) | Badge "Mode difficile" dans l'historique des parties | Should | Frontend Dev, UX/UI | ✅ done |
-| [F3-36](stories/phase-3/🔄-F3-36-fix-multiplayer-result-ranking.md) | Fix — Classement MultiplayerResultScreen incorrect (dernière manche exclue) | Must | Frontend Dev | 🔄 in-progress |
+| [F3-36](stories/phase-3/✅-F3-36-fix-multiplayer-result-ranking.md) | Fix — Classement MultiplayerResultScreen incorrect (dernière manche exclue) | Must | Frontend Dev | ✅ done |
 
 ---
 
@@ -224,4 +224,5 @@
 *v4.7 : Vague H lancée — F3-25/F3-31 in-progress (2026-03-15)*
 *v4.8 : F3-36 créée — bug classement MultiplayerResultScreen (dernière manche exclue de rankedPlayers) détecté en code review F3-31 (2026-03-16)*
 *v4.9 : F3-36 in-progress — fix classement dernière manche (2026-03-16)*
+*v5.0 : F3-36 done — 18/18 tests passants, tsc et lint propres, tests obsolètes mis à jour (2026-03-16)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
