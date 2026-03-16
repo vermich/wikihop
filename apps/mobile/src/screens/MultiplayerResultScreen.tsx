@@ -34,8 +34,8 @@
  */
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { Article } from '@wikihop/shared';
-import React, { useCallback } from 'react';
+import type { Article, MultiplayerRoundResult } from '@wikihop/shared';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -47,9 +47,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useRandomPair } from '../hooks/useRandomPair';
 import type { RootStackParamList } from '../navigation/RootNavigator';
+import * as MultiplayerScoreStorage from '../services/multiplayer-score-storage.service';
 import { useGameStore } from '../store/game.store';
 import { useMultiplayerStore } from '../store/multiplayer.store';
-import type { MultiplayerRoundResult } from '../store/multiplayer.store';
+import { buildMultiplayerRecord } from '../utils/multiplayer-history.utils';
 import { rankPlayersGlobalWithRank } from '../utils/multiplayer.utils';
 import type { GlobalRankEntryWithRank } from '../utils/multiplayer.utils';
 
@@ -60,6 +61,22 @@ import { formatElapsed } from './VictoryScreen';
 // ─────────────────────────────────────────────────────────────────────────────
 
 type MultiplayerResultScreenProps = NativeStackScreenProps<RootStackParamList, 'MultiplayerResult'>;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Helpers internes
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Génère un UUID v4 conforme RFC 4122 sans dépendance sur l'API Web Crypto.
+ * Pattern identique à game.store.ts — crypto.randomUUID() non disponible sur Hermes.
+ */
+function generateUUID(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constantes
@@ -231,6 +248,39 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
 
   // Chargement silencieux d'une nouvelle paire en arrière-plan (F3-29)
   const { state: pairState } = useRandomPair('normal');
+
+  // F3-31 : sauvegarde unique au montage — ref pour éviter la double sauvegarde
+  // si le composant se remonte (rare mais possible, ex. React strict mode).
+  const sessionSavedRef = useRef(false);
+
+  useEffect(() => {
+    if (sessionSavedRef.current) return;
+    sessionSavedRef.current = true;
+
+    // Construire le snapshot de la dernière manche depuis players[].
+    // startNextRound() flush la manche courante dans roundHistory AVANT de passer
+    // à la suivante — la dernière manche n'est donc PAS dans roundHistory du store.
+    const lastRoundSnapshot: MultiplayerRoundResult[] = players.map((p) => ({
+      jumps: p.jumps,
+      durationMs: p.durationMs,
+      won: p.won,
+    }));
+
+    const completeRoundHistory = [...roundHistory, lastRoundSnapshot];
+
+    const record = buildMultiplayerRecord(
+      generateUUID(),
+      new Date().toISOString(),
+      players.map((p) => p.name),
+      roundCount,
+      completeRoundHistory,
+    );
+
+    // deps vide intentionnel : sauvegarde unique au montage — sessionSavedRef garantit l'unicité
+    void MultiplayerScoreStorage.save(record);
+  // eslint-plugin-react-hooks non installé dans ce projet — deps vides justifiées
+  }, []);
+
 
   const playerNames = players.map((p) => p.name);
   // F3-33 : utilisation de rankPlayersGlobalWithRank au lieu de rankPlayersGlobal

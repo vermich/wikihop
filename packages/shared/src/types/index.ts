@@ -140,6 +140,52 @@ export interface GameRecord {
 }
 
 // ─────────────────────────────────────────────
+// Historique des parties multijoueur
+// ─────────────────────────────────────────────
+
+/**
+ * Résultat d'un joueur pour une manche donnée — F3-31.
+ * Migré depuis multiplayer.store.ts pour éviter une dépendance
+ * packages/shared → apps/mobile. Le store ré-exporte ce type depuis shared.
+ *
+ * Story : F3-31
+ */
+export interface MultiplayerRoundResult {
+  jumps: number | null;
+  durationMs: number | null;
+  won: boolean;
+}
+
+/**
+ * Enregistrement d'une session multijoueur terminée.
+ * Stocké dans AsyncStorage — les dates sont en string ISO 8601
+ * (pas Date) pour éviter toute désérialisation.
+ *
+ * Story : F3-31
+ */
+export interface MultiplayerGameRecord {
+  /** Identifiant unique de la session (UUID v4) */
+  id: string;
+  /** Date de début de session — ISO 8601 string */
+  date: string;
+  /** Noms des joueurs dans l'ordre de leur index */
+  playerNames: string[];
+  /** Nombre total de manches jouées */
+  roundCount: number;
+  /**
+   * Historique des résultats par manche.
+   * roundHistory[roundIndex][playerIndex] = résultat du joueur.
+   * Contient TOUTES les manches, y compris la dernière.
+   */
+  roundHistory: MultiplayerRoundResult[][];
+  /**
+   * Nom du gagnant global (calculé à partir de rankPlayersGlobal).
+   * null si égalité parfaite (wins/jumps/durée identiques pour plusieurs joueurs).
+   */
+  winner: string | null;
+}
+
+// ─────────────────────────────────────────────
 // Défi quotidien
 // ─────────────────────────────────────────────
 

@@ -537,6 +537,15 @@ export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenPro
               {'Chargement des paires en cours...'}
             </Text>
           )}
+          {/* F3-31 : accès à l'historique multijoueur — bouton texte secondaire */}
+          <TouchableOpacity
+            style={styles.historyButton}
+            onPress={() => { navigation.navigate('MultiplayerHistory'); }}
+            accessibilityLabel="Voir l'historique des parties multijoueur"
+            accessibilityRole="button"
+          >
+            <Text style={styles.historyButtonText}>{'Historique multijoueur'}</Text>
+          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -794,5 +803,16 @@ const styles = StyleSheet.create({
     color: '#64748B',
     textAlign: 'center',
     marginTop: 6,
+  },
+  // F3-31 : bouton historique multijoueur — style secondaire identique HomeScreen
+  historyButton: {
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 4,
+  },
+  historyButtonText: {
+    fontSize: 14,
+    color: '#64748B',
   },
 });
