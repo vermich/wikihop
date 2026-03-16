@@ -29,7 +29,20 @@ En tant que joueur, je veux une interface cohérente, intuitive et sans friction
 - [ ] `npm run lint` passe sans erreur
 
 ## Notes de réalisation
-<!-- Rempli par l'agent lors de l'implémentation -->
+
+Audit complet des 8 critères réalisé le 2026-03-16. Tous les critères étaient déjà implémentés dans `develop` au moment de la prise en charge, répartis dans plusieurs PR précédentes :
+
+- **Critère 1** — "Historique des parties" : texte correct dans `HomeScreen.tsx` (branches loading + success) et dans `HistoryScreen.tsx` (header `Header` interne).
+- **Critère 2** — Toggle mode difficile dans le header : `Switch` positionné dans `difficultyHeaderToggle` (`position: 'absolute', left: 16`), premier enfant du header JSX, accessibilityLabel dynamique, `accessibilityState={{ checked }}`. Supprimé du corps ScrollView.
+- **Critère 3** — Bouton "Lire [titre]" dans la zone sticky : `readButton` présent avant `primaryButtonsRow` dans `stickyButtons`, hauteur 48, bordure `#2563EB`, `marginBottom: 12`.
+- **Critère 4** — Lien "Voir l'historique" : absent de `VictoryScreen.tsx` — supprimé, aucun style mort résiduel.
+- **Critère 5** — Partager en couleur primaire : `shareButtonText.color = '#2563EB'` (promu depuis `#64748B`).
+- **Critère 6** — SortBar 3 états : implémenté dans `HistoryScreen.tsx` via `useHistorySort` + `SORT_BUTTONS`. Déjà fait.
+- **Critère 7** — "Stats" remplace "⊞" : `statsButtonText` affiche `{'Stats'}`, `fontSize: 13`, `fontWeight: 'bold'`, `color: '#2563EB'`, zone tactile `minWidth: 44, height: 44, paddingHorizontal: 8`.
+- **Critère 8** — "À propos" au-dessus de la ligne de flottaison : ordre des boutons secondaires correct (Historique des parties → Soutenir Wikipedia → À propos), séparateur `secondaryLinksSeparator` présent dans les deux branches (loading + success).
+
+**lint** : 0 erreur (19 warnings console pre-existants).
+**tsc** : l'erreur `Property 'id' is missing` sur `Stack.Navigator` est une erreur pre-existante dans `develop` (non liée à F3-25).
 
 ## Validation QA — Halim
 <!-- Rempli par QA après les tests -->
