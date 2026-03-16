@@ -74,8 +74,9 @@ Le PM est **toujours informé** de ce qui se passe sur l'application. Il a la vi
 **Règles obligatoires :**
 - Toute demande qui n'est pas couverte par une user story existante → le PM crée la story dans `docs/stories/` **avant** que le développement commence
 - Le PM met à jour le statut des stories (`pending` → `in-progress` → `done`) au fil des livraisons
-- Le PM met à jour `docs/backlog.md` (icônes ⬜/🔄/✅) en conséquence
+- Le PM met à jour `docs/backlog.md` (icônes ⬜/🔄/✅) **au moment du handoff**, pas en fin de vague
 - Le PM est consulté via `/sprint [description]` pour planifier un bloc de fonctionnalités
+- **Si les critères d'acceptance d'une story sont ambigus ou incomplets**, le PM sollicite le Client pour clarification **avant** de lancer le Tech Lead — jamais en cours d'implémentation
 
 ---
 
@@ -197,16 +198,17 @@ Approche Test-Driven Development appliquée selon le type de code :
 
 Les specs doivent être dans `develop` avant que le code ne commence. Jamais de specs commitées après le code.
 
-## Gate device physique — règle bloquante (A2 rétro 2026-03-03)
+## Gate device physique — règle bloquante (rétro 2026-03-03 + 2026-03-16)
 
-Toute PR touchant la **WebView, la navigation, le store de jeu ou le flux Home→Game→Victory** requiert une confirmation manuelle avant merge :
+Toute story touchant la **WebView, la navigation, le store de jeu ou le flux Home→Game→Victory** requiert une validation sur device physique par le **Client** avant de pouvoir passer en `done`.
 
 > *"Le chemin complet Home → article de départ → navigation inter-articles → VictoryScreen a été joué sur device physique."*
 
 **Responsabilités :**
-- **Laurent** (Frontend Dev) confirme dans la description de sa PR qu'il a testé sur device physique, ou indique explicitement qu'il n'a pas accès au device
-- **Halim** (QA) coche ce critère avant d'émettre son rapport de validation
-- **Maxime** (Tech Lead) ne peut pas approuver une PR concernée si ce critère n'est pas coché
+- **Le Client** est le seul à pouvoir valider ce critère — c'est un test d'acceptance utilisateur, pas un test technique
+- **Halim** (QA) ne peut pas cocher ce critère seul — il doit attendre la confirmation explicite du Client
+- **Maxime** (Tech Lead) ne peut pas approuver une PR concernée sans cette confirmation
+- **Si le Client n'a pas encore testé**, la story reste en `in-progress` — aucune exception, aucun "validé avec réserves"
 
 Ce gate s'applique **en plus** des critères existants (`tsc --noEmit`, lint, tests automatisés).
 
@@ -235,6 +237,26 @@ Si une correction échoue 2 fois de suite sur le même critère d'acceptance :
 - L'orchestrateur envoie la fiche diagnostic au Client **avant** la 3e tentative
 - Le Tech Lead fait un checkpoint : revue de toutes les hypothèses testées, décision sur la stratégie suivante
 - Le Client n'est pas consulté pour un choix technique, mais doit avoir visibilité sur l'avancement
+
+---
+
+## Specs navigation — règle obligatoire (rétro Phase 3, 2026-03-16)
+
+Toute spec Tech Lead touchant **ArticleScreen, la WebView, React Navigation ou le BackHandler** doit inclure :
+
+1. **Diagramme d'état** des stacks impliqués (navigation stack + WebView history stack)
+2. **Comportement explicite** pour chaque affordance de retour : geste iOS / bouton header / hardware Android
+3. **Section "Interactions connues"** listant les composants/stores impactés
+
+**Si un bug navigation revient une deuxième fois sur la même zone** → le Tech Lead rédige un ADR avant toute nouvelle correction. Aucun dev ne touche au code avant que l'ADR soit committé.
+
+---
+
+## Périmètre des sprints — règle (rétro Phase 3, 2026-03-16)
+
+- Maximum **8-10 stories par lot** / **15 stories par phase**
+- Les bugs correctifs Must créés en cours de phase comptent dans le plafond
+- Toute régression sur une zone déjà livrée → story Must créée **immédiatement** (pas en correctif post-livraison)
 
 ---
 

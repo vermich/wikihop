@@ -152,6 +152,81 @@
 
 ---
 
+## Rétro 3 — Phase 3 — Features
+
+**Date** : 2026-03-16
+**Stories validées** : F3-01 à F3-36 (31 actives + 5 won't)
+**Tests** : 678 tests, 0 régression
+**Waves** : A à I
+
+### Observations
+
+---
+
+#### Problème 1 : Bug retour arrière — 3 occurrences (F3-22, F3-27, F3-34)
+
+**Symptôme** : Le retour arrière dans ArticleScreen a nécessité 3 stories correctifs successifs. Chaque correctif résolvait un symptôme mais pas la cause racine.
+
+**Cause** : Deux sources de vérité pour l'état de navigation — le stack React Navigation d'un côté, l'historique interne de la WebView de l'autre. Les specs F3-22 et F3-27 ne modélisaient pas explicitement la coexistence de ces deux stacks. Les specs ne précisaient pas non plus le comportement attendu pour les 3 affordances de retour (geste iOS / bouton header / hardware Android). La solution correcte (stack applicatif explicite) n'est arrivée qu'en F3-34.
+
+**Résolution appliquée** :
+- Règle "Specs navigation — diagramme d'état obligatoire" ajoutée dans `CLAUDE.md`
+- Règle "ADR obligatoire si bug navigation revient une 2e fois" ajoutée dans `CLAUDE.md`
+
+**Leçon générale** : Deux sources de vérité pour le même état = bug garanti. Quand une zone de code génère deux bugs consécutifs, c'est le signal d'un problème architectural, pas d'implémentation. Il faut s'arrêter et modéliser avant de corriger.
+
+---
+
+#### Problème 2 : Gate device physique — dérive
+
+**Symptôme** : Sur les waves D et E, Laurent n'avait pas accès au device physique. Les stories ont quand même été validées "avec réserves" par QA et passées en `done`.
+
+**Cause** : Le gate était décrit comme un critère de PR (Tech Lead + QA), mais personne n'était désigné comme décisionnaire final. Le Client n'était pas impliqué.
+
+**Résolution appliquée** :
+- La validation device physique est désormais explicitement de la responsabilité du **Client**
+- Une story sans validation Client reste en `in-progress` — aucune exception, aucun "validé avec réserves"
+- `CLAUDE.md` mis à jour
+
+**Leçon générale** : Les tests d'acceptance utilisateur ne peuvent pas être délégués à l'équipe technique. Le Client est le seul décisionnaire sur "est-ce que ça marche sur mon appareil".
+
+---
+
+#### Problème 3 : Specs imprécises — ambiguïtés non remontées avant le dev
+
+**Symptôme** : Des comportements de navigation n'étaient pas spécifiés (affordances de retour, cas limites iOS vs Android). Laurent a dû interpréter ou découvrir en implémentant.
+
+**Cause** : Le PM ne sollicitait pas le Client pour clarifier les cas ambigus avant de lancer le Tech Lead. Les lacunes restaient dans les specs et n'étaient découvertes qu'en implémentation.
+
+**Résolution appliquée** :
+- Règle ajoutée dans `CLAUDE.md` : si les critères d'acceptance sont ambigus, le PM demande au Client **avant** de lancer le Tech Lead
+
+**Leçon générale** : Le coût de poser une question au Client avant de commencer est infiniment plus faible que celui de corriger après livraison.
+
+---
+
+#### Problème 4 : Périmètre Phase 3 trop large
+
+**Symptôme** : 36 stories actives en Phase 3, dont 5 correctifs Must non anticipés. Code reviews sous pression sur les zones sensibles (WebView, navigation).
+
+**Cause** : Pas de plafond défini. Les features et correctifs se sont accumulés sans régulation du scope.
+
+**Résolution appliquée** :
+- Règle "8-10 stories par lot, 15 max par phase" ajoutée dans `CLAUDE.md`
+- Toute régression = story Must créée immédiatement (pas en correctif post-livraison)
+
+---
+
+#### Observation positive : Optimisation tokens (injection contenu dans prompts agents)
+
+**Pratique** : Pré-lire les fichiers avec Read/Grep et injecter le contenu directement dans les prompts agents, au lieu de leur demander de lire eux-mêmes.
+
+**Impact** : Réduction significative du nombre de tool calls par agent. Appréciée par toute l'équipe.
+
+**À conserver** : Systématiser pour PM, Tech Lead, QA. Laisser les agents dev lire eux-mêmes (ils ont besoin de vérifier leur output).
+
+---
+
 ## Historique des changements process
 
 | Date | Changement | Fichier(s) modifié(s) | Déclencheur |
@@ -163,6 +238,13 @@
 | 2026-03-02 | Code mort = critère bloquant en code review | `CLAUDE.md`, `tech-lead-maxime.md`, `frontend-dev.md`, `backend-dev.md` | Rétro Phase 2 |
 | 2026-03-02 | Commits specs avant lancement agents dev | `CLAUDE.md` | Rétro Phase 2 |
 | 2026-03-02 | Fix `fetchCount` ref morte dans `useRandomPair.ts` | `apps/mobile/src/hooks/useRandomPair.ts` | Rétro Phase 2 |
+| 2026-03-16 | Gate device physique = validation Client obligatoire (plus seulement Laurent+QA) | `CLAUDE.md` | Rétro Phase 3 |
+| 2026-03-16 | PM doit clarifier specs auprès du Client avant lancement Tech Lead | `CLAUDE.md` | Rétro Phase 3 |
+| 2026-03-16 | Specs navigation : diagramme d'état + affordances + interactions obligatoires | `CLAUDE.md` | Rétro Phase 3 |
+| 2026-03-16 | ADR obligatoire si bug navigation revient une 2e fois | `CLAUDE.md` | Rétro Phase 3 |
+| 2026-03-16 | Plafond 8-10 stories/lot, 15/phase | `CLAUDE.md` | Rétro Phase 3 |
+| 2026-03-16 | Backlog mis à jour au handoff (pas en fin de vague) | `CLAUDE.md` | Rétro Phase 3 |
+| 2026-03-16 | Commandes mv/rm/sed/find/etc. ajoutées aux outils auto-approuvés | `~/.claude/settings.json` | Rétro Phase 3 |
 
 ---
 
