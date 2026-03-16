@@ -4,7 +4,7 @@ title: Fix — Classement MultiplayerResultScreen incorrect (dernière manche ex
 phase: 3-Features
 priority: Must
 agents: [Frontend Dev]
-status: pending
+status: in-progress
 created: 2026-03-16
 completed:
 ---
@@ -42,4 +42,4 @@ Le résultat : le classement affiché exclut les résultats de la dernière manc
 
 ## Statut
 
-pending
+pending → in-progress
