@@ -249,6 +249,22 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
   // Chargement silencieux d'une nouvelle paire en arrière-plan (F3-29)
   const { state: pairState } = useRandomPair('normal');
 
+  const playerNames = players.map((p) => p.name);
+
+  // F3-36 : reconstruire completeRoundHistory dans le corps du composant.
+  // startNextRound() flush roundHistory AVANT de passer à la manche suivante —
+  // la dernière manche reste dans players[] et n'est PAS dans roundHistory du store.
+  // completeRoundHistory est utilisé à la fois pour la sauvegarde ET le classement.
+  const lastRoundSnapshot: MultiplayerRoundResult[] = players.map((p) => ({
+    jumps: p.jumps,
+    durationMs: p.durationMs,
+    won: p.won,
+  }));
+  const completeRoundHistory = [...roundHistory, lastRoundSnapshot];
+
+  // F3-33/F3-36 : utiliser completeRoundHistory (toutes les manches, y compris la dernière)
+  const rankedPlayers = rankPlayersGlobalWithRank(completeRoundHistory, playerNames);
+
   // F3-31 : sauvegarde unique au montage — ref pour éviter la double sauvegarde
   // si le composant se remonte (rare mais possible, ex. React strict mode).
   const sessionSavedRef = useRef(false);
@@ -257,21 +273,10 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
     if (sessionSavedRef.current) return;
     sessionSavedRef.current = true;
 
-    // Construire le snapshot de la dernière manche depuis players[].
-    // startNextRound() flush la manche courante dans roundHistory AVANT de passer
-    // à la suivante — la dernière manche n'est donc PAS dans roundHistory du store.
-    const lastRoundSnapshot: MultiplayerRoundResult[] = players.map((p) => ({
-      jumps: p.jumps,
-      durationMs: p.durationMs,
-      won: p.won,
-    }));
-
-    const completeRoundHistory = [...roundHistory, lastRoundSnapshot];
-
     const record = buildMultiplayerRecord(
       generateUUID(),
       new Date().toISOString(),
-      players.map((p) => p.name),
+      playerNames,
       roundCount,
       completeRoundHistory,
     );
@@ -280,11 +285,6 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
     void MultiplayerScoreStorage.save(record);
   // eslint-plugin-react-hooks non installé dans ce projet — deps vides justifiées
   }, []);
-
-
-  const playerNames = players.map((p) => p.name);
-  // F3-33 : utilisation de rankPlayersGlobalWithRank au lieu de rankPlayersGlobal
-  const rankedPlayers = rankPlayersGlobalWithRank(roundHistory, playerNames);
 
   const handleHome = useCallback((): void => {
     resetSession();
@@ -355,8 +355,8 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
         {/* Séparateur */}
         <View style={styles.separator} />
 
-        {/* Section PAR MANCHE — F3-33 — conditionnelle si > 1 manche */}
-        {roundHistory.length > 1 && (
+        {/* Section PAR MANCHE — F3-33/F3-36 — conditionnelle si > 1 manche (completeRoundHistory inclut la dernière) */}
+        {completeRoundHistory.length > 1 && (
           <>
             <Text
               style={styles.sectionLabel}
@@ -366,14 +366,14 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
             >
               {'PAR MANCHE'}
             </Text>
-            {roundHistory.map((mancheResults, mancheIndex) => (
+            {completeRoundHistory.map((mancheResults, mancheIndex) => (
               <React.Fragment key={String(mancheIndex)}>
                 <MancheSummaryRow
                   mancheNumber={mancheIndex + 1}
                   results={mancheResults}
                   playerNames={playerNames}
                 />
-                {mancheIndex < roundHistory.length - 1 && (
+                {mancheIndex < completeRoundHistory.length - 1 && (
                   <View style={styles.mancheSeparator} />
                 )}
               </React.Fragment>
