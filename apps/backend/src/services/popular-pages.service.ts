@@ -11,14 +11,14 @@
  * Référence : docs/stories/M-16-popular-pages-strategy.md — Partie A
  */
 
+import { SUPPORTED_LANGUAGES } from '@wikihop/shared';
+
 import popularPagesData from '../assets/popular-pages.json';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-/** Langues supportées — F3-26 (doit rester synchronisé avec Language dans packages/shared) */
-export const SUPPORTED_LANGUAGES = ['fr', 'en', 'es', 'de', 'pt', 'it', 'nl', 'pl'] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
 /** Langues disposant d'un fallback JSON statique embarqué */

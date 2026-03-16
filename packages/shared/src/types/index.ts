@@ -11,8 +11,11 @@
 // Primitives
 // ─────────────────────────────────────────────
 
+/** Constante runtime des langues supportées — F3-26 */
+export const SUPPORTED_LANGUAGES = ['fr', 'en', 'es', 'de', 'pt', 'it', 'nl', 'pl'] as const;
+
 /** Langues supportées par WikiHop (ISO 639-1) — F3-26 */
-export type Language = 'fr' | 'en' | 'es' | 'de' | 'pt' | 'it' | 'nl' | 'pl';
+export type Language = (typeof SUPPORTED_LANGUAGES)[number];
 
 // ─────────────────────────────────────────────
 // Entités Wikipedia

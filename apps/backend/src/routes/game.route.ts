@@ -22,6 +22,8 @@ import type { FastifyInstance } from 'fastify';
 import type { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { z } from 'zod/v4';
 
+import { SUPPORTED_LANGUAGES } from '@wikihop/shared';
+
 import { getPopularPages } from '../services/popular-pages.service';
 import { computeDailyIndices, djb2Hash, getTodayUTC } from '../utils/daily-challenge.utils';
 import { getHardModePool } from '../utils/hard-mode.utils';
@@ -65,10 +67,9 @@ function isWikipediaSummaryResponse(value: unknown): value is WikipediaSummaryRe
 // ---------------------------------------------------------------------------
 
 /** Langues Wikipedia supportées — F3-26 (doit rester synchronisé avec Language dans packages/shared) */
-const SUPPORTED_LANGS = ['fr', 'en', 'es', 'de', 'pt', 'it', 'nl', 'pl'] as const;
-type SupportedLang = (typeof SUPPORTED_LANGS)[number];
+type SupportedLang = (typeof SUPPORTED_LANGUAGES)[number];
 
-const langSchema = z.enum(SUPPORTED_LANGS).default('fr');
+const langSchema = z.enum(SUPPORTED_LANGUAGES).default('fr');
 
 const randomPairQuerySchema = z.object({
   lang: langSchema,
@@ -83,7 +84,7 @@ const articleSummarySchema = z.object({
   id: z.string(),
   title: z.string(),
   url: z.string().url(),
-  language: z.enum(SUPPORTED_LANGS),
+  language: z.enum(SUPPORTED_LANGUAGES),
   extract: z.string(),
   thumbnailUrl: z.string().url().optional(),
 });
