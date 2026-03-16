@@ -243,6 +243,20 @@
     "cta_button": "Doneer aan Wikipedia",
     "cta_button_a11y": "Doneer aan Wikimedia. Opent de browser."
   },
+  "article_screen": {
+    "abandon_title": "Spel verlaten?",
+    "abandon_message": "Je voortgang gaat verloren.",
+    "abandon_cancel": "Doorgaan",
+    "abandon_confirm": "Bevestigen",
+    "back_button": "← Terug",
+    "abandon_button": "Verlaten",
+    "error_title": "Kan dit artikel niet laden.",
+    "error_subtitle": "Controleer je internetverbinding.",
+    "retry_button": "Opnieuw proberen"
+  },
+  "language_selector": {
+    "title": "Interfacetaal"
+  },
   "article_viewer": {
     "back_button_a11y": "Artikel sluiten",
     "loading_a11y": "Artikel laden"

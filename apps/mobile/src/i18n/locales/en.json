@@ -243,6 +243,20 @@
     "cta_button": "Donate to Wikipedia",
     "cta_button_a11y": "Donate to Wikimedia. Opens browser."
   },
+  "article_screen": {
+    "abandon_title": "Abandon the game?",
+    "abandon_message": "Your progress will be lost.",
+    "abandon_cancel": "Resume",
+    "abandon_confirm": "Confirm",
+    "back_button": "← Back",
+    "abandon_button": "Abandon",
+    "error_title": "Unable to load this article.",
+    "error_subtitle": "Check your internet connection.",
+    "retry_button": "Retry"
+  },
+  "language_selector": {
+    "title": "Interface language"
+  },
   "article_viewer": {
     "back_button_a11y": "Close article",
     "loading_a11y": "Loading article"

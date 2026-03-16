@@ -250,6 +250,20 @@
     "cta_button": "Przekaż darowiznę dla Wikipedii",
     "cta_button_a11y": "Przekaż darowiznę dla Wikimedia. Otwiera przeglądarkę."
   },
+  "article_screen": {
+    "abandon_title": "Porzucić grę?",
+    "abandon_message": "Twój postęp zostanie utracony.",
+    "abandon_cancel": "Wznów",
+    "abandon_confirm": "Potwierdź",
+    "back_button": "← Wróć",
+    "abandon_button": "Porzuć",
+    "error_title": "Nie można załadować tego artykułu.",
+    "error_subtitle": "Sprawdź połączenie z internetem.",
+    "retry_button": "Spróbuj ponownie"
+  },
+  "language_selector": {
+    "title": "Język interfejsu"
+  },
   "article_viewer": {
     "back_button_a11y": "Zamknij artykuł",
     "loading_a11y": "Ładowanie artykułu"

@@ -36,6 +36,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constantes
@@ -128,6 +129,7 @@ export function LanguageSelectionSheet({
   onClose,
 }: LanguageSelectionSheetProps): React.JSX.Element {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   // reduceMotion — conditionne l'animationType de la Modal (spec UX F3-26)
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -159,7 +161,7 @@ export function LanguageSelectionSheet({
 
         {/* Titre */}
         <Text style={styles.sheetTitle} accessibilityRole="header">
-          {"Langue de l'interface"}
+          {t('language_selector.title')}
         </Text>
 
         {/* Séparateur */}

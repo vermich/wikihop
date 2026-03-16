@@ -243,6 +243,20 @@
     "cta_button": "Fazer uma doação à Wikipedia",
     "cta_button_a11y": "Fazer uma doação à Wikimedia. Abre o navegador."
   },
+  "article_screen": {
+    "abandon_title": "Abandonar a partida?",
+    "abandon_message": "O seu progresso será perdido.",
+    "abandon_cancel": "Continuar",
+    "abandon_confirm": "Confirmar",
+    "back_button": "← Voltar",
+    "abandon_button": "Abandonar",
+    "error_title": "Impossível carregar este artigo.",
+    "error_subtitle": "Verifique a sua conexão com a internet.",
+    "retry_button": "Tentar novamente"
+  },
+  "language_selector": {
+    "title": "Idioma da interface"
+  },
   "article_viewer": {
     "back_button_a11y": "Fechar artigo",
     "loading_a11y": "Carregando artigo"

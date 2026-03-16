@@ -243,6 +243,20 @@
     "cta_button": "An Wikipedia spenden",
     "cta_button_a11y": "An Wikimedia spenden. Öffnet den Browser."
   },
+  "article_screen": {
+    "abandon_title": "Spiel abbrechen?",
+    "abandon_message": "Dein Fortschritt geht verloren.",
+    "abandon_cancel": "Weiterspielen",
+    "abandon_confirm": "Bestätigen",
+    "back_button": "← Zurück",
+    "abandon_button": "Abbrechen",
+    "error_title": "Artikel konnte nicht geladen werden.",
+    "error_subtitle": "Überprüfe deine Internetverbindung.",
+    "retry_button": "Wiederholen"
+  },
+  "language_selector": {
+    "title": "Oberflächensprache"
+  },
   "article_viewer": {
     "back_button_a11y": "Artikel schließen",
     "loading_a11y": "Artikel wird geladen"

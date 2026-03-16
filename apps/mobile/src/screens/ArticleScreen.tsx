@@ -57,6 +57,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { GameHUD } from '../components/game/GameHUD';
 import {
@@ -80,6 +81,7 @@ type ArticleScreenProps = NativeStackScreenProps<RootStackParamList, 'Game'>;
 export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.JSX.Element {
   const { articleTitle } = route.params;
   const lang = useLanguageStore((state) => state.language);
+  const { t } = useTranslation();
 
   // Store de session
   const currentSession = useGameStore((state) => state.currentSession);
@@ -182,12 +184,12 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
   // ── handleAbandon : confirmation abandon + navigate Home ─────────────────────
   const handleAbandon = useCallback((): void => {
     Alert.alert(
-      'Abandonner la partie ?',
-      'Votre progression sera perdue.',
+      t('article_screen.abandon_title'),
+      t('article_screen.abandon_message'),
       [
-        { text: 'Reprendre', style: 'cancel' },
+        { text: t('article_screen.abandon_cancel'), style: 'cancel' },
         {
-          text: 'Confirmer',
+          text: t('article_screen.abandon_confirm'),
           style: 'destructive',
           onPress: () => {
             void abandonSession().then(() => { navigation.navigate('Home'); });
@@ -195,7 +197,7 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
         },
       ],
     );
-  }, [abandonSession, navigation]);
+  }, [abandonSession, navigation, t]);
 
   // ── handleGoBack — retour vers l'article précédent via le stack applicatif ────
   const handleGoBack = useCallback((): void => {
@@ -264,7 +266,7 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
               accessibilityLabel="Retour à l'article précédent"
               accessibilityRole="button"
             >
-              <Text style={styles.backButtonText}>{'← Retour'}</Text>
+              <Text style={styles.backButtonText}>{t('article_screen.back_button')}</Text>
             </TouchableOpacity>
           ) : (
             <View style={styles.backButtonPlaceholder} />
@@ -283,7 +285,7 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
             accessibilityRole="button"
             testID="abandon-button"
           >
-            <Text style={styles.homeButtonText}>{'Abandonner'}</Text>
+            <Text style={styles.homeButtonText}>{t('article_screen.abandon_button')}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -300,10 +302,10 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
         {webViewError !== null ? (
           <View style={styles.errorContainer}>
             <Text style={styles.errorTitle}>
-              {'Impossible de charger cet article.'}
+              {t('article_screen.error_title')}
             </Text>
             <Text style={styles.errorSubtext}>
-              {'Vérifiez votre connexion internet.'}
+              {t('article_screen.error_subtitle')}
             </Text>
             <TouchableOpacity
               style={styles.retryButton}
@@ -315,7 +317,7 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
               accessibilityLabel="Réessayer de charger l'article"
               accessibilityRole="button"
             >
-              <Text style={styles.retryButtonText}>{'Réessayer'}</Text>
+              <Text style={styles.retryButtonText}>{t('article_screen.retry_button')}</Text>
             </TouchableOpacity>
           </View>
         ) : (

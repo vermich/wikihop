@@ -243,6 +243,20 @@
     "cta_button": "Dona a Wikipedia",
     "cta_button_a11y": "Dona a Wikimedia. Apre il browser."
   },
+  "article_screen": {
+    "abandon_title": "Abbandonare la partita?",
+    "abandon_message": "Il tuo progresso andrà perso.",
+    "abandon_cancel": "Riprendi",
+    "abandon_confirm": "Conferma",
+    "back_button": "← Indietro",
+    "abandon_button": "Abbandona",
+    "error_title": "Impossibile caricare questo articolo.",
+    "error_subtitle": "Verifica la tua connessione internet.",
+    "retry_button": "Riprova"
+  },
+  "language_selector": {
+    "title": "Lingua dell'interfaccia"
+  },
   "article_viewer": {
     "back_button_a11y": "Chiudi articolo",
     "loading_a11y": "Caricamento articolo"
