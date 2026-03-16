@@ -229,14 +229,10 @@ describe('MultiplayerResultScreen — classement global', () => {
     expect(queryByText('PAR MANCHE')).toBeNull();
   });
 
-  it('n\'affiche pas de section PAR MANCHE si roundHistory.length === 1', () => {
-    // Une seule manche → résultats globaux seulement, pas de section PAR MANCHE
-    mockRoundHistory = [
-      [
-        { jumps: 3, durationMs: 45000, won: true },
-        { jumps: 5, durationMs: 60000, won: false },
-      ],
-    ];
+  it('n\'affiche pas de section PAR MANCHE pour une session à 1 manche', () => {
+    // Session 1 manche : roundHistory est vide (startNextRound ne flush que les manches précédentes)
+    // la seule manche est dans players[]. completeRoundHistory.length === 1 → pas de section PAR MANCHE.
+    mockRoundHistory = [];
     const { queryByText } = renderScreen();
     expect(queryByText('PAR MANCHE')).toBeNull();
   });
@@ -267,18 +263,13 @@ describe('MultiplayerResultScreen — classement global', () => {
 
 describe('MultiplayerResultScreen — égalité', () => {
   it('affiche des médailles pour les deux premiers joueurs ex-aequo', () => {
-    // Deux joueurs avec 1 victoire chacun → rank=1 (Alice), rank=2 (Bob)
-    // Les deux reçoivent une médaille (RANK_MEDALS[0] et RANK_MEDALS[1])
+    // Session 1 manche : roundHistory vide, la manche (Alice et Bob gagnent) est dans players[].
+    // completeRoundHistory = [lastRoundSnapshot] → Alice 1 victoire, Bob 1 victoire.
     mockPlayers = [
       { name: 'Alice', status: 'done', jumps: 3, durationMs: 45000, won: true },
       { name: 'Bob', status: 'done', jumps: 3, durationMs: 45000, won: true },
     ];
-    mockRoundHistory = [
-      [
-        { jumps: 3, durationMs: 45000, won: true },
-        { jumps: 3, durationMs: 45000, won: true },
-      ],
-    ];
+    mockRoundHistory = [];
 
     // Vérifier que les deux joueurs sont affichés avec leurs noms
     const { getByText } = renderScreen();
