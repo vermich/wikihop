@@ -23,7 +23,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useState } from 'react';
 
 import {
-  DEFAULT_SORT_CRITERION,
   SORT_CRITERION_STORAGE_KEY,
   toSortCriterion,
 } from '../utils/history-sort.utils';
@@ -188,4 +187,3 @@ export function useHistorySort(): UseHistorySortResult {
   };
 }
 
-export { DEFAULT_SORT_CRITERION };
