@@ -44,6 +44,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { ArticleSummary } from '@wikihop/shared';
@@ -88,6 +89,7 @@ function PlayerRow({
   inputRef,
   nextInputRef,
 }: PlayerRowProps): React.JSX.Element {
+  const { t } = useTranslation();
   const number = index + 1;
   return (
     <View style={styles.playerRow}>
@@ -97,18 +99,18 @@ function PlayerRow({
         style={styles.playerInput}
         value={name}
         onChangeText={(value) => { onChangeName(index, value); }}
-        placeholder="Prénom du joueur"
+        placeholder={t('multiplayer_setup.player_placeholder', { number })}
         placeholderTextColor="#94A3B8"
         maxLength={20}
         returnKeyType={nextInputRef !== undefined ? 'next' : 'done'}
         onSubmitEditing={() => { nextInputRef?.current?.focus(); }}
-        accessibilityLabel={`Nom du joueur ${String(number)}`}
+        accessibilityLabel={t('multiplayer_setup.player_input_a11y', { number })}
       />
       <TouchableOpacity
         style={[styles.removeButton, !canRemove && styles.removeButtonDisabled]}
         onPress={() => { onRemove(index); }}
         disabled={!canRemove}
-        accessibilityLabel={`Supprimer le joueur ${String(number)}`}
+        accessibilityLabel={t('multiplayer_setup.player_remove_a11y', { number })}
         accessibilityRole="button"
         accessibilityState={{ disabled: !canRemove }}
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -142,6 +144,7 @@ function PairSlot({
   onPairReady,
   onPairNotReady,
 }: PairSlotProps): React.JSX.Element {
+  const { t } = useTranslation();
   const { state, refresh } = useRefreshablePair();
 
   // Notifier le parent selon l'état de la paire
@@ -149,13 +152,17 @@ function PairSlot({
     if (state.status === 'success') {
       onPairReady(roundIndex, state.start, state.target);
       void AccessibilityInfo.announceForAccessibility(
-        `Manche ${String(roundNumber)} : paire chargée. De ${state.start.title}, vers ${state.target.title}.`,
+        t('multiplayer_setup.pair_slot_ready_a11y', {
+          round: roundNumber,
+          start: state.start.title,
+          target: state.target.title,
+        }),
       );
     } else {
       onPairNotReady(roundIndex);
       if (state.status === 'error') {
         void AccessibilityInfo.announceForAccessibility(
-          `Manche ${String(roundNumber)} : erreur de chargement.`,
+          t('multiplayer_setup.pair_slot_error_a11y', { round: roundNumber }),
         );
       }
     }
@@ -167,7 +174,9 @@ function PairSlot({
   return (
     <View style={styles.pairSlotWrapper}>
       {/* Label MANCHE N — en dehors du ContainerBloc */}
-      <Text style={styles.pairSlotLabel}>{`MANCHE ${String(roundNumber)}`}</Text>
+      <Text style={styles.pairSlotLabel}>
+        {t('multiplayer_setup.pair_slot_label', { number: roundNumber })}
+      </Text>
 
       {/* ContainerBloc — fond différent selon état pour conformité contraste */}
       <View style={[
@@ -190,16 +199,16 @@ function PairSlot({
         {state.status === 'error' && (
           <>
             <Text style={styles.pairErrorText}>
-              {'Impossible de charger la paire. Vérifiez votre connexion.'}
+              {t('multiplayer_setup.pair_error_message')}
             </Text>
             <TouchableOpacity
               style={styles.renewButton}
               onPress={refresh}
-              accessibilityLabel={`Réessayer de charger la paire de la manche ${String(roundNumber)}`}
+              accessibilityLabel={t('multiplayer_setup.pair_retry_a11y', { round: roundNumber })}
               accessibilityRole="button"
               hitSlop={{ top: 4, bottom: 4, left: 8, right: 8 }}
             >
-              <Text style={styles.renewButtonText}>{'Réessayer'}</Text>
+              <Text style={styles.renewButtonText}>{t('multiplayer_setup.pair_retry_button')}</Text>
             </TouchableOpacity>
           </>
         )}
@@ -207,21 +216,21 @@ function PairSlot({
         {state.status === 'success' && (
           <>
             <Text style={styles.pairArticleRow} numberOfLines={2}>
-              <Text style={styles.pairArticleRowLabel}>{'De : '}</Text>
+              <Text style={styles.pairArticleRowLabel}>{t('multiplayer_setup.pair_from_label')}</Text>
               <Text style={styles.pairArticleTitle}>{state.start.title}</Text>
             </Text>
             <Text style={[styles.pairArticleRow, styles.pairArticleRowVers]} numberOfLines={2}>
-              <Text style={styles.pairArticleRowLabel}>{'Vers : '}</Text>
+              <Text style={styles.pairArticleRowLabel}>{t('multiplayer_setup.pair_to_label')}</Text>
               <Text style={styles.pairArticleTitle}>{state.target.title}</Text>
             </Text>
             <TouchableOpacity
               style={styles.renewButton}
               onPress={refresh}
-              accessibilityLabel={`Renouveler la paire de la manche ${String(roundNumber)}`}
+              accessibilityLabel={t('multiplayer_setup.pair_renew_a11y', { round: roundNumber })}
               accessibilityRole="button"
               hitSlop={{ top: 4, bottom: 4, left: 8, right: 8 }}
             >
-              <Text style={styles.renewButtonText}>{'⟳  Renouveler'}</Text>
+              <Text style={styles.renewButtonText}>{t('multiplayer_setup.pair_renew_button')}</Text>
             </TouchableOpacity>
           </>
         )}
@@ -235,6 +244,7 @@ function PairSlot({
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenProps): React.JSX.Element {
+  const { t } = useTranslation();
   const [players, setPlayers] = useState<PlayerEntry[]>([
     { id: '1', name: '' },
     { id: '2', name: '' },
@@ -318,14 +328,14 @@ export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenPro
     const newId = String(Date.now());
     setPlayers((prev) => [...prev, { id: newId, name: '' }]);
     void AccessibilityInfo.announceForAccessibility(
-      `Joueur ${String(players.length + 1)} ajouté`,
+      t('multiplayer_setup.player_added_a11y', { number: players.length + 1 }),
     );
   }, [players.length]);
 
   const handleRemovePlayer = useCallback((index: number): void => {
     if (players.length <= 2) return;
     setPlayers((prev) => prev.filter((_, i) => i !== index));
-    void AccessibilityInfo.announceForAccessibility('Joueur supprimé');
+    void AccessibilityInfo.announceForAccessibility(t('multiplayer_setup.player_removed_a11y'));
   }, [players.length]);
 
   // ── Démarrage ────────────────────────────────────────────────────────────────
@@ -396,13 +406,13 @@ export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenPro
         <TouchableOpacity
           style={styles.backButton}
           onPress={handleBack}
-          accessibilityLabel="Retour"
+          accessibilityLabel={t('multiplayer_setup.back_button_a11y')}
           accessibilityRole="button"
         >
           <Text style={styles.backButtonText}>{'←'}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle} accessibilityRole="header">
-          {'Multijoueur'}
+          {t('multiplayer_setup.header_title')}
         </Text>
       </View>
 
@@ -417,7 +427,7 @@ export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenPro
           showsVerticalScrollIndicator={false}
         >
           {/* Label section JOUEURS */}
-          <Text style={styles.sectionLabel}>{'JOUEURS'}</Text>
+          <Text style={styles.sectionLabel}>{t('multiplayer_setup.section_players')}</Text>
 
           {/* Liste des joueurs */}
           {/* exactOptionalPropertyTypes : spread conditionnel pour inputRef / nextInputRef */}
@@ -443,12 +453,12 @@ export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenPro
             style={[styles.addButton, players.length >= 6 && styles.addButtonDisabled]}
             onPress={handleAddPlayer}
             disabled={players.length >= 6}
-            accessibilityLabel="Ajouter un joueur"
+            accessibilityLabel={t('multiplayer_setup.add_player_a11y')}
             accessibilityRole="button"
             accessibilityState={{ disabled: players.length >= 6 }}
           >
             <Text style={[styles.addButtonText, players.length >= 6 && styles.addButtonTextDisabled]}>
-              {'+ Ajouter un joueur'}
+              {t('multiplayer_setup.add_player_button')}
             </Text>
           </TouchableOpacity>
 
@@ -456,13 +466,13 @@ export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenPro
           <View style={styles.divider} />
 
           {/* Sélecteur de manches (F3-28) */}
-          <Text style={styles.sectionLabel}>{'MANCHES'}</Text>
+          <Text style={styles.sectionLabel}>{t('multiplayer_setup.section_rounds')}</Text>
           <View style={styles.stepperRow}>
             <TouchableOpacity
               style={[styles.stepperButton, roundCount <= 1 && styles.stepperButtonDisabled]}
               onPress={() => { setRoundCount((prev) => Math.max(1, prev - 1)); }}
               disabled={roundCount <= 1}
-              accessibilityLabel={`Réduire le nombre de manches — ${String(roundCount)} actuellement`}
+              accessibilityLabel={t('multiplayer_setup.round_decrease_a11y', { count: roundCount })}
               accessibilityRole="button"
               accessibilityState={{ disabled: roundCount <= 1 }}
             >
@@ -470,7 +480,7 @@ export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenPro
             </TouchableOpacity>
             <Text
               style={styles.stepperValue}
-              accessibilityLabel={`${String(roundCount)} manche${roundCount > 1 ? 's' : ''}`}
+              accessibilityLabel={t('multiplayer_setup.round_value_a11y', { count: roundCount })}
             >
               {String(roundCount)}
             </Text>
@@ -478,7 +488,7 @@ export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenPro
               style={[styles.stepperButton, roundCount >= 5 && styles.stepperButtonDisabled]}
               onPress={() => { setRoundCount((prev) => Math.min(5, prev + 1)); }}
               disabled={roundCount >= 5}
-              accessibilityLabel={`Augmenter le nombre de manches — ${String(roundCount)} actuellement`}
+              accessibilityLabel={t('multiplayer_setup.round_increase_a11y', { count: roundCount })}
               accessibilityRole="button"
               accessibilityState={{ disabled: roundCount >= 5 }}
             >
@@ -490,8 +500,8 @@ export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenPro
           <View style={styles.divider} />
 
           {/* Section PAIRES — F3-32 */}
-          <View accessibilityLabel="Section Paires d'articles">
-            <Text style={styles.sectionLabel}>{'PAIRES'}</Text>
+          <View accessibilityLabel={t('multiplayer_setup.pairs_section_a11y')}>
+            <Text style={styles.sectionLabel}>{t('multiplayer_setup.section_pairs')}</Text>
             {Array.from({ length: roundCount }, (_, i) => (
               <PairSlot
                 key={String(i)}
@@ -521,12 +531,12 @@ export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenPro
             style={[styles.startButton, isStartDisabled && styles.startButtonDisabled]}
             onPress={() => { void handleStart(); }}
             disabled={isStartDisabled}
-            accessibilityLabel="Commencer la partie"
+            accessibilityLabel={t('multiplayer_setup.start_button_a11y')}
             accessibilityRole="button"
             accessibilityState={{ disabled: isStartDisabled }}
           >
             <Text style={[styles.startButtonText, isStartDisabled && styles.startButtonTextDisabled]}>
-              {'Commencer'}
+              {t('multiplayer_setup.start_button')}
             </Text>
           </TouchableOpacity>
           {showLoadingMessage && (
@@ -534,17 +544,17 @@ export function MultiplayerSetupScreen({ navigation }: MultiplayerSetupScreenPro
               style={styles.loadingMessage}
               accessibilityLiveRegion="polite"
             >
-              {'Chargement des paires en cours...'}
+              {t('multiplayer_setup.loading_pairs')}
             </Text>
           )}
           {/* F3-31 : accès à l'historique multijoueur — bouton texte secondaire */}
           <TouchableOpacity
             style={styles.historyButton}
             onPress={() => { navigation.navigate('MultiplayerHistory'); }}
-            accessibilityLabel="Voir l'historique des parties multijoueur"
+            accessibilityLabel={t('multiplayer_setup.history_button_a11y')}
             accessibilityRole="button"
           >
-            <Text style={styles.historyButtonText}>{'Historique multijoueur'}</Text>
+            <Text style={styles.historyButtonText}>{t('multiplayer_setup.history_button')}</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

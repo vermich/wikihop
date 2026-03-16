@@ -433,7 +433,8 @@ describe('MultiplayerSetupScreen — bouton Commencer', () => {
 describe('MultiplayerSetupScreen — navigation retour', () => {
   it('appelle navigation.goBack() au clic sur le bouton retour', () => {
     const { getByLabelText } = renderScreen();
-    fireEvent.press(getByLabelText('Retour'));
+    // t('multiplayer_setup.back_button_a11y') = 'Retour à l\'accueil' (F3-26 i18n)
+    fireEvent.press(getByLabelText("Retour à l'accueil"));
     expect(mockGoBack).toHaveBeenCalledTimes(1);
   });
 });

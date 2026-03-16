@@ -25,6 +25,7 @@
 import type { GameRecord } from '@wikihop/shared';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { isHardMode } from '../../utils/difficulty.utils';
 import { formatDuration, formatRecordDate } from '../../utils/history.utils';
@@ -44,19 +45,24 @@ interface HistoryItemProps {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function HistoryItem({ record, onPress }: HistoryItemProps): React.JSX.Element {
+  const { t } = useTranslation();
   const isVictory = record.status === 'won';
 
   const formattedDuration = formatDuration(record.durationMs);
   const formattedDate = formatRecordDate(record.completedAt);
-  const jumpLabel = record.jumps <= 1 ? 'saut' : 'sauts';
+  const jumpLabel = t('history_item.jumps_one', { count: record.jumps });
+
+  const statusLabel = isVictory ? t('history_item.badge_won') : t('history_item.badge_abandoned');
+  const dailyBadgeLabel = t('history_item.badge_daily');
+  const hardBadgeLabel = t('history_item.badge_hard');
 
   // Label d'accessibilité complet (badge, date et stats sont accessible={false})
-  // F3-35 : préfixe "Mode difficile." si difficulty === 'hard' (avant le préfixe défi)
-  // F3-23 : préfixe "Défi du jour." si isDailyChallenge === true (=== true car champ optionnel)
-  // Ordre : "Mode difficile. [si hard]" + "Défi du jour. [si daily]" + info article
-  const hardModePrefix = isHardMode(record.difficulty) ? 'Mode difficile. ' : '';
-  const dailyChallengePrefix = record.isDailyChallenge === true ? 'Défi du jour. ' : '';
-  const accessibilityLabel = `${isVictory ? 'Victoire' : 'Abandonné'}. ${hardModePrefix}${dailyChallengePrefix}${record.startArticle.title} vers ${record.targetArticle.title}. ${String(record.jumps)} ${jumpLabel}. ${formattedDuration}. Le ${formattedDate}.`;
+  // F3-35 : préfixe mode difficile si difficulty === 'hard' (avant le préfixe défi)
+  // F3-23 : préfixe défi du jour si isDailyChallenge === true (=== true car champ optionnel)
+  // Ordre : "[Mode difficile.] [Défi du jour.] info article"
+  const hardModePrefix = isHardMode(record.difficulty) ? `${hardBadgeLabel}. ` : '';
+  const dailyChallengePrefix = record.isDailyChallenge === true ? `${dailyBadgeLabel}. ` : '';
+  const accessibilityLabel = `${statusLabel}. ${hardModePrefix}${dailyChallengePrefix}${record.startArticle.title} vers ${record.targetArticle.title}. ${String(record.jumps)} ${jumpLabel}. ${formattedDuration}. Le ${formattedDate}.`;
 
   return (
     <TouchableOpacity
@@ -73,21 +79,21 @@ export function HistoryItem({ record, onPress }: HistoryItemProps): React.JSX.El
           accessible={false}
         >
           <Text style={[styles.badgeText, isVictory ? styles.badgeTextVictory : styles.badgeTextAbandoned]}>
-            {isVictory ? 'Victoire' : 'Abandonné'}
+            {statusLabel}
           </Text>
         </View>
 
         {/* Badge défi du jour (F3-23) — conditionnel, utilise === true car champ optionnel */}
         {record.isDailyChallenge === true && (
           <View style={styles.badgeDaily} accessible={false}>
-            <Text style={styles.badgeDailyText}>{'DÉFI'}</Text>
+            <Text style={styles.badgeDailyText}>{dailyBadgeLabel.toUpperCase()}</Text>
           </View>
         )}
 
         {/* Badge mode difficile (F3-35) — conditionnel via isHardMode */}
         {isHardMode(record.difficulty) && (
           <View style={styles.diffBadge} accessible={false}>
-            <Text style={styles.diffBadgeText}>{'DIFF'}</Text>
+            <Text style={styles.diffBadgeText}>{hardBadgeLabel.toUpperCase()}</Text>
           </View>
         )}
 

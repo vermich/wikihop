@@ -18,6 +18,13 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Mock i18next — évite l'initialisation réelle du module i18n dans les tests
+jest.mock('../../src/i18n/i18n', () => ({
+  i18next: {
+    changeLanguage: jest.fn().mockResolvedValue(undefined),
+  },
+}));
+
 // Mock du game store AVANT l'import de language.store pour que le module
 // capte le mock lors de son initialisation.
 jest.mock('../../src/store/game.store', () => ({
@@ -184,14 +191,23 @@ describe('hydrateLanguage', () => {
     expect(useLanguageStore.getState().isLanguageHydrated).toBe(true);
   });
 
-  it("conserve 'fr' si valeur valide JSON mais non supportée ('es'), isLanguageHydrated: true", async () => {
-    // 'es' est un JSON valide mais n'est pas une Language WikiHop acceptée
-    await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, JSON.stringify('es'));
+  it("conserve 'fr' si valeur valide JSON mais non supportée ('zh'), isLanguageHydrated: true", async () => {
+    // 'zh' est un JSON valide mais n'est pas une Language WikiHop supportée (F3-26 : 8 langues)
+    await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, JSON.stringify('zh'));
 
     await useLanguageStore.getState().hydrateLanguage();
 
     // Valeur ignorée silencieusement, défaut 'fr' conservé
     expect(useLanguageStore.getState().language).toBe('fr');
+    expect(useLanguageStore.getState().isLanguageHydrated).toBe(true);
+  });
+
+  it("initialise la langue à 'es' si 'es' est en AsyncStorage (F3-26 : espagnol supporté)", async () => {
+    await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, JSON.stringify('es'));
+
+    await useLanguageStore.getState().hydrateLanguage();
+
+    expect(useLanguageStore.getState().language).toBe('es');
     expect(useLanguageStore.getState().isLanguageHydrated).toBe(true);
   });
 

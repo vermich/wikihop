@@ -32,6 +32,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { RootStackParamList } from '../navigation/RootNavigator';
@@ -56,11 +57,14 @@ interface MultiplayerHistoryItemProps {
 }
 
 function MultiplayerHistoryItem({ record }: MultiplayerHistoryItemProps): React.JSX.Element {
+  const { t } = useTranslation();
   const dateFormatted = formatMultiplayerDate(record.date);
   const playersText = record.playerNames.join(' vs ');
-  const roundsText = `${String(record.roundCount)} manche${record.roundCount > 1 ? 's' : ''}`;
+  const roundsText = `${String(record.roundCount)} ${t(`multiplayer_history.rounds_label`, { count: record.roundCount })}`;
   const winnerText =
-    record.winner !== null ? `Gagnant : ${record.winner}` : 'Égalité';
+    record.winner !== null
+      ? t('multiplayer_history.winner_prefix', { name: record.winner })
+      : t('multiplayer_history.draw_label');
 
   const a11yLabel = [dateFormatted, playersText, roundsText, winnerText].join(', ');
 
@@ -95,6 +99,7 @@ function MultiplayerHistoryItem({ record }: MultiplayerHistoryItemProps): React.
 export function MultiplayerHistoryScreen({
   navigation,
 }: MultiplayerHistoryScreenProps): React.JSX.Element {
+  const { t } = useTranslation();
   const [records, setRecords] = useState<ReadonlyArray<MultiplayerGameRecord>>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -151,13 +156,13 @@ export function MultiplayerHistoryScreen({
         <TouchableOpacity
           style={styles.backButton}
           onPress={handleBack}
-          accessibilityLabel="Retour"
+          accessibilityLabel={t('multiplayer_history.back_button_a11y')}
           accessibilityRole="button"
         >
           <Text style={styles.backButtonText}>{'←'}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle} accessibilityRole="header">
-          {'Historique multijoueur'}
+          {t('multiplayer_history.header_title')}
         </Text>
       </View>
 
@@ -176,7 +181,7 @@ export function MultiplayerHistoryScreen({
       {!isLoading && records.length === 0 && (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>
-            {'Aucune partie multijoueur pour l\'instant'}
+            {t('multiplayer_history.empty_message')}
           </Text>
         </View>
       )}

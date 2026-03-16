@@ -120,7 +120,8 @@ describe('AboutScreen', () => {
 
   it('appelle navigation.goBack() quand le bouton retour est pressé', () => {
     renderAboutScreen();
-    fireEvent.press(screen.getByLabelText('Retour'));
+    // Le label a11y est t('about.back_button_a11y') = 'Retour à l\'accueil' (F3-26 i18n)
+    fireEvent.press(screen.getByLabelText("Retour à l'accueil"));
     expect(mockGoBack).toHaveBeenCalledTimes(1);
   });
 

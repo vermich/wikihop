@@ -136,7 +136,8 @@ describe('DonationScreen', () => {
 
   it('appelle navigation.goBack() lors du tap sur le bouton retour', () => {
     const { getByLabelText } = renderDonationScreen();
-    const backButton = getByLabelText('Retour');
+    // Le label a11y est t('donation.back_button_a11y') = 'Retour à l\'accueil' (F3-26 i18n)
+    const backButton = getByLabelText("Retour à l'accueil");
 
     fireEvent.press(backButton);
 

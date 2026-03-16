@@ -31,6 +31,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import type { RootStackParamList } from '../navigation/RootNavigator';
 
@@ -68,6 +69,8 @@ async function handleDonate(): Promise<void> {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function DonationScreen({ navigation }: DonationScreenProps): React.JSX.Element {
+  const { t } = useTranslation();
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       {/* Header */}
@@ -75,13 +78,13 @@ export function DonationScreen({ navigation }: DonationScreenProps): React.JSX.E
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => { navigation.goBack(); }}
-          accessibilityLabel="Retour"
+          accessibilityLabel={t('donation.back_button_a11y')}
           accessibilityRole="button"
         >
           <Text style={styles.backButtonText}>{'←'}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle} accessibilityRole="header">
-          {'Soutenir Wikipedia'}
+          {t('donation.header_title')}
         </Text>
       </View>
       <View style={styles.headerSeparator} />
@@ -98,35 +101,22 @@ export function DonationScreen({ navigation }: DonationScreenProps): React.JSX.E
         </View>
 
         {/* Titre de section */}
-        <Text style={styles.sectionTitle}>{'WikiHop et Wikipedia'}</Text>
+        <Text style={styles.sectionTitle}>{t('donation.section_title')}</Text>
 
         {/* Paragraphe 1 — texte approuvé DPO */}
         <Text style={styles.bodyText}>
-          {
-            "WikiHop est un jeu de navigation qui utilise l'API publique et gratuite " +
-            "de Wikipedia pour afficher les articles. WikiHop n'est pas affilié à " +
-            "la Fondation Wikimedia et n'agit pas en son nom."
-          }
+          {t('donation.body_p1')}
         </Text>
 
         {/* Paragraphe 2 — texte approuvé DPO */}
         <Text style={[styles.bodyText, styles.bodyTextMargin]}>
-          {
-            "Wikipedia existe grâce aux dons de millions de personnes dans le monde. " +
-            "Si vous appréciez Wikipedia, vous pouvez soutenir la Fondation Wikimedia " +
-            "directement depuis votre navigateur."
-          }
+          {t('donation.body_p2')}
         </Text>
 
         {/* Bloc mention légale — fond distinct pour différencier du corps */}
         <View style={styles.legalBlock}>
           <Text style={styles.legalText}>
-            {
-              "Votre don est géré exclusivement par la Fondation Wikimedia, sous leur " +
-              "propre politique de confidentialité. WikiHop n'intervient pas dans ce " +
-              "processus, ne collecte aucune information sur votre don et ne perçoit " +
-              "aucune commission."
-            }
+            {t('donation.legal_text')}
           </Text>
         </View>
 
@@ -134,10 +124,10 @@ export function DonationScreen({ navigation }: DonationScreenProps): React.JSX.E
         <TouchableOpacity
           style={styles.ctaButton}
           onPress={() => { void handleDonate(); }}
-          accessibilityLabel="Faire un don à Wikimedia. Ouvre le navigateur."
+          accessibilityLabel={t('donation.cta_button_a11y')}
           accessibilityRole="button"
         >
-          <Text style={styles.ctaButtonText}>{'Faire un don à Wikipedia'}</Text>
+          <Text style={styles.ctaButtonText}>{t('donation.cta_button')}</Text>
         </TouchableOpacity>
 
         {/* URL de référence — décorative, non cliquable */}

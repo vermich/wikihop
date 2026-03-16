@@ -40,6 +40,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import type { RootStackParamList } from '../navigation/RootNavigator';
 
@@ -96,6 +97,7 @@ function LinkRow({ label, url, accessibilityLabel }: LinkRowProps): React.JSX.El
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function AboutScreen({ navigation }: AboutScreenProps): React.JSX.Element {
+  const { t } = useTranslation();
   const version = Constants.expoConfig?.version ?? '—';
 
   return (
@@ -105,7 +107,7 @@ export function AboutScreen({ navigation }: AboutScreenProps): React.JSX.Element
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => { navigation.goBack(); }}
-          accessibilityLabel="Retour"
+          accessibilityLabel={t('about.back_button_a11y')}
           accessibilityRole="button"
         >
           <Text style={styles.backButtonText}>{'← Retour'}</Text>
@@ -114,7 +116,7 @@ export function AboutScreen({ navigation }: AboutScreenProps): React.JSX.Element
           style={styles.headerTitle}
           accessibilityRole="header"
         >
-          {'À propos'}
+          {t('about.header_title')}
         </Text>
         {/* Placeholder pour équilibrer le header (flex layout centré) */}
         <View style={styles.headerRight} />
@@ -128,46 +130,46 @@ export function AboutScreen({ navigation }: AboutScreenProps): React.JSX.Element
       >
         {/* Section app — nom + version */}
         <Text style={styles.appName}>{'WikiHop'}</Text>
-        <Text style={styles.appVersion}>{`Version ${version}`}</Text>
+        <Text style={styles.appVersion}>{t('about.app_version', { version })}</Text>
 
         <View style={styles.separator} />
 
         {/* Description — texte validé DPO Maïté 2026-03-08 */}
         <Text style={styles.description}>
-          {'WikiHop est un jeu de navigation\u00a0: partez d\'un article Wikipedia et rejoignez l\'article destination en cliquant uniquement sur les liens internes. Combien de sauts vous faudra-t-il\u00a0?'}
+          {t('about.description')}
         </Text>
 
         <View style={styles.separator} />
 
         {/* Section Sources */}
-        <SectionHeader title="Sources" />
+        <SectionHeader title={t('about.section_sources')} />
         <Text style={styles.sectionText}>
-          {'Ce jeu utilise l\'API Wikipedia (contenu sous licence CC\u00a0BY-SA\u00a04.0). WikiHop n\'est pas affilié à la Wikimedia Foundation.'}
+          {t('about.sources_text')}
         </Text>
         <LinkRow
-          label="Conditions d'utilisation de l'API MediaWiki"
+          label={t('about.sources_api_label')}
           url="https://www.mediawiki.org/wiki/API:Main_page"
-          accessibilityLabel="Voir les conditions d'utilisation de l'API MediaWiki"
+          accessibilityLabel={t('about.sources_api_a11y')}
         />
 
         <View style={styles.separator} />
 
         {/* Section Légal */}
-        <SectionHeader title="Légal" />
+        <SectionHeader title={t('about.section_legal')} />
         <LinkRow
-          label="Politique de confidentialité"
+          label={t('about.legal_privacy_label')}
           url="https://wikihop.app/privacy"
-          accessibilityLabel="Consulter la politique de confidentialité de WikiHop"
+          accessibilityLabel={t('about.legal_privacy_a11y')}
         />
 
         <View style={styles.separator} />
 
         {/* Section Code source */}
-        <SectionHeader title="Code source" />
+        <SectionHeader title={t('about.section_code')} />
         <LinkRow
-          label="Code source sur GitHub"
+          label={t('about.code_github_label')}
           url="https://github.com/wikihop/wikihop"
-          accessibilityLabel="Voir le code source de WikiHop sur GitHub"
+          accessibilityLabel={t('about.code_github_a11y')}
         />
       </ScrollView>
     </SafeAreaView>
