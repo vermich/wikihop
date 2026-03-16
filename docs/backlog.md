@@ -94,14 +94,14 @@
 | [F3-14](stories/wont/🚫-F3-14-contact-feedback.md) | Formulaire de feedback in-app (ContactScreen) | Could | Frontend Dev, UX/UI, DPO, Backend Dev | 🚫 won't |
 | [F3-15](stories/wont/🚫-F3-15-firebase-analytics.md) | Firebase Analytics — intégration skeleton (événements de base) | Could | Frontend Dev, DPO | 🚫 won't |
 | [F3-16](stories/phase-3/✅-F3-16-daily-challenge-completion-indicator.md) | Indicateur de complétion du défi quotidien | Should | Frontend Dev, UX/UI | ✅ done |
-| [F3-17](stories/phase-3/🔄-F3-17-daily-challenge-once-only.md) | Défi quotidien — une seule tentative par jour | Should | Frontend Dev | ✅ done |
-| [F3-19](stories/phase-3/🔄-F3-19-daily-challenge-new-badge.md) | Badge « New » sur le défi non encore réalisé | Could | Frontend Dev, UX/UI | ✅ done |
+| [F3-17](stories/phase-3/✅-F3-17-daily-challenge-once-only.md) | Défi quotidien — une seule tentative par jour | Should | Frontend Dev | ✅ done |
+| [F3-19](stories/phase-3/✅-F3-19-daily-challenge-new-badge.md) | Badge « New » sur le défi non encore réalisé | Could | Frontend Dev, UX/UI | ✅ done |
 | [F3-20](stories/phase-3/✅-F3-20-fix-history-duplicate-keys.md) | Fix doublon de clés dans HistoryScreen | Must | Frontend Dev | ✅ done |
 | [F3-21](stories/phase-3/✅-F3-21-fix-daily-challenge-button-visual-state.md) | Fix état visuel bouton défi du jour complété | Must | Frontend Dev | ✅ done |
 | [F3-22](stories/phase-3/✅-F3-22-fix-back-navigation-article.md) | Fix retour arrière dans la partie | Must | Frontend Dev | ✅ done |
 | [F3-23](stories/phase-3/✅-F3-23-daily-challenge-badge-history.md) | Badge "défi du jour" dans l'historique des parties | Should | Frontend Dev, UX/UI | ✅ done |
 | [F3-24](stories/phase-3/✅-F3-24-game-detail-full-path.md) | Parcours complet dans GameDetailScreen | Could | Tech Lead, Frontend Dev | ✅ done |
-| [F3-25](stories/phase-3/🔄-F3-25-ux-ui-global-rework.md) | Refonte UX/UI globale (vague dédiée) | Should | UX/UI, Frontend Dev | ✅ done |
+| [F3-25](stories/phase-3/✅-F3-25-ux-ui-global-rework.md) | Refonte UX/UI globale (vague dédiée) | Should | UX/UI, Frontend Dev | ✅ done |
 | [F3-26](stories/phase-3/✅-F3-26-internationalization.md) | Internationalisation des interfaces | Should | Tech Lead, Frontend Dev, Backend Dev | ✅ done |
 | [F3-27](stories/phase-3/✅-F3-27-fix-back-navigation-regression.md) | Fix retour arrière — régression F3-22 | Must | Tech Lead, Frontend Dev | ✅ done |
 | [F3-28](stories/phase-3/✅-F3-28-multiplayer-configurable-rounds.md) | Multijoueur — nombre de manches configurable | Should | Tech Lead, Frontend Dev | ✅ done |
