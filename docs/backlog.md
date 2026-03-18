@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-16 | **Version** : 5.1
+**PM** : Gauderic | **Mis à jour** : 2026-03-18 | **Version** : 5.3
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -113,6 +113,15 @@
 | [F3-34](stories/phase-3/✅-F3-34-fix-back-navigation-webview.md) | Fix retour arrière WebView — régression persistante après F3-27 | Must | Tech Lead, Frontend Dev | ✅ done |
 | [F3-35](stories/phase-3/✅-F3-35-hard-mode-badge-history.md) | Badge "Mode difficile" dans l'historique des parties | Should | Frontend Dev, UX/UI | ✅ done |
 | [F3-36](stories/phase-3/✅-F3-36-fix-multiplayer-result-ranking.md) | Fix — Classement MultiplayerResultScreen incorrect (dernière manche exclue) | Must | Frontend Dev | ✅ done |
+| [F3-37](stories/phase-3/⬜-F3-37-fix-daily-challenge-button-contrast.md) | Fix — Contraste bouton défi du jour (texte blanc sur fond gris, locale FR) | Must | Frontend Dev | ⬜ pending |
+| [F3-38](stories/phase-3/⬜-F3-38-fix-articles-not-loading-non-en-fr.md) | Fix — Articles non chargés pour les langues ES/DE/PT/IT/NL/PL | Must | Frontend Dev, Backend Dev | ⬜ pending |
+| [F3-39](stories/phase-3/⬜-F3-39-remove-diff-pill-gamehud.md) | UX — Retirer la pillule "DIFF" du GameHUD dans ArticleScreen | Should | Frontend Dev | ⬜ pending |
+| [F3-40](stories/phase-3/⬜-F3-40-fix-article-header-title-centering.md) | UX — Titre article centré dans le header ArticleScreen (sans bouton retour) | Should | Frontend Dev | ⬜ pending |
+| [F3-41](stories/phase-3/⬜-F3-41-victory-share-icon-button.md) | UX — Bouton de partage VictoryScreen : icône standard dans l'encadré statistiques | Should | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-42](stories/phase-3/⬜-F3-42-remove-congratulations-victory-screen.md) | UX — Retirer "Félicitations !" de VictoryScreen (doublon avec "Victoire !") | Should | Frontend Dev | ⬜ pending |
+| [F3-43](stories/phase-3/⬜-F3-43-hard-mode-label-home-toggle.md) | UX — Ajouter le libellé "Difficile" à côté du toggle mode difficile sur HomeScreen | Should | Frontend Dev | ⬜ pending |
+| [F3-44](stories/phase-3/⬜-F3-44-history-link-to-button-home.md) | UX — Transformer le lien "Historique des parties" en bouton sur HomeScreen | Should | Frontend Dev, UX/UI | ⬜ pending |
+| [F3-45](stories/phase-3/⬜-F3-45-home-bottom-action-row.md) | UX — Ligne de 3 boutons en bas de HomeScreen (Wikipedia / Recharger / À propos) | Should | Frontend Dev, UX/UI | ⬜ pending |
 
 ---
 
@@ -171,11 +180,11 @@
 |-------|------|--------|-------|-------|
 | 1-Fondations | 10 | 2 | 0 | 12 |
 | 2-MVP | 12 | 5 | 1 | 18 |
-| 3-Features | 10 | 14 | 7 | 31 |
+| 3-Features | 12 | 19 | 7 | 38 |
 | 5-Services managés | 0 | 1 | 0 | 1 |
 | 4-Production | 9 | 4 | 2 | 15 |
 | Won't | — | — | — | 4 |
-| **Total** | **41** | **26** | **10** | **81** |
+| **Total** | **43** | **31** | **10** | **88** |
 
 > Phase 5 non incluse dans le total — décision différée.
 
@@ -227,4 +236,5 @@
 *v5.0 : F3-36 done — 18/18 tests passants, tsc et lint propres, tests obsolètes mis à jour (2026-03-16)*
 *v5.1 : F3-26 passée en in-progress — langues cibles validées par le PO (fr, en, es, de, pt, it, nl, pl) (2026-03-16)*
 *v5.2 : F3-26 done — internationalisation validée QA (678 tests passants, 8 langues, tsc + lint propres) (2026-03-16)*
+*v5.3 : Phase 3B Recette — 9 stories créées (F3-37 à F3-45) suite aux tests d'acceptance Client (2 bugs Must + 7 UX Should) (2026-03-18)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
