@@ -334,6 +334,190 @@ describe('getPopularPagesFromFallback', () => {
 });
 
 // ---------------------------------------------------------------------------
+// describe: getPopularPagesFromFallback — nouvelles langues (F3-38)
+// ---------------------------------------------------------------------------
+
+describe('getPopularPagesFromFallback - nouvelles langues ES/DE/PT/IT/NL/PL', () => {
+  it("retourne un tableau non vide pour 'es'", () => {
+    const result = getPopularPagesFromFallback('es');
+
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBeGreaterThanOrEqual(80);
+  });
+
+  it("retourne un tableau non vide pour 'de'", () => {
+    const result = getPopularPagesFromFallback('de');
+
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBeGreaterThanOrEqual(80);
+  });
+
+  it("retourne un tableau non vide pour 'pt'", () => {
+    const result = getPopularPagesFromFallback('pt');
+
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBeGreaterThanOrEqual(80);
+  });
+
+  it("retourne un tableau non vide pour 'it'", () => {
+    const result = getPopularPagesFromFallback('it');
+
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBeGreaterThanOrEqual(80);
+  });
+
+  it("retourne un tableau non vide pour 'nl'", () => {
+    const result = getPopularPagesFromFallback('nl');
+
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBeGreaterThanOrEqual(80);
+  });
+
+  it("retourne un tableau non vide pour 'pl'", () => {
+    const result = getPopularPagesFromFallback('pl');
+
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBeGreaterThanOrEqual(80);
+  });
+
+  it('tous les titres ES sont des strings non vides sans underscores', () => {
+    const result = getPopularPagesFromFallback('es');
+    for (const title of result) {
+      expect(typeof title).toBe('string');
+      expect(title.trim().length).toBeGreaterThan(0);
+      expect(title).not.toContain('_');
+    }
+  });
+
+  it('tous les titres DE sont des strings non vides sans underscores', () => {
+    const result = getPopularPagesFromFallback('de');
+    for (const title of result) {
+      expect(typeof title).toBe('string');
+      expect(title.trim().length).toBeGreaterThan(0);
+      expect(title).not.toContain('_');
+    }
+  });
+
+  it('tous les titres PT sont des strings non vides sans underscores', () => {
+    const result = getPopularPagesFromFallback('pt');
+    for (const title of result) {
+      expect(typeof title).toBe('string');
+      expect(title.trim().length).toBeGreaterThan(0);
+      expect(title).not.toContain('_');
+    }
+  });
+
+  it('tous les titres IT sont des strings non vides sans underscores', () => {
+    const result = getPopularPagesFromFallback('it');
+    for (const title of result) {
+      expect(typeof title).toBe('string');
+      expect(title.trim().length).toBeGreaterThan(0);
+      expect(title).not.toContain('_');
+    }
+  });
+
+  it('tous les titres NL sont des strings non vides sans underscores', () => {
+    const result = getPopularPagesFromFallback('nl');
+    for (const title of result) {
+      expect(typeof title).toBe('string');
+      expect(title.trim().length).toBeGreaterThan(0);
+      expect(title).not.toContain('_');
+    }
+  });
+
+  it('tous les titres PL sont des strings non vides sans underscores', () => {
+    const result = getPopularPagesFromFallback('pl');
+    for (const title of result) {
+      expect(typeof title).toBe('string');
+      expect(title.trim().length).toBeGreaterThan(0);
+      expect(title).not.toContain('_');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// describe: getPopularPages — fallback nouvelles langues (F3-38)
+// ---------------------------------------------------------------------------
+
+describe('getPopularPages - fallback statique nouvelles langues', () => {
+  let fetchSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    fetchSpy = jest.spyOn(global, 'fetch');
+  });
+
+  afterEach(() => {
+    fetchSpy.mockRestore();
+  });
+
+  it("retourne des articles ES depuis le fallback JSON quand l'API échoue", async () => {
+    fetchSpy.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+    const result = await getPopularPages('es');
+
+    expect(result.source).toBe('fallback');
+    expect(result.language).toBe('es');
+    expect(Array.isArray(result.articles)).toBe(true);
+    expect(result.articles.length).toBeGreaterThanOrEqual(80);
+  });
+
+  it("retourne des articles DE depuis le fallback JSON quand l'API échoue", async () => {
+    fetchSpy.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+    const result = await getPopularPages('de');
+
+    expect(result.source).toBe('fallback');
+    expect(result.language).toBe('de');
+    expect(Array.isArray(result.articles)).toBe(true);
+    expect(result.articles.length).toBeGreaterThanOrEqual(80);
+  });
+
+  it("retourne des articles PT depuis le fallback JSON quand l'API échoue", async () => {
+    fetchSpy.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+    const result = await getPopularPages('pt');
+
+    expect(result.source).toBe('fallback');
+    expect(result.language).toBe('pt');
+    expect(Array.isArray(result.articles)).toBe(true);
+    expect(result.articles.length).toBeGreaterThanOrEqual(80);
+  });
+
+  it("retourne des articles IT depuis le fallback JSON quand l'API échoue", async () => {
+    fetchSpy.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+    const result = await getPopularPages('it');
+
+    expect(result.source).toBe('fallback');
+    expect(result.language).toBe('it');
+    expect(Array.isArray(result.articles)).toBe(true);
+    expect(result.articles.length).toBeGreaterThanOrEqual(80);
+  });
+
+  it("retourne des articles NL depuis le fallback JSON quand l'API échoue", async () => {
+    fetchSpy.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+    const result = await getPopularPages('nl');
+
+    expect(result.source).toBe('fallback');
+    expect(result.language).toBe('nl');
+    expect(Array.isArray(result.articles)).toBe(true);
+    expect(result.articles.length).toBeGreaterThanOrEqual(80);
+  });
+
+  it("retourne des articles PL depuis le fallback JSON quand l'API échoue", async () => {
+    fetchSpy.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+    const result = await getPopularPages('pl');
+
+    expect(result.source).toBe('fallback');
+    expect(result.language).toBe('pl');
+    expect(Array.isArray(result.articles)).toBe(true);
+    expect(result.articles.length).toBeGreaterThanOrEqual(80);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // describe: getPopularPages (stratégie hybride)
 // ---------------------------------------------------------------------------
 

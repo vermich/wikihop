@@ -11,7 +11,7 @@
  * Référence : docs/stories/M-16-popular-pages-strategy.md — Partie A
  */
 
-import { SUPPORTED_LANGUAGES } from '@wikihop/shared';
+import type { SUPPORTED_LANGUAGES } from '@wikihop/shared';
 
 import popularPagesData from '../assets/popular-pages.json';
 
@@ -22,7 +22,7 @@ import popularPagesData from '../assets/popular-pages.json';
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
 /** Langues disposant d'un fallback JSON statique embarqué */
-type FallbackLanguage = 'fr' | 'en';
+type FallbackLanguage = 'fr' | 'en' | 'es' | 'de' | 'pt' | 'it' | 'nl' | 'pl';
 
 export interface PopularPagesResult {
   /** Titres normalisés (espaces, filtrés) */
@@ -31,8 +31,17 @@ export interface PopularPagesResult {
   source: 'wikimedia' | 'fallback';
 }
 
-/** Type inféré automatiquement depuis le JSON embarqué (fr/en uniquement) */
-type PopularPagesData = { fr: string[]; en: string[] };
+/** Type inféré automatiquement depuis le JSON embarqué (toutes les langues supportées — F3-38) */
+type PopularPagesData = {
+  fr: string[];
+  en: string[];
+  es: string[];
+  de: string[];
+  pt: string[];
+  it: string[];
+  nl: string[];
+  pl: string[];
+};
 
 // Assertion de type nécessaire car TypeScript infère le type littéral du JSON
 const fallbackData = popularPagesData as PopularPagesData;
@@ -214,9 +223,9 @@ export async function fetchPopularPagesFromWikimedia(
  * Retourne les pages populaires depuis le fichier JSON statique embarqué.
  *
  * Ne peut pas échouer : les données sont embarquées au moment du build.
- * Seules les langues 'fr' et 'en' disposent d'un fallback statique (F3-26).
+ * Toutes les langues supportées disposent d'un fallback statique (F3-38).
  *
- * @param language - Langue cible (fr ou en uniquement — fallback statique disponible)
+ * @param language - Langue cible (toutes les langues avec fallback statique disponible)
  */
 export function getPopularPagesFromFallback(language: FallbackLanguage): string[] {
   return fallbackData[language];
@@ -225,9 +234,8 @@ export function getPopularPagesFromFallback(language: FallbackLanguage): string[
 /**
  * Stratégie hybride : tente l'API Wikimedia d'abord, bascule sur le JSON statique en cas d'échec.
  *
- * Pour fr/en : retourne toujours un résultat non vide (garanti par le fallback embarqué).
- * Pour les autres langues (es, de, pt, it, nl, pl — F3-26) : si l'API Wikimedia échoue,
- * retourne un tableau vide (pas de fallback statique disponible).
+ * Pour toutes les langues supportées : retourne toujours un résultat non vide
+ * (garanti par le fallback embarqué — F3-38).
  *
  * @param language - Langue cible (toutes les langues supportées)
  * @param limit    - Nombre maximum d'articles (défaut : 200)
@@ -246,9 +254,10 @@ export async function getPopularPages(
     };
   }
 
-  // Fallback sur le JSON statique — disponible uniquement pour fr et en
-  if (language === 'fr' || language === 'en') {
-    const fallbackArticles = getPopularPagesFromFallback(language);
+  // Fallback sur le JSON statique — disponible pour toutes les langues supportées (F3-38)
+  const supportedFallbackLanguages: FallbackLanguage[] = ['fr', 'en', 'es', 'de', 'pt', 'it', 'nl', 'pl'];
+  if (supportedFallbackLanguages.includes(language as FallbackLanguage)) {
+    const fallbackArticles = getPopularPagesFromFallback(language as FallbackLanguage);
     return {
       articles: fallbackArticles.slice(0, limit),
       language,
@@ -256,7 +265,7 @@ export async function getPopularPages(
     };
   }
 
-  // Autres langues : pas de fallback statique — la route retournera 503 si le pool est vide
+  // Langue sans fallback statique (cas théorique — toutes les langues actuelles ont un fallback)
   return {
     articles: [],
     language,
