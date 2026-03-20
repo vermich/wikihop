@@ -254,21 +254,12 @@ export async function getPopularPages(
     };
   }
 
-  // Fallback sur le JSON statique — disponible pour toutes les langues supportées (F3-38)
-  const supportedFallbackLanguages: FallbackLanguage[] = ['fr', 'en', 'es', 'de', 'pt', 'it', 'nl', 'pl'];
-  if (supportedFallbackLanguages.includes(language as FallbackLanguage)) {
-    const fallbackArticles = getPopularPagesFromFallback(language as FallbackLanguage);
-    return {
-      articles: fallbackArticles.slice(0, limit),
-      language,
-      source: 'fallback',
-    };
-  }
-
-  // Langue sans fallback statique (cas théorique — toutes les langues actuelles ont un fallback)
+  // Fallback sur le JSON statique — garanti disponible pour toutes les langues supportées (F3-38)
+  // SupportedLanguage === FallbackLanguage : le cast est sûr car les deux types sont identiques
+  const fallbackArticles = getPopularPagesFromFallback(language as FallbackLanguage);
   return {
-    articles: [],
+    articles: fallbackArticles.slice(0, limit),
     language,
-    source: 'wikimedia',
+    source: 'fallback',
   };
 }
