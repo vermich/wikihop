@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-18 | **Version** : 5.3
+**PM** : Gauderic | **Mis à jour** : 2026-03-21 | **Version** : 5.5
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -121,7 +121,12 @@
 | [F3-42](stories/phase-3/🔄-F3-42-remove-congratulations-victory-screen.md) | UX — Retirer "Félicitations !" de VictoryScreen (doublon avec "Victoire !") | Should | Frontend Dev | ✅ done |
 | [F3-43](stories/phase-3/🔄-F3-43-hard-mode-label-home-toggle.md) | UX — Ajouter le libellé "Difficile" à côté du toggle mode difficile sur HomeScreen | Should | Frontend Dev | ✅ done |
 | [F3-44](stories/phase-3/🔄-F3-44-history-link-to-button-home.md) | UX — Transformer le lien "Historique des parties" en bouton sur HomeScreen | Should | Frontend Dev, UX/UI | ✅ done |
-| [F3-45](stories/phase-3/🔄-F3-45-home-bottom-action-row.md) | UX — Ligne de 3 boutons en bas de HomeScreen (Wikipedia / Recharger / À propos) | Should | Frontend Dev, UX/UI | ✅ done |
+| [F3-45](stories/phase-3/✅-F3-45-home-bottom-action-row.md) | UX — Ligne de 3 boutons en bas de HomeScreen (Wikipedia / Recharger / À propos) | Should | Frontend Dev, UX/UI | ✅ done |
+| [F3-46](stories/phase-3/🔄-F3-46-fix-daily-challenge-button-display.md) | Fix — Affichage bouton défi du jour (FR/IT incorrect, délai autres langues) | Must | Frontend Dev | 🔄 in-progress |
+| [F3-47](stories/phase-3/🔄-F3-47-fix-share-button-position-victory-screen.md) | Fix — Bouton partage mal positionné sur VictoryScreen (chevauchement texte) | Must | Frontend Dev | 🔄 in-progress |
+| [F3-48](stories/phase-3/🔄-F3-48-fix-back-button-missing-first-jumps.md) | Fix — Bouton retour absent sur les premiers sauts dans ArticleScreen | Must | Frontend Dev | 🔄 in-progress |
+| [F3-49](stories/phase-3/🔄-F3-49-fix-multiplayer-forfeit-handling.md) | Fix — Multijoueur : abandon d'un joueur passe incorrectement au joueur suivant | Must | Frontend Dev, Backend Dev | 🔄 in-progress |
+| [F3-50](stories/phase-3/🔄-F3-50-ux-refresh-button-label-loader.md) | UX — Renommer "Changer articles" + loader dynamique sur le bouton Recharger | Should | Frontend Dev | 🔄 in-progress |
 
 ---
 
@@ -180,11 +185,11 @@
 |-------|------|--------|-------|-------|
 | 1-Fondations | 10 | 2 | 0 | 12 |
 | 2-MVP | 12 | 5 | 1 | 18 |
-| 3-Features | 12 | 19 | 7 | 38 |
+| 3-Features | 16 | 20 | 7 | 43 |
 | 5-Services managés | 0 | 1 | 0 | 1 |
 | 4-Production | 9 | 4 | 2 | 15 |
 | Won't | — | — | — | 4 |
-| **Total** | **43** | **31** | **10** | **88** |
+| **Total** | **47** | **32** | **10** | **93** |
 
 > Phase 5 non incluse dans le total — décision différée.
 
@@ -195,8 +200,8 @@
 | Agent | Stories |
 |-------|---------|
 | Tech Lead | F-01, F-02, F-03, F-04, F-05, F-06, F-07, F-08, F-09, F-10, F-12, P-06, P-12 |
-| Frontend Dev | F-04, M-01, M-03, M-04, M-05, M-06, M-07, M-08, M-10, M-11, M-12, M-13, M-14, M-15, M-16, M-17, F3-02, F3-03, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-13, F3-14, F3-15, F3-20, F3-21, F3-22, F3-23, F3-24, F3-25, F3-26, F3-27, F3-28, F3-29, F3-30, F3-31, F3-35, P-07, P-08, P-12, P-13, P-14 |
-| Backend Dev | F-05, F-06, F-11, M-02, M-08, M-12, M-16, F3-01, F3-05, F3-14, F3-26, P-03, P-05, P-06, P-09 |
+| Frontend Dev | F-04, M-01, M-03, M-04, M-05, M-06, M-07, M-08, M-10, M-11, M-12, M-13, M-14, M-15, M-16, M-17, F3-02, F3-03, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-13, F3-14, F3-15, F3-20, F3-21, F3-22, F3-23, F3-24, F3-25, F3-26, F3-27, F3-28, F3-29, F3-30, F3-31, F3-35, F3-46, F3-47, F3-48, F3-49, F3-50, P-07, P-08, P-12, P-13, P-14 |
+| Backend Dev | F-05, F-06, F-11, M-02, M-08, M-12, M-16, F3-01, F3-05, F3-14, F3-26, F3-49, P-03, P-05, P-06, P-09 |
 | UX/UI | M-01, M-06, M-13, M-14, M-17, F3-01, F3-02, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-14, F3-16, F3-23, F3-25, F3-35 |
 | QA | F-08, M-09, M-18, F3-07, P-05, P-11 |
 | Security | P-02, P-03, P-04, P-15 |
@@ -238,4 +243,5 @@
 *v5.2 : F3-26 done — internationalisation validée QA (678 tests passants, 8 langues, tsc + lint propres) (2026-03-16)*
 *v5.3 : Phase 3B Recette — 9 stories créées (F3-37 à F3-45) suite aux tests d'acceptance Client (2 bugs Must + 7 UX Should) (2026-03-18)*
 *v5.4 : F3-37 à F3-45 passées in-progress — Phase 3B vague UX lancée (2026-03-20)*
+*v5.5 : Phase 3C — 5 stories créées (F3-46 à F3-50) suite aux retours de tests Phase 3B du Client (4 bugs Must + 1 UX Should) (2026-03-21)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
