@@ -372,10 +372,11 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: 'bold',
     color: '#1E293B',
-    textAlign: 'left',
+    textAlign: 'center',
     marginHorizontal: 8,
   },
   homeButton: {
+    minWidth: 44,
     minHeight: 44,
     justifyContent: 'center',
     paddingHorizontal: 8,
