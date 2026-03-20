@@ -33,6 +33,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { Article } from '@wikihop/shared';
 import * as Haptics from 'expo-haptics';
+import { Ionicons } from '@expo/vector-icons';
 import React, {
   useCallback,
   useEffect,
@@ -416,6 +417,17 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
             </View>
           )}
 
+          {/* Icône partage — coin supérieur droit du statsBlock (F3-41) */}
+          <TouchableOpacity
+            style={styles.shareIconButton}
+            onPress={handleShare}
+            accessibilityLabel={t('victory.a11y_share')}
+            accessibilityRole="button"
+            hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
+          >
+            <Ionicons name="share-social-outline" size={22} color="#2563EB" />
+          </TouchableOpacity>
+
           {/* Sous-éléments accessibles={false} pour éviter la double lecture */}
           <View style={styles.statsRow} accessible={false}>
             <View style={styles.statCell}>
@@ -518,15 +530,6 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
             </TouchableOpacity>
           )}
         </View>
-        {/* F3-25 critère 5 : Partager promu en couleur bleue */}
-        <TouchableOpacity
-          style={styles.shareButton}
-          onPress={handleShare}
-          accessibilityLabel={t('victory.a11y_share')}
-          accessibilityRole="button"
-        >
-          <Text style={styles.shareButtonText}>{t('victory.share_button')}</Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -722,15 +725,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#2563EB',
   },
-  shareButton: {
-    height: 44,
+  // F3-41 : icône partage positionnée en absolu dans le statsBlock
+  shareIconButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    padding: 11,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  // F3-25 critère 5 : couleur promue de #64748B → #2563EB
-  shareButtonText: {
-    fontSize: 16,
-    color: '#2563EB',
   },
   // Badges F3-01 / F3-05 — composant BadgePill (réutilisable)
   badgePill: {
