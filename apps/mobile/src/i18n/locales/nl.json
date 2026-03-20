@@ -40,7 +40,6 @@
   },
   "victory": {
     "header_title": "Overwinning!",
-    "congrats_text": "Gefeliciteerd!",
     "stat_jump_one": "sprong",
     "stat_jump_other": "sprongen",
     "stat_duration_label": "duur",

@@ -40,7 +40,6 @@
   },
   "victory": {
     "header_title": "Sieg!",
-    "congrats_text": "Herzlichen Glückwunsch!",
     "stat_jump_one": "Sprung",
     "stat_jump_other": "Sprünge",
     "stat_duration_label": "Dauer",
