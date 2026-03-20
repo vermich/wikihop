@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-21 | **Version** : 5.5
+**PM** : Gauderic | **Mis à jour** : 2026-03-21 | **Version** : 5.6
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -127,6 +127,7 @@
 | [F3-48](stories/phase-3/🔄-F3-48-fix-back-button-missing-first-jumps.md) | Fix — Bouton retour absent sur les premiers sauts dans ArticleScreen | Must | Frontend Dev | 🔄 in-progress |
 | [F3-49](stories/phase-3/🔄-F3-49-fix-multiplayer-forfeit-handling.md) | Fix — Multijoueur : abandon d'un joueur passe incorrectement au joueur suivant | Must | Frontend Dev, Backend Dev | 🔄 in-progress |
 | [F3-50](stories/phase-3/🔄-F3-50-ux-refresh-button-label-loader.md) | UX — Renommer "Changer articles" + loader dynamique sur le bouton Recharger | Should | Frontend Dev | 🔄 in-progress |
+| [F3-51](stories/phase-3/🔄-F3-51-daily-challenge-news-based-precalculated.md) | Défi du jour basé sur l'actualité Wikipedia (pré-calculé J-1) | Should | Backend Dev, Tech Lead | 🔄 in-progress |
 
 ---
 
@@ -185,11 +186,11 @@
 |-------|------|--------|-------|-------|
 | 1-Fondations | 10 | 2 | 0 | 12 |
 | 2-MVP | 12 | 5 | 1 | 18 |
-| 3-Features | 16 | 20 | 7 | 43 |
+| 3-Features | 16 | 21 | 7 | 44 |
 | 5-Services managés | 0 | 1 | 0 | 1 |
 | 4-Production | 9 | 4 | 2 | 15 |
 | Won't | — | — | — | 4 |
-| **Total** | **47** | **32** | **10** | **93** |
+| **Total** | **47** | **33** | **10** | **94** |
 
 > Phase 5 non incluse dans le total — décision différée.
 
@@ -199,9 +200,9 @@
 
 | Agent | Stories |
 |-------|---------|
-| Tech Lead | F-01, F-02, F-03, F-04, F-05, F-06, F-07, F-08, F-09, F-10, F-12, P-06, P-12 |
+| Tech Lead | F-01, F-02, F-03, F-04, F-05, F-06, F-07, F-08, F-09, F-10, F-12, F3-51, P-06, P-12 |
 | Frontend Dev | F-04, M-01, M-03, M-04, M-05, M-06, M-07, M-08, M-10, M-11, M-12, M-13, M-14, M-15, M-16, M-17, F3-02, F3-03, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-13, F3-14, F3-15, F3-20, F3-21, F3-22, F3-23, F3-24, F3-25, F3-26, F3-27, F3-28, F3-29, F3-30, F3-31, F3-35, F3-46, F3-47, F3-48, F3-49, F3-50, P-07, P-08, P-12, P-13, P-14 |
-| Backend Dev | F-05, F-06, F-11, M-02, M-08, M-12, M-16, F3-01, F3-05, F3-14, F3-26, F3-49, P-03, P-05, P-06, P-09 |
+| Backend Dev | F-05, F-06, F-11, M-02, M-08, M-12, M-16, F3-01, F3-05, F3-14, F3-26, F3-49, F3-51, P-03, P-05, P-06, P-09 |
 | UX/UI | M-01, M-06, M-13, M-14, M-17, F3-01, F3-02, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-14, F3-16, F3-23, F3-25, F3-35 |
 | QA | F-08, M-09, M-18, F3-07, P-05, P-11 |
 | Security | P-02, P-03, P-04, P-15 |
