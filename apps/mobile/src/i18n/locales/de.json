@@ -36,7 +36,8 @@
     "daily_error_title": "Nicht verfügbar",
     "daily_error_message": "Die tägliche Herausforderung ist vorübergehend nicht verfügbar.",
     "error_start_title": "Fehler",
-    "error_start_message": "Das Spiel konnte nicht gestartet werden. Bitte versuche es erneut."
+    "error_start_message": "Das Spiel konnte nicht gestartet werden. Bitte versuche es erneut.",
+    "hard_mode_label": "Schwer"
   },
   "victory": {
     "header_title": "Sieg!",

@@ -36,7 +36,8 @@
     "daily_error_title": "Unavailable",
     "daily_error_message": "The daily challenge is temporarily unavailable.",
     "error_start_title": "Error",
-    "error_start_message": "Unable to start the game. Please try again."
+    "error_start_message": "Unable to start the game. Please try again.",
+    "hard_mode_label": "Hard"
   },
   "victory": {
     "header_title": "Victory!",

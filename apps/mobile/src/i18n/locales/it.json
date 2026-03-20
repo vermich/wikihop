@@ -36,7 +36,8 @@
     "daily_error_title": "Non disponibile",
     "daily_error_message": "La sfida del giorno è temporaneamente non disponibile.",
     "error_start_title": "Errore",
-    "error_start_message": "Impossibile avviare la partita. Riprova."
+    "error_start_message": "Impossibile avviare la partita. Riprova.",
+    "hard_mode_label": "Difficile"
   },
   "victory": {
     "header_title": "Vittoria!",
