@@ -40,7 +40,6 @@
   },
   "victory": {
     "header_title": "Vittoria!",
-    "congrats_text": "Congratulazioni!",
     "stat_jump_one": "salto",
     "stat_jump_other": "salti",
     "stat_duration_label": "durata",

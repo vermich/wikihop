@@ -417,10 +417,6 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
           )}
 
           {/* Sous-éléments accessibles={false} pour éviter la double lecture */}
-          <View style={styles.congratsRow} accessible={false}>
-            <Text style={styles.checkIcon}>{'✓'}</Text>
-            <Text style={styles.congratsText}>{t('victory.congrats_text')}</Text>
-          </View>
           <View style={styles.statsRow} accessible={false}>
             <View style={styles.statCell}>
               <Text style={styles.statValue}>{String(stats.jumps)}</Text>
@@ -582,21 +578,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 3,
-  },
-  congratsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  checkIcon: {
-    fontSize: 20,
-    color: '#16A34A',
-    marginRight: 8,
-  },
-  congratsText: {
-    fontSize: 13,
-    fontWeight: 'bold',
-    color: '#16A34A',
   },
   statsRow: {
     flexDirection: 'row',
