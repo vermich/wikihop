@@ -255,9 +255,9 @@ describe('VictoryScreen', () => {
       expect(screen.getByText('Victoire !')).toBeTruthy();
     });
 
-    it('affiche le message Félicitations !', () => {
+    it('ne contient plus le message "Félicitations !" (supprimé en F3-42)', () => {
       renderVictoryScreen();
-      expect(screen.getByText('Félicitations !')).toBeTruthy();
+      expect(screen.queryByText('Félicitations !')).toBeNull();
     });
 
     it('affiche le nombre de sauts', () => {
@@ -387,9 +387,9 @@ describe('VictoryScreen', () => {
       expect(screen.getByLabelText("Lire l'article Louvre")).toBeTruthy();
     });
 
-    it('le bouton Partager est présent avec le texte "Partager  ↑"', () => {
+    it('le bouton Partager est présent via son accessibilityLabel (icône depuis F3-41)', () => {
       renderVictoryScreen();
-      expect(screen.getByText('Partager  ↑')).toBeTruthy();
+      expect(screen.getByLabelText('Partager mon résultat')).toBeTruthy();
     });
 
     it('le lien "Voir l\'historique" n\'existe plus', () => {
