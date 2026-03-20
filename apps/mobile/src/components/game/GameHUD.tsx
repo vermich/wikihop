@@ -41,7 +41,7 @@ export interface GameHUDProps {
   /**
    * Indique si la partie est en mode difficile (F3-05).
    * Optionnel pour la rétrocompatibilité — aucun appel existant à modifier.
-   * Si true, affiche une pill "DIFF" compacte à gauche du HUD.
+   * Utilisé pour le label d'accessibilité vocale (pill DIFF supprimée en F3-39).
    */
   isHardMode?: boolean;
 }
@@ -87,18 +87,6 @@ export const GameHUD = React.memo(function GameHUD({
       accessibilityRole="text"
       testID="game-hud"
     >
-      {/* Pill "DIFF" — mode difficile (F3-05) */}
-      {isHardMode && (
-        <>
-          <View style={styles.hardModePill} accessible={false}>
-            <Text style={styles.hardModePillText} accessible={false}>
-              {'DIFF'}
-            </Text>
-          </View>
-          <View style={styles.separator} accessible={false} />
-        </>
-      )}
-
       {/* Compteur sauts */}
       <View style={styles.block} accessible={false}>
         <Text style={styles.icon} accessible={false}>
@@ -196,17 +184,5 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 12,
     color: '#1E293B',
-  },
-  hardModePill: {
-    backgroundColor: '#FEE2E2',
-    borderRadius: 4,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    marginLeft: 8,
-  },
-  hardModePillText: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: '#991B1B',
   },
 });
