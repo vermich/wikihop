@@ -819,7 +819,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   dailyButtonTextDisabled: {
-    color: '#94A3B8',
+    color: '#475569',
   },
   // Texte du bouton défi en état complété (F3-16) — 16px pour accommoder icône + texte plus long
   dailyButtonTextCompleted: {
