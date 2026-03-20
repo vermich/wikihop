@@ -502,16 +502,17 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
                 </Animated.Text>
               </Animated.View>
             </TouchableOpacity>
-            {/* F3-25 critère 8 : séparateur + liens secondaires juste après Refresh */}
-            <View style={styles.secondaryLinksSeparator} />
+            {/* F3-44 : bouton Historique outline bleu — remplace le lien texte */}
             <TouchableOpacity
-              style={styles.secondaryTextButton}
+              style={styles.historyButton}
               onPress={() => { navigation.navigate('History'); }}
               accessibilityLabel={t('home.history_a11y')}
               accessibilityRole="button"
             >
-              <Text style={styles.secondaryTextButtonText}>{t('home.history_link')}</Text>
+              <Text style={styles.historyButtonText}>{t('home.history_link')}</Text>
             </TouchableOpacity>
+            {/* F3-25 critère 8 : séparateur + liens secondaires */}
+            <View style={styles.secondaryLinksSeparator} />
             <TouchableOpacity
               style={styles.secondaryTextButton}
               onPress={() => { navigation.navigate('Donation'); }}
@@ -628,16 +629,17 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
               <Text style={styles.refreshIcon}>{'↺'}</Text>
             </View>
           </TouchableOpacity>
-          {/* F3-25 critère 8 : séparateur + liens secondaires juste après Refresh */}
-          <View style={styles.secondaryLinksSeparator} />
+          {/* F3-44 : bouton Historique outline bleu — remplace le lien texte */}
           <TouchableOpacity
-            style={styles.secondaryTextButton}
+            style={styles.historyButton}
             onPress={() => { navigation.navigate('History'); }}
             accessibilityLabel={t('home.history_a11y')}
             accessibilityRole="button"
           >
-            <Text style={styles.secondaryTextButtonText}>{t('home.history_link')}</Text>
+            <Text style={styles.historyButtonText}>{t('home.history_link')}</Text>
           </TouchableOpacity>
+          {/* F3-25 critère 8 : séparateur + liens secondaires */}
+          <View style={styles.secondaryLinksSeparator} />
           <TouchableOpacity
             style={styles.secondaryTextButton}
             onPress={() => { navigation.navigate('Donation'); }}
@@ -970,6 +972,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
     letterSpacing: 0.5,
+  },
+  // F3-44 : bouton Historique — outline bleu, fond blanc
+  historyButton: {
+    height: 52,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#2563EB',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+  },
+  historyButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2563EB',
   },
   // Bouton Multijoueur (F3-12) — outline bleu, fond blanc
   multiplayerButton: {
