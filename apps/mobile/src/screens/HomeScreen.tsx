@@ -674,6 +674,15 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
             accessibilityLabel={isDifficultyHard ? t('home.difficulty_toggle_on_a11y') : t('home.difficulty_toggle_off_a11y')}
             accessibilityState={{ checked: isDifficultyHard }}
           />
+          <Text
+            style={[
+              styles.difficultyLabel,
+              isDifficultyHard && styles.difficultyLabelActive,
+            ]}
+            accessible={false}
+          >
+            {t('home.hard_mode_label')}
+          </Text>
         </View>
         <Text
           style={styles.headerTitle}
@@ -834,13 +843,22 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginRight: 8,
   },
-  // F3-25 critère 2 : Toggle mode difficile dans le header, position absolute left:16
+  // F3-43 : Toggle mode difficile + libellé dans le header
   difficultyHeaderToggle: {
     position: 'absolute',
-    left: 16,
-    width: 44,
+    left: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
     height: 44,
-    justifyContent: 'center',
+    gap: 4,
+  },
+  difficultyLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#64748B',
+  },
+  difficultyLabelActive: {
+    color: '#EF4444',
   },
   // F3-25 critère 8 : séparateur visuel avant les liens secondaires
   secondaryLinksSeparator: {

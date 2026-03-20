@@ -36,7 +36,8 @@
     "daily_error_title": "Niedostępne",
     "daily_error_message": "Wyzwanie dnia jest tymczasowo niedostępne.",
     "error_start_title": "Błąd",
-    "error_start_message": "Nie można rozpocząć gry. Spróbuj ponownie."
+    "error_start_message": "Nie można rozpocząć gry. Spróbuj ponownie.",
+    "hard_mode_label": "Trudny"
   },
   "victory": {
     "header_title": "Zwycięstwo!",

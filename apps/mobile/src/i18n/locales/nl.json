@@ -36,7 +36,8 @@
     "daily_error_title": "Niet beschikbaar",
     "daily_error_message": "De dagelijkse uitdaging is tijdelijk niet beschikbaar.",
     "error_start_title": "Fout",
-    "error_start_message": "Het spel kon niet worden gestart. Probeer het opnieuw."
+    "error_start_message": "Het spel kon niet worden gestart. Probeer het opnieuw.",
+    "hard_mode_label": "Moeilijk"
   },
   "victory": {
     "header_title": "Overwinning!",

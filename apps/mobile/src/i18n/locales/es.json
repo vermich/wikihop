@@ -36,7 +36,8 @@
     "daily_error_title": "No disponible",
     "daily_error_message": "El desafío del día no está disponible temporalmente.",
     "error_start_title": "Error",
-    "error_start_message": "No se puede iniciar la partida. Inténtalo de nuevo."
+    "error_start_message": "No se puede iniciar la partida. Inténtalo de nuevo.",
+    "hard_mode_label": "Difícil"
   },
   "victory": {
     "header_title": "¡Victoria!",
