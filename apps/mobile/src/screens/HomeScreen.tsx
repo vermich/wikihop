@@ -486,22 +486,6 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
             >
               <Text style={styles.multiplayerButtonText}>{t('home.multiplayer_button')}</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.refreshButton}
-              disabled={true}
-              onPress={refresh}
-              accessibilityLabel={t('home.refresh_a11y')}
-              accessibilityRole="button"
-            >
-              <Animated.View style={[styles.refreshButtonInner, styles.refreshButtonDisabled]}>
-                <Text style={styles.refreshButtonText}>{t('home.new_articles_button')}</Text>
-                <Animated.Text
-                  style={[styles.refreshIcon, { transform: [{ rotate: rotateInterpolated }] }]}
-                >
-                  {'↺'}
-                </Animated.Text>
-              </Animated.View>
-            </TouchableOpacity>
             {/* F3-44 : bouton Historique outline bleu — remplace le lien texte */}
             <TouchableOpacity
               style={styles.historyButton}
@@ -511,24 +495,51 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
             >
               <Text style={styles.historyButtonText}>{t('home.history_link')}</Text>
             </TouchableOpacity>
-            {/* F3-25 critère 8 : séparateur + liens secondaires */}
+            {/* F3-45 : ligne 3 boutons compacts */}
             <View style={styles.secondaryLinksSeparator} />
-            <TouchableOpacity
-              style={styles.secondaryTextButton}
-              onPress={() => { navigation.navigate('Donation'); }}
-              accessibilityLabel={t('home.donation_a11y')}
-              accessibilityRole="button"
-            >
-              <Text style={styles.secondaryTextButtonText}>{t('home.support_wikipedia_link')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.secondaryTextButton}
-              onPress={() => { navigation.navigate('About'); }}
-              accessibilityLabel={t('home.about_a11y')}
-              accessibilityRole="button"
-            >
-              <Text style={styles.secondaryTextButtonText}>{t('home.about_link')}</Text>
-            </TouchableOpacity>
+            <View style={styles.bottomActionRow}>
+              <TouchableOpacity
+                style={styles.bottomActionButton}
+                onPress={() => { navigation.navigate('Donation'); }}
+                accessibilityLabel={t('home.donation_a11y')}
+                accessibilityRole="button"
+              >
+                <Text style={styles.bottomActionButtonText} numberOfLines={2}>
+                  {t('home.support_wikipedia_link')}
+                </Text>
+              </TouchableOpacity>
+
+              <View style={styles.bottomActionRowSeparator} accessible={false} />
+
+              <TouchableOpacity
+                style={styles.bottomActionButton}
+                onPress={refresh}
+                disabled={isLoading}
+                accessibilityLabel={t('home.refresh_a11y')}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: isLoading }}
+              >
+                <Animated.Text style={{ transform: [{ rotate: rotateInterpolated }] }} accessible={false}>
+                  {'↺ '}
+                </Animated.Text>
+                <Text style={[styles.bottomActionButtonText, isLoading && styles.bottomActionButtonTextDisabled]} numberOfLines={2}>
+                  {t('home.new_articles_button')}
+                </Text>
+              </TouchableOpacity>
+
+              <View style={styles.bottomActionRowSeparator} accessible={false} />
+
+              <TouchableOpacity
+                style={styles.bottomActionButton}
+                onPress={() => { navigation.navigate('About'); }}
+                accessibilityLabel={t('home.about_a11y')}
+                accessibilityRole="button"
+              >
+                <Text style={styles.bottomActionButtonText} numberOfLines={2}>
+                  {t('home.about_link')}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </ScrollView>
       );
@@ -618,17 +629,6 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
           >
             <Text style={styles.multiplayerButtonText}>{t('home.multiplayer_button')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.refreshButton}
-            onPress={refresh}
-            accessibilityLabel={t('home.refresh_a11y')}
-            accessibilityRole="button"
-          >
-            <View style={styles.refreshButtonInner}>
-              <Text style={styles.refreshButtonText}>{t('home.new_articles_button')}</Text>
-              <Text style={styles.refreshIcon}>{'↺'}</Text>
-            </View>
-          </TouchableOpacity>
           {/* F3-44 : bouton Historique outline bleu — remplace le lien texte */}
           <TouchableOpacity
             style={styles.historyButton}
@@ -638,24 +638,51 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
           >
             <Text style={styles.historyButtonText}>{t('home.history_link')}</Text>
           </TouchableOpacity>
-          {/* F3-25 critère 8 : séparateur + liens secondaires */}
+          {/* F3-45 : ligne 3 boutons compacts */}
           <View style={styles.secondaryLinksSeparator} />
-          <TouchableOpacity
-            style={styles.secondaryTextButton}
-            onPress={() => { navigation.navigate('Donation'); }}
-            accessibilityLabel={t('home.donation_a11y')}
-            accessibilityRole="button"
-          >
-            <Text style={styles.secondaryTextButtonText}>{t('home.support_wikipedia_link')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.secondaryTextButton}
-            onPress={() => { navigation.navigate('About'); }}
-            accessibilityLabel={t('home.about_a11y')}
-            accessibilityRole="button"
-          >
-            <Text style={styles.secondaryTextButtonText}>{t('home.about_link')}</Text>
-          </TouchableOpacity>
+          <View style={styles.bottomActionRow}>
+            <TouchableOpacity
+              style={styles.bottomActionButton}
+              onPress={() => { navigation.navigate('Donation'); }}
+              accessibilityLabel={t('home.donation_a11y')}
+              accessibilityRole="button"
+            >
+              <Text style={styles.bottomActionButtonText} numberOfLines={2}>
+                {t('home.support_wikipedia_link')}
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.bottomActionRowSeparator} accessible={false} />
+
+            <TouchableOpacity
+              style={styles.bottomActionButton}
+              onPress={refresh}
+              disabled={isLoading}
+              accessibilityLabel={t('home.refresh_a11y')}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: isLoading }}
+            >
+              <Animated.Text style={{ transform: [{ rotate: rotateInterpolated }] }} accessible={false}>
+                {'↺ '}
+              </Animated.Text>
+              <Text style={[styles.bottomActionButtonText, isLoading && styles.bottomActionButtonTextDisabled]} numberOfLines={2}>
+                {t('home.new_articles_button')}
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.bottomActionRowSeparator} accessible={false} />
+
+            <TouchableOpacity
+              style={styles.bottomActionButton}
+              onPress={() => { navigation.navigate('About'); }}
+              accessibilityLabel={t('home.about_a11y')}
+              accessibilityRole="button"
+            >
+              <Text style={styles.bottomActionButtonText} numberOfLines={2}>
+                {t('home.about_link')}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     );
@@ -888,37 +915,49 @@ const styles = StyleSheet.create({
   playButtonTextDisabled: {
     color: '#94A3B8',
   },
-  refreshButton: {
-    height: 44,
+  // F3-44 : bouton Historique — outline bleu, fond blanc
+  historyButton: {
+    height: 52,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#2563EB',
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 12,
   },
-  refreshButtonInner: {
+  historyButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2563EB',
+  },
+  // F3-45 : ligne 3 boutons compacts
+  bottomActionRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 0,
   },
-  refreshButtonDisabled: {
-    opacity: 0.4,
-  },
-  refreshButtonText: {
-    fontSize: 16,
-    color: '#2563EB',
-    marginRight: 4,
-  },
-  refreshIcon: {
-    fontSize: 16,
-    color: '#2563EB',
-  },
-  secondaryTextButton: {
-    height: 44,
+  bottomActionButton: {
+    flex: 1,
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 4,
+    paddingHorizontal: 4,
+    backgroundColor: 'transparent',
   },
-  secondaryTextButtonText: {
-    fontSize: 16,
+  bottomActionButtonText: {
+    fontSize: 14,
+    fontWeight: 'bold',
     color: '#64748B',
+    textAlign: 'center',
+  },
+  bottomActionButtonTextDisabled: {
+    color: '#CBD5E1',
+  },
+  bottomActionRowSeparator: {
+    width: 1,
+    height: 20,
+    backgroundColor: '#E2E8F0',
   },
   errorContainer: {
     flex: 1,
@@ -972,22 +1011,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
     letterSpacing: 0.5,
-  },
-  // F3-44 : bouton Historique — outline bleu, fond blanc
-  historyButton: {
-    height: 52,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#2563EB',
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 12,
-  },
-  historyButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#2563EB',
   },
   // Bouton Multijoueur (F3-12) — outline bleu, fond blanc
   multiplayerButton: {
