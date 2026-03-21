@@ -161,6 +161,11 @@ export function AboutScreen({ navigation }: AboutScreenProps): React.JSX.Element
           url="https://wikihop.app/privacy"
           accessibilityLabel={t('about.legal_privacy_a11y')}
         />
+        <LinkRow
+          label={t('about.legal_mentions_label')}
+          url="https://wikihop.app/mentions-legales"
+          accessibilityLabel={t('about.legal_mentions_a11y')}
+        />
 
         <View style={styles.separator} />
 
