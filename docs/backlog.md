@@ -154,7 +154,7 @@
 | [P-13](stories/phase-4/⬜-P-13-legal-texts.md) | Textes légaux in-app (CGU simplifiées) | Should | DPO, Frontend Dev | ⬜ pending |
 | [P-14](stories/phase-4/⬜-P-14-crash-reporting.md) | Traçabilité des erreurs côté mobile (crash reporting) | Could | Frontend Dev, DPO | ⬜ pending |
 | [P-15](stories/phase-4/⬜-P-15-sast-security.md) | Tests de sécurité automatisés (SAST) | Could | Security | ⬜ pending |
-| [P-16](stories/phase-4/🔄-P-16-fix-daily-challenge-button-disabled-fr-it.md) | Fix — Bouton défi du jour grisé en FR et IT | Must | Frontend Dev, Backend Dev | 🔄 in-progress |
+| [P-16](stories/phase-4/✅-P-16-fix-daily-challenge-button-disabled-fr-it.md) | Fix — Bouton défi du jour grisé en FR et IT | Must | Frontend Dev, Backend Dev | ✅ done |
 | [P-17](stories/phase-4/🔄-P-17-remove-back-button-daily-challenge.md) | UX — Supprimer le bouton retour sur l'écran défi du jour | Should | Frontend Dev | 🔄 in-progress |
 
 ---
