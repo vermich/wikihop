@@ -7,6 +7,7 @@
 
 import type { FastifyInstance } from 'fastify';
 
+import { adminRoutes } from './admin.route';
 import { gameRoutes } from './game.route';
 import { healthRoutes } from './health.route';
 
@@ -20,6 +21,9 @@ export function registerRoutes(app: FastifyInstance): void {
 
   // Phase 2 — Jeu
   void app.register(gameRoutes);
+
+  // Phase 3 — Administration (F3-51)
+  void app.register(adminRoutes);
 
   // Phase 2 — À ajouter :
   // void app.register(wikipediaRoutes, { prefix: '/wikipedia' });

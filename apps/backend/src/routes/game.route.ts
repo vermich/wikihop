@@ -16,58 +16,31 @@
  * - docs/stories/phase-2/M-02-random-pair-api.md
  * - docs/stories/phase-3/F3-01-daily-challenge.md
  * - docs/stories/phase-3/F3-05-hard-mode.md
+ * - docs/stories/phase-3/F3-51-daily-challenge-news-based-precalculated.md
  */
 
+import { SUPPORTED_LANGUAGES } from '@wikihop/shared';
 import type { FastifyInstance } from 'fastify';
 import type { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { z } from 'zod/v4';
 
-import { SUPPORTED_LANGUAGES } from '@wikihop/shared';
 
+import { query } from '../db/index';
+import type { DailyChallengeRow } from '../db/schema';
 import { getPopularPages } from '../services/popular-pages.service';
 import { computeDailyIndices, djb2Hash, getTodayUTC } from '../utils/daily-challenge.utils';
 import { getHardModePool } from '../utils/hard-mode.utils';
+import { fetchArticleSummary } from '../utils/wikipedia.utils';
 
 // ---------------------------------------------------------------------------
 // Constantes
 // ---------------------------------------------------------------------------
 
 const MAX_ATTEMPTS = 5;
-const WIKIPEDIA_TIMEOUT_MS = 3_000;
-const EXTRACT_MIN_LENGTH = 200;
-const WIKIPEDIA_USER_AGENT = 'WikiHop/1.0 (contact@wikihop.app)';
-
-// ---------------------------------------------------------------------------
-// Type guard interne — réponse Wikipedia REST /page/summary/{title}
-// ---------------------------------------------------------------------------
-
-interface WikipediaSummaryResponse {
-  pageid: number;
-  title: string;
-  extract?: string;
-  content_urls: {
-    desktop: { page: string };
-  };
-  thumbnail?: { source: string };
-}
-
-function isWikipediaSummaryResponse(value: unknown): value is WikipediaSummaryResponse {
-  if (typeof value !== 'object' || value === null) return false;
-  const obj = value as Record<string, unknown>;
-  return (
-    typeof obj['pageid'] === 'number' &&
-    typeof obj['title'] === 'string' &&
-    typeof obj['content_urls'] === 'object' &&
-    obj['content_urls'] !== null
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Schemas Zod
 // ---------------------------------------------------------------------------
-
-/** Langues Wikipedia supportées — F3-26 (doit rester synchronisé avec Language dans packages/shared) */
-type SupportedLang = (typeof SUPPORTED_LANGUAGES)[number];
 
 const langSchema = z.enum(SUPPORTED_LANGUAGES).default('fr');
 
@@ -113,83 +86,8 @@ export type RandomPairResponse = z.infer<typeof randomPairResponseSchema>;
 export type DailyResponse = z.infer<typeof dailyResponseSchema>;
 
 // ---------------------------------------------------------------------------
-// Logique métier — fetching d'un article Wikipedia
+// Logique métier interne
 // ---------------------------------------------------------------------------
-
-/**
- * Appelle GET https://{lang}.wikipedia.org/api/rest_v1/page/summary/{encodedTitle}
- * avec un timeout de 3 secondes.
- *
- * Retourne l'`ArticleSummaryResponse` si l'article est valide (HTTP 200, extract > 200 chars).
- * Retourne `null` si l'article est invalide (ébauche, timeout, HTTP non-200, JSON malformé).
- */
-async function fetchArticleSummary(
-  title: string,
-  lang: SupportedLang,
-): Promise<ArticleSummaryResponse | null> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => {
-    controller.abort();
-  }, WIKIPEDIA_TIMEOUT_MS);
-
-  try {
-    const encodedTitle = encodeURIComponent(title);
-    const url = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodedTitle}`;
-
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        'User-Agent': WIKIPEDIA_USER_AGENT,
-      },
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    let parsed: unknown;
-    try {
-      parsed = (await response.json()) as unknown;
-    } catch {
-      return null;
-    }
-
-    if (!isWikipediaSummaryResponse(parsed)) {
-      return null;
-    }
-
-    const extract = parsed.extract ?? '';
-
-    // Critère non-ébauche : extract doit dépasser EXTRACT_MIN_LENGTH caractères
-    if (extract.length <= EXTRACT_MIN_LENGTH) {
-      return null;
-    }
-
-    // Construction de la réponse typée
-    const contentUrls = parsed.content_urls.desktop;
-    const articleUrl = contentUrls.page;
-
-    const result: ArticleSummaryResponse = {
-      id: String(parsed.pageid),
-      title: parsed.title,
-      url: articleUrl,
-      language: lang,
-      extract,
-    };
-
-    if (parsed.thumbnail?.source !== undefined) {
-      result.thumbnailUrl = parsed.thumbnail.source;
-    }
-
-    return result;
-  } catch (error: unknown) {
-    // AbortError (timeout) ou erreur réseau — retourne null silencieusement
-    void error;
-    return null;
-  } finally {
-    clearTimeout(timeoutId);
-  }
-}
 
 /**
  * Sélectionne 2 indices distincts aléatoirement depuis un tableau.
@@ -345,6 +243,46 @@ export async function gameRoutes(instance: FastifyInstance): Promise<void> {
 
       // Date du jour en UTC — garantit le changement à minuit UTC
       const date = getTodayUTC();
+
+      // ─── 1. Tenter la lecture depuis daily_challenges (F3-51) ───────────
+      // Si une paire pré-calculée existe pour aujourd'hui, la servir directement.
+      // Validation Zod obligatoire : les JSONB peuvent être corrompus.
+      try {
+        const rows = await query<DailyChallengeRow>(
+          'SELECT start_article, target_article FROM daily_challenges WHERE date = $1 AND lang = $2',
+          [date, lang],
+        );
+
+        const row = rows[0];
+        if (row !== undefined) {
+          const startParsed = articleSummarySchema.safeParse(row.start_article);
+          const targetParsed = articleSummarySchema.safeParse(row.target_article);
+
+          if (startParsed.success && targetParsed.success) {
+            request.log.info({ lang, date }, 'daily: paire servie depuis daily_challenges');
+            return reply.code(200).send({
+              date,
+              start: startParsed.data,
+              target: targetParsed.data,
+            });
+          }
+
+          // Données corrompues → log warn + fallback hash+pageviews
+          request.log.warn(
+            { lang, date },
+            'daily: données corrompues en base — fallback hash+pageviews',
+          );
+        }
+      } catch (dbError: unknown) {
+        // Erreur DB non bloquante — fallback hash+pageviews
+        const message = dbError instanceof Error ? dbError.message : String(dbError);
+        request.log.warn(
+          { lang, date, error: message },
+          'daily: erreur DB — fallback hash+pageviews',
+        );
+      }
+
+      // ─── 2. Fallback hash+pageviews (comportement existant inchangé) ────
 
       // Hash déterministe de la date + langue pour varier selon la langue
       const hashInput = `${date}:${lang}`;
