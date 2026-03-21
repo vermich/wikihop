@@ -726,11 +726,13 @@ const styles = StyleSheet.create({
     color: '#2563EB',
   },
   // F3-41 : icône partage positionnée en absolu dans le statsBlock
+  // F3-47 : top/right/padding ajustés — l'icône reste dans la zone de padding supérieur du bloc,
+  // sans chevaucher le statsRow. hitSlop={{ top:8, right:8, bottom:8, left:8 }} garantit 44×44 de tap.
   shareIconButton: {
     position: 'absolute',
-    top: 12,
-    right: 12,
-    padding: 11,
+    top: 8,
+    right: 8,
+    padding: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
