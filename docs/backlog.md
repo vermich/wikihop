@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-21 | **Version** : 5.8
+**PM** : Gauderic | **Mis à jour** : 2026-03-21 | **Version** : 5.9
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -140,7 +140,7 @@
 | [P-01](stories/phase-4/⬜-P-01-privacy-policy.md) | Politique de confidentialité (RGPD) | Must | DPO, Frontend Dev | ⬜ pending |
 | [P-02](stories/phase-4/✅-P-02-owasp-audit.md) | Audit de sécurité — OWASP Mobile Top 10 | Must | Security | ✅ done |
 | [P-03](stories/phase-4/✅-P-03-backend-security.md) | Sécurisation du backend — Headers, CORS, Rate limiting | Must | Security, Backend Dev | ✅ done |
-| [P-04](stories/phase-4/🔄-P-04-secrets-management.md) | Secrets et variables d'environnement (production) | Must | Security, Tech Lead | 🔄 in-progress |
+| [P-04](stories/phase-4/✅-P-04-secrets-management.md) | Secrets et variables d'environnement (production) | Must | Security, Tech Lead | ✅ done |
 | [P-05](stories/phase-4/⬜-P-05-performance-tests.md) | Tests de performance et de charge (backend) | Must | QA, Backend Dev | ⬜ pending |
 | [P-06](stories/phase-4/⬜-P-06-cicd-deployment.md) | Pipeline CI/CD — Build et déploiement automatisé | Must | Tech Lead | ⬜ pending |
 | [P-07](stories/phase-4/⬜-P-07-appstore-ios.md) | Soumission App Store (iOS) | Must | Tech Lead, Frontend Dev, DPO | ⬜ pending |
@@ -153,7 +153,7 @@
 | [P-12](stories/phase-4/⬜-P-12-ota-updates.md) | Stratégie de mise à jour OTA (Over The Air) | Should | Tech Lead, Frontend Dev | ⬜ pending |
 | [P-13](stories/phase-4/⬜-P-13-legal-texts.md) | Textes légaux in-app (CGU simplifiées) | Should | DPO, Frontend Dev | ⬜ pending |
 | [P-14](stories/phase-4/⬜-P-14-crash-reporting.md) | Traçabilité des erreurs côté mobile (crash reporting) | Could | Frontend Dev, DPO | ⬜ pending |
-| [P-15](stories/phase-4/🔄-P-15-sast-security.md) | Tests de sécurité automatisés (SAST) | Could | Security | 🔄 in-progress |
+| [P-15](stories/phase-4/✅-P-15-sast-security.md) | Tests de sécurité automatisés (SAST) | Could | Security | ✅ done |
 | [P-16](stories/phase-4/✅-P-16-fix-daily-challenge-button-disabled-fr-it.md) | Fix — Bouton défi du jour grisé en FR et IT | Must | Frontend Dev, Backend Dev | ✅ done |
 | [P-17](stories/phase-4/🔄-P-17-remove-back-button-daily-challenge.md) | UX — Supprimer le bouton retour sur l'écran défi du jour | Should | Frontend Dev | 🔄 in-progress |
 
