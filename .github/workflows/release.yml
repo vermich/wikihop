@@ -2,18 +2,15 @@ name: Release
 
 on:
   push:
-    branches: [main]
-    paths:
-      - 'apps/mobile/**'
-      - 'apps/backend/**'
-      - 'packages/**'
+    tags:
+      - 'v*.*.*'
 
 jobs:
   # ─────────────────────────────────────────────
-  # Build Expo EAS (preview interne)
+  # Build EAS Production (iOS + Android)
   # ─────────────────────────────────────────────
   build-mobile:
-    name: Build mobile (EAS)
+    name: Build EAS Production
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,9 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: apps/mobile/package-lock.json
+          node-version: 24
 
       - name: Setup Expo
         uses: expo/expo-github-action@v8
@@ -36,17 +31,21 @@ jobs:
         working-directory: apps/mobile
         run: npm ci
 
-      - name: Build preview (iOS + Android)
+      - name: Build production (iOS + Android)
         working-directory: apps/mobile
-        run: eas build --platform all --profile preview --non-interactive
+        run: eas build --platform all --profile production --non-interactive
 
   # ─────────────────────────────────────────────
-  # Deploy Backend
+  # Deploy Backend (après build mobile réussi)
   # ─────────────────────────────────────────────
   deploy-backend:
-    name: Deploy backend
+    name: Deploy Backend
+    needs: [build-mobile]
     runs-on: ubuntu-latest
     environment: production
+    concurrency:
+      group: production-deploy
+      cancel-in-progress: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -54,19 +53,44 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: apps/backend/package-lock.json
+          node-version: 24
 
-      - name: Install dependencies
-        working-directory: apps/backend
-        run: npm ci --production
+      - name: Configure SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
 
-      # À adapter selon l'hébergeur choisi (Railway, Render, Fly.io...)
-      # - name: Deploy to Railway
-      #   run: railway up
-      #   env:
-      #     RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      - name: Deploy to production
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST \
+            "cd /opt/wikihop && \
+             git fetch --tags && \
+             git checkout ${{ github.ref_name }} && \
+             cd apps/backend && \
+             npm ci --omit=dev && \
+             npm run db:migrate && \
+             pm2 reload wikihop-backend"
 
-      - name: Deploy placeholder
-        run: echo "🚀 Backend deployment step — configure with your hosting provider"
+  # ─────────────────────────────────────────────
+  # Notification d'échec (GitHub Issue automatique)
+  # ─────────────────────────────────────────────
+  notify-failure:
+    name: Notify on failure
+    needs: [build-mobile, deploy-backend]
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Create failure issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Release failed: ${context.ref}`,
+              body: `Le pipeline de release a échoué.\n\nRun : ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              labels: ['bug', 'release']
+            })
