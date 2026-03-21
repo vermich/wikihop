@@ -10,7 +10,7 @@
  *   - Bouton Jouer désactivé dans l'état loading
  *   - Message d'erreur + bouton Réessayer dans l'état error
  *   - Sélecteur de langue affiché après hydratation
- *   - Bouton Nouveaux articles visible
+ *   - Bouton Changer articles visible
  *
  * useRandomPair et les stores sont mockés pour des tests déterministes.
  *
@@ -165,10 +165,13 @@ describe('HomeScreen', () => {
       expect(playButton).toBeTruthy();
     });
 
-    it('affiche le bouton Nouveaux articles', () => {
+    it('affiche le bouton Changer articles (ActivityIndicator en état loading)', () => {
       mockPairState = { status: 'loading' };
-      renderHomeScreen();
-      expect(screen.getByText('Nouveaux articles')).toBeTruthy();
+      const { UNSAFE_getByProps } = renderHomeScreen();
+      // En état loading, le bouton refresh affiche un ActivityIndicator (pas le texte)
+      // On vérifie la présence du bouton via son accessibilityLabel
+      const refreshButton = UNSAFE_getByProps({ accessibilityLabel: 'Tirer de nouveaux articles', disabled: true });
+      expect(refreshButton).toBeTruthy();
     });
   });
 

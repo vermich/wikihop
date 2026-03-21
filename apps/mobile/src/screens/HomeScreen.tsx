@@ -34,6 +34,7 @@ import { Image } from 'expo-image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   AccessibilityInfo,
+  ActivityIndicator,
   Alert,
   Animated,
   ScrollView,
@@ -211,8 +212,6 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
 
   // Animation shimmer pour le skeleton
   const shimmerAnim = useRef(new Animated.Value(0.4)).current;
-  // Animation rotation pour l'icône refresh
-  const rotateAnim = useRef(new Animated.Value(0)).current;
 
   // ── Animation shimmer skeleton ───────────────────────────────────────────
   useEffect(() => {
@@ -241,28 +240,6 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
       animation.stop();
     };
   }, [state.status, shimmerAnim]);
-
-  // ── Animation rotation icône refresh ────────────────────────────────────
-  useEffect(() => {
-    if (state.status !== 'loading') {
-      rotateAnim.setValue(0);
-      return;
-    }
-
-    const animation = Animated.loop(
-      Animated.timing(rotateAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-    );
-
-    animation.start();
-
-    return () => {
-      animation.stop();
-    };
-  }, [state.status, rotateAnim]);
 
   // ── Annonces accessibilité ────────────────────────────────────────────────
   useEffect(() => {
@@ -387,12 +364,6 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
       Alert.alert(t('home.error_start_title'), t('home.error_start_message'));
     }
   }, [state, clearSession, startSession, navigation, isDifficultyHard]);
-
-  // ── Calcul de la rotation ────────────────────────────────────────────────
-  const rotateInterpolated = rotateAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
 
   const isLoading = state.status === 'loading';
 
@@ -519,12 +490,17 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
                 accessibilityRole="button"
                 accessibilityState={{ disabled: isLoading }}
               >
-                <Animated.Text style={{ transform: [{ rotate: rotateInterpolated }] }} accessible={false}>
-                  {'↺ '}
-                </Animated.Text>
-                <Text style={[styles.bottomActionButtonText, isLoading && styles.bottomActionButtonTextDisabled]} numberOfLines={2}>
-                  {t('home.new_articles_button')}
-                </Text>
+                {isLoading ? (
+                  <ActivityIndicator
+                    size="small"
+                    color="#2563EB"
+                    accessible={false}
+                  />
+                ) : (
+                  <Text style={styles.bottomActionButtonText} numberOfLines={2}>
+                    {t('home.new_articles_button')}
+                  </Text>
+                )}
               </TouchableOpacity>
 
               <View style={styles.bottomActionRowSeparator} accessible={false} />
@@ -662,12 +638,17 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
               accessibilityRole="button"
               accessibilityState={{ disabled: isLoading }}
             >
-              <Animated.Text style={{ transform: [{ rotate: rotateInterpolated }] }} accessible={false}>
-                {'↺ '}
-              </Animated.Text>
-              <Text style={[styles.bottomActionButtonText, isLoading && styles.bottomActionButtonTextDisabled]} numberOfLines={2}>
-                {t('home.new_articles_button')}
-              </Text>
+              {isLoading ? (
+                <ActivityIndicator
+                  size="small"
+                  color="#2563EB"
+                  accessible={false}
+                />
+              ) : (
+                <Text style={styles.bottomActionButtonText} numberOfLines={2}>
+                  {t('home.new_articles_button')}
+                </Text>
+              )}
             </TouchableOpacity>
 
             <View style={styles.bottomActionRowSeparator} accessible={false} />
@@ -838,8 +819,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 12,
   },
+  // F3-46 : style autonome complet — évite le flash de layout lors de la transition loading→success
   dailyButtonDisabled: {
+    height: 52,
     backgroundColor: '#E2E8F0',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
   },
   // État complété du défi (F3-16) — fond brun foncé #92400E, flexDirection row pour icône + texte
   dailyButtonCompleted: {
@@ -950,9 +937,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#64748B',
     textAlign: 'center',
-  },
-  bottomActionButtonTextDisabled: {
-    color: '#CBD5E1',
   },
   bottomActionRowSeparator: {
     width: 1,
