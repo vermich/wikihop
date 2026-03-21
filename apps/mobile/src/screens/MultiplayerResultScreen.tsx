@@ -112,6 +112,10 @@ function MancheSummaryRow({
       const key = jumps <= 1 ? 'manche_victory_a11y' : 'manche_victory_a11y_plural';
       return t(`multiplayer_result.${key}`, { name, jumps });
     }
+    // F3-49 : forfeit distinct de l'abandon normal
+    if (r.forfeit === true) {
+      return t('multiplayer_result.manche_forfeit_a11y', { name });
+    }
     return t('multiplayer_result.manche_abandoned_a11y', { name });
   }).join(', ');
 
@@ -137,6 +141,16 @@ function MancheSummaryRow({
               <View key={String(i)} style={styles.chipVictoire}>
                 <Text style={styles.chipVictoireText} numberOfLines={1}>
                   {`${name} ✓ ${jumpsText}`}
+                </Text>
+              </View>
+            );
+          }
+          // F3-49 : chip distinct pour les manches abandonnées (forfeit)
+          if (r.forfeit === true) {
+            return (
+              <View key={String(i)} style={styles.chipForfeit}>
+                <Text style={styles.chipForfeitText} numberOfLines={1}>
+                  {`${name} —`}
                 </Text>
               </View>
             );
@@ -270,11 +284,14 @@ export function MultiplayerResultScreen({ navigation }: MultiplayerResultScreenP
   // startNextRound() flush roundHistory AVANT de passer à la manche suivante —
   // la dernière manche reste dans players[] et n'est PAS dans roundHistory du store.
   // completeRoundHistory est utilisé à la fois pour la sauvegarde ET le classement.
-  const lastRoundSnapshot: MultiplayerRoundResult[] = players.map((p) => ({
-    jumps: p.jumps,
-    durationMs: p.durationMs,
-    won: p.won,
-  }));
+  // F3-49 : inclure forfeit dans le snapshot si le joueur a abandonné sa manche.
+  const lastRoundSnapshot: MultiplayerRoundResult[] = players.map((p) => {
+    const base = { jumps: p.jumps, durationMs: p.durationMs, won: p.won };
+    if (p.forfeit === true) {
+      return { ...base, forfeit: true };
+    }
+    return base;
+  });
   const completeRoundHistory = [...roundHistory, lastRoundSnapshot];
 
   // F3-33/F3-36 : utiliser completeRoundHistory (toutes les manches, y compris la dernière)
@@ -555,6 +572,17 @@ const styles = StyleSheet.create({
   chipAbandonText: {
     fontSize: 12,
     color: '#64748B',
+  },
+  // F3-49 : chip forfeit — distinct de l'abandon normal (fond orange pâle)
+  chipForfeit: {
+    backgroundColor: '#FFF7ED',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  chipForfeitText: {
+    fontSize: 12,
+    color: '#C2410C',
   },
   mancheSeparator: {
     height: 1,

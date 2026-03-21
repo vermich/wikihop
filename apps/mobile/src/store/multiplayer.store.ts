@@ -24,7 +24,7 @@ import { create } from 'zustand';
 // Types publics (exportés — utilisés dans les tests et les composants)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type MultiplayerPlayerStatus = 'waiting' | 'playing' | 'done';
+export type MultiplayerPlayerStatus = 'waiting' | 'playing' | 'done' | 'forfeit';
 
 export interface MultiplayerPlayer {
   name: string;
@@ -32,6 +32,8 @@ export interface MultiplayerPlayer {
   jumps: number | null;
   durationMs: number | null;
   won: boolean;
+  /** F3-49 : indique que ce joueur a abandonné sa manche courante */
+  forfeit?: boolean;
 }
 
 /**
@@ -90,6 +92,13 @@ interface MultiplayerActions {
 
   /** Passe au joueur suivant (incrémente currentPlayerIndex). */
   advanceToNextPlayer(): void;
+
+  /**
+   * Enregistre un abandon pour le joueur à l'index donné.
+   * Le joueur est marqué status: 'forfeit', won: false, jumps: null, durationMs: null.
+   * F3-49.
+   */
+  recordForfeit(index: number): void;
 
   /**
    * Transition vers la manche suivante.
@@ -176,19 +185,39 @@ export const useMultiplayerStore = create<MultiplayerState & MultiplayerActions>
     set((state) => ({ currentPlayerIndex: state.currentPlayerIndex + 1 }));
   },
 
+  recordForfeit: (index) => {
+    set((state) => {
+      const updated = [...state.players];
+      const player = updated[index];
+      if (player === undefined) return state;
+      updated[index] = {
+        ...player,
+        status: 'forfeit' as MultiplayerPlayerStatus,
+        jumps: null,
+        durationMs: null,
+        won: false,
+        forfeit: true,
+      };
+      return { players: updated };
+    });
+  },
+
   startNextRound: (start, target) => {
     set((state) => {
       // Construire le snapshot de la manche courante
-      const roundSnapshot: MultiplayerRoundResult[] = state.players.map((p) => ({
-        jumps: p.jumps,
-        durationMs: p.durationMs,
-        won: p.won,
-      }));
+      // F3-49 : inclure forfeit dans le snapshot si le joueur a abandonné
+      const roundSnapshot: MultiplayerRoundResult[] = state.players.map((p) => {
+        const base = { jumps: p.jumps, durationMs: p.durationMs, won: p.won };
+        if (p.forfeit === true) {
+          return { ...base, forfeit: true };
+        }
+        return base;
+      });
 
       return {
         roundHistory: [...state.roundHistory, roundSnapshot],
-        players: state.players.map((p) => ({
-          ...p,
+        players: state.players.map((p): MultiplayerPlayer => ({
+          name: p.name,
           status: 'waiting' as MultiplayerPlayerStatus,
           jumps: null,
           durationMs: null,
@@ -205,8 +234,8 @@ export const useMultiplayerStore = create<MultiplayerState & MultiplayerActions>
   restartSession: (pairs) => {
     const firstPair = pairs[0];
     set((state) => ({
-      players: state.players.map((p) => ({
-        ...p,
+      players: state.players.map((p): MultiplayerPlayer => ({
+        name: p.name,
         status: 'waiting' as MultiplayerPlayerStatus,
         jumps: null,
         durationMs: null,

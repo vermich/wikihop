@@ -157,6 +157,8 @@ export interface MultiplayerRoundResult {
   jumps: number | null;
   durationMs: number | null;
   won: boolean;
+  /** Indique que le joueur a abandonné sa manche — distinct d'une défaite normale. F3-49. */
+  forfeit?: boolean;
 }
 
 /**
