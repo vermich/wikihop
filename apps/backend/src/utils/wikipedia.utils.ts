@@ -9,7 +9,7 @@
  * Référence : docs/specs/F3-51-daily-challenge-news-precalculated.md — Section 5.5
  */
 
-import { SUPPORTED_LANGUAGES } from '@wikihop/shared';
+import type { SUPPORTED_LANGUAGES } from '@wikihop/shared';
 
 import type { ArticleSummaryResponse } from '../routes/game.route';
 
