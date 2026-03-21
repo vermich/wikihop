@@ -4,7 +4,7 @@ title: Monitoring et alerting en production
 phase: 4-Production
 priority: Must
 agents: [Tech Lead, Backend Dev]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---

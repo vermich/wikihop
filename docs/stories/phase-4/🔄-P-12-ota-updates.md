@@ -4,7 +4,7 @@ title: Stratégie de mise à jour OTA (Over The Air)
 phase: 4-Production
 priority: Should
 agents: [Tech Lead, Frontend Dev]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---

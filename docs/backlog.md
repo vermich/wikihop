@@ -142,15 +142,15 @@
 | [P-03](stories/phase-4/✅-P-03-backend-security.md) | Sécurisation du backend — Headers, CORS, Rate limiting | Must | Security, Backend Dev | ✅ done |
 | [P-04](stories/phase-4/✅-P-04-secrets-management.md) | Secrets et variables d'environnement (production) | Must | Security, Tech Lead | ✅ done |
 | [P-05](stories/phase-4/⬜-P-05-performance-tests.md) | Tests de performance et de charge (backend) | Must | QA, Backend Dev | ⬜ pending |
-| [P-06](stories/phase-4/⬜-P-06-cicd-deployment.md) | Pipeline CI/CD — Build et déploiement automatisé | Must | Tech Lead | ⬜ pending |
+| [P-06](stories/phase-4/🔄-P-06-cicd-deployment.md) | Pipeline CI/CD — Build et déploiement automatisé | Must | Tech Lead | 🔄 in-progress |
 | [P-07](stories/phase-4/⬜-P-07-appstore-ios.md) | Soumission App Store (iOS) | Must | Tech Lead, Frontend Dev, DPO | ⬜ pending |
 | [P-08](stories/phase-4/⬜-P-08-playstore-android.md) | Soumission Google Play Store (Android) | Must | Tech Lead, Frontend Dev, DPO | ⬜ pending |
-| [P-09](stories/phase-4/⬜-P-09-monitoring-alerting.md) | Monitoring et alerting en production | Must | Tech Lead, Backend Dev | ⬜ pending |
+| [P-09](stories/phase-4/🔄-P-09-monitoring-alerting.md) | Monitoring et alerting en production | Must | Tech Lead, Backend Dev | 🔄 in-progress |
 | [P-10](stories/phase-4/✅-P-10-rgpd-compliance.md) | Conformité RGPD complète — Registre de traitement | Should | DPO | ✅ done |
 | [P-11](stories/phase-4/⬜-P-11-device-compatibility.md) | Tests de compatibilité appareils (iOS et Android) | Should | QA | ⬜ pending |
 | [M-11](stories/phase-4/⬜-M-11-offline-mode.md) | Gestion du mode hors-ligne | Should | Frontend Dev | ⬜ pending |
 | [M-13](stories/phase-4/⬜-M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | ⬜ pending |
-| [P-12](stories/phase-4/⬜-P-12-ota-updates.md) | Stratégie de mise à jour OTA (Over The Air) | Should | Tech Lead, Frontend Dev | ⬜ pending |
+| [P-12](stories/phase-4/🔄-P-12-ota-updates.md) | Stratégie de mise à jour OTA (Over The Air) | Should | Tech Lead, Frontend Dev | 🔄 in-progress |
 | [P-13](stories/phase-4/✅-P-13-legal-texts.md) | Textes légaux in-app (CGU simplifiées) | Should | DPO, Frontend Dev | ✅ done |
 | [P-14](stories/phase-4/⬜-P-14-crash-reporting.md) | Traçabilité des erreurs côté mobile (crash reporting) | Could | Frontend Dev, DPO | ⬜ pending |
 | [P-15](stories/phase-4/✅-P-15-sast-security.md) | Tests de sécurité automatisés (SAST) | Could | Security | ✅ done |

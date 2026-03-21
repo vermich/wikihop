@@ -4,7 +4,7 @@ title: Pipeline CI/CD — Build et déploiement automatisé
 phase: 4-Production
 priority: Must
 agents: [Tech Lead]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---
