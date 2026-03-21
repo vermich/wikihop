@@ -252,7 +252,11 @@
     "abandon_button": "Abbrechen",
     "error_title": "Artikel konnte nicht geladen werden.",
     "error_subtitle": "Überprüfe deine Internetverbindung.",
-    "retry_button": "Wiederholen"
+    "retry_button": "Wiederholen",
+    "daily_quit_title": "Challenge verlassen?",
+    "daily_quit_message": "Wenn du jetzt verlässt, wird dein täglicher Versuch verbraucht.",
+    "daily_quit_cancel": "Challenge fortsetzen",
+    "daily_quit_confirm": "Verlassen"
   },
   "language_selector": {
     "title": "Oberflächensprache"
