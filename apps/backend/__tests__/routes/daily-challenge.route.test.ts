@@ -308,7 +308,7 @@ describe('GET /api/game/daily', () => {
     expect(response.body).toMatchObject({
       success: false,
       error: {
-        code: 'DAILY_UNAVAILABLE',
+        code: 'DAILY_POOL_EXHAUSTED',
       },
     });
   });
