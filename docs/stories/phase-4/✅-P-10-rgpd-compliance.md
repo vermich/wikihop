@@ -4,9 +4,9 @@ title: Conformité RGPD complète — Registre de traitement
 phase: 4-Production
 priority: Should
 agents: [DPO]
-status: in-progress
+status: done
 created: 2026-02-28
-completed:
+completed: 2026-03-21
 ---
 
 # P-10 — Conformité RGPD complète — Registre de traitement
@@ -39,7 +39,8 @@ Le registre documente 3 traitements :
 **Procédure droits RGPD** : documentée — canal privacy@wikihop.app, réponse sous 1 mois. Dans les faits, aucune donnée identifiante conservée côté serveur (IP pseudonymisée non rattachable à un individu).
 
 ## Validation QA — Halim
-<!-- Rempli par QA après les tests -->
+
+Validée le 2026-03-21. Tous les critères cochés. Registre conforme art. 30 RGPD — 3 traitements documentés. Analyse de risque Wikipedia réalisée. Conclusion bannière cookie motivée et documentée.
 
 ## Statut
 pending → in-progress → done
