@@ -24,7 +24,7 @@ jobs:
         working-directory: apps/backend
         run: |
           if [ -f package.json ]; then
-            npm audit --audit-level=critical
+            npm audit --audit-level=high
           else
             echo "No package.json yet — skipping"
           fi
@@ -45,7 +45,7 @@ jobs:
         working-directory: apps/mobile
         run: |
           if [ -f package.json ]; then
-            npm audit --audit-level=critical
+            npm audit --audit-level=high
           else
             echo "No package.json yet — skipping"
           fi

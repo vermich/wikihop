@@ -43,6 +43,32 @@ const envSchema = z.object({
     .regex(/^\d+$/, 'CACHE_TTL_SECONDS doit être un entier positif')
     .transform(Number)
     .default(3600),
+
+  /**
+   * Origines CORS autorisées en production.
+   * Valeur : chaîne URL unique ou liste séparée par des virgules.
+   * Ex : "https://api.wikihop.app" ou "https://api.wikihop.app,https://admin.wikihop.app"
+   * Non requis en développement (origin: true est utilisé par défaut).
+   * Note : une app React Native native n'envoie pas d'en-tête Origin —
+   * cette variable ne concerne qu'un éventuel frontend web.
+   */
+  CORS_ORIGIN: z.string().optional(),
+
+  /**
+   * Nombre maximum de requêtes par IP par fenêtre de 60 secondes.
+   * Défaut : 60
+   */
+  RATE_LIMIT_MAX: z
+    .string()
+    .regex(/^\d+$/, 'RATE_LIMIT_MAX doit être un entier positif')
+    .transform(Number)
+    .default(60),
+
+  /**
+   * Token secret pour les routes d'administration (Bearer token).
+   * Si absent, la route admin répond 401 (fail-safe).
+   */
+  ADMIN_SECRET_TOKEN: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

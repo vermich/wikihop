@@ -1,0 +1,65 @@
+version: 2
+updates:
+  # Backend dependencies
+  - package-ecosystem: npm
+    directory: /apps/backend
+    schedule:
+      interval: weekly
+      day: monday
+      time: "08:00"
+      timezone: Europe/Paris
+    labels:
+      - dependencies
+      - backend
+    open-pull-requests-limit: 5
+
+  # Mobile dependencies
+  - package-ecosystem: npm
+    directory: /apps/mobile
+    schedule:
+      interval: weekly
+      day: monday
+      time: "08:00"
+      timezone: Europe/Paris
+    labels:
+      - dependencies
+      - mobile
+    open-pull-requests-limit: 5
+
+  # Shared package
+  - package-ecosystem: npm
+    directory: /packages/shared
+    schedule:
+      interval: weekly
+      day: monday
+      time: "08:00"
+      timezone: Europe/Paris
+    labels:
+      - dependencies
+      - shared
+    open-pull-requests-limit: 3
+
+  # Root monorepo
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "08:00"
+      timezone: Europe/Paris
+    labels:
+      - dependencies
+    open-pull-requests-limit: 3
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "08:00"
+      timezone: Europe/Paris
+    labels:
+      - dependencies
+      - ci
+    open-pull-requests-limit: 3

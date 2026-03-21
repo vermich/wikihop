@@ -14,6 +14,14 @@ import { env } from './env';
 async function start(): Promise<void> {
   const app = buildApp();
 
+  // P-04 : NODE_ENV non défini explicitement → comportement par défaut 'development'
+  // En production, NODE_ENV doit être déclaré explicitement dans l'environnement.
+  if (process.env['NODE_ENV'] === undefined) {
+    app.log.warn(
+      'NODE_ENV is not set — defaulting to "development". Set NODE_ENV=production in production environments.',
+    );
+  }
+
   try {
     await app.listen({ port: env.PORT, host: env.HOST });
     // Fastify log l'adresse d'écoute automatiquement via Pino

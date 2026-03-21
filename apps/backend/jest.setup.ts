@@ -12,6 +12,8 @@ process.env['NODE_ENV'] = 'test';
 process.env['PORT'] = '0'; // Port 0 = port aléatoire (évite les conflits)
 process.env['HOST'] = '127.0.0.1';
 process.env['LOG_LEVEL'] = 'silent';
+// Token admin pour les tests — valeur arbitraire non-secrète
+process.env['ADMIN_SECRET_TOKEN'] = 'test-admin-token';
 
 // DATABASE_URL est requis par env.ts — on fournit une URL valide pour le parsing.
 // Le test de connexion réel (db.test.ts) nécessite une BDD PostgreSQL accessible.
