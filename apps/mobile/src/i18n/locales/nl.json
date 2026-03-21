@@ -137,6 +137,8 @@
     "sources_api_a11y": "Gebruiksvoorwaarden van de MediaWiki API bekijken",
     "legal_privacy_label": "Privacybeleid",
     "legal_privacy_a11y": "Privacybeleid van WikiHop bekijken",
+    "legal_mentions_label": "Juridische informatie",
+    "legal_mentions_a11y": "Juridische informatie van WikiHop bekijken",
     "code_github_label": "Broncode op GitHub",
     "code_github_a11y": "Broncode van WikiHop op GitHub bekijken"
   },
