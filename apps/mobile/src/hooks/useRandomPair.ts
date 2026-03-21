@@ -11,13 +11,14 @@
  * Conventions :
  *   - Export nommé
  *   - AbortController + flag `cancelled` pour éviter les setState après démontage
- *   - URL backend : localhost:3000 en développement (Phase 2)
+ *   - URL backend : centralisée dans config/backend.config.ts (EXPO_PUBLIC_BACKEND_URL)
  *   - La langue courante est lue depuis useLanguageStore
  */
 
 import type { ArticleSummary, GameDifficulty } from '@wikihop/shared';
 import { useCallback, useEffect, useState } from 'react';
 
+import { BACKEND_BASE_URL } from '../config/backend.config';
 import { useLanguageStore } from '../store/language.store';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -82,7 +83,7 @@ export function useRandomPair(difficulty: GameDifficulty = 'normal'): UseRandomP
 
     void (async () => {
       try {
-        const url = `http://192.168.1.30:3000/api/game/random-pair?lang=${language}&difficulty=${difficulty}`;
+        const url = `${BACKEND_BASE_URL}/api/game/random-pair?lang=${language}&difficulty=${difficulty}`;
         const response = await fetch(url, {
           signal: controller.signal,
         });

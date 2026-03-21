@@ -10,11 +10,13 @@
  *   - Exports nommés uniquement (pas de classe, pas de singleton)
  *   - AbortController + flag `cancelled` pour éviter les setState après démontage
  *   - Retour null en cas d'erreur (pas de throw) — cohérence avec useRandomPair
- *   - URL backend : même base que useRandomPair (192.168.1.30:3000)
+ *   - URL backend : centralisée dans config/backend.config.ts (EXPO_PUBLIC_BACKEND_URL)
  *   - Timeout 10s via AbortController
  */
 
 import type { ArticleSummary, Language } from '@wikihop/shared';
+
+import { BACKEND_BASE_URL } from '../config/backend.config';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constantes
@@ -22,9 +24,6 @@ import type { ArticleSummary, Language } from '@wikihop/shared';
 
 /** Timeout pour l'appel au backend (ms) */
 const DAILY_CHALLENGE_TIMEOUT_MS = 10_000;
-
-/** URL de base du backend WikiHop */
-const BACKEND_BASE_URL = 'http://192.168.1.30:3000';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
