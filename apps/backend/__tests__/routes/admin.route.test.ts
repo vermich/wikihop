@@ -7,8 +7,10 @@
  * - 200 avec erreur API Wikimedia mockée (status 'error')
  * - Structure de la réponse : { date, results }
  * - Idempotence : le rejeu ne crée pas de doublon
+ * - 401 sans Bearer token valide (P-03 — P-02 finding 3)
  *
  * `computeDailyChallengeFromNews` et `query` sont mockés — aucun appel réseau réel en CI.
+ * ADMIN_SECRET_TOKEN='test-admin-token' est injecté par jest.setup.ts.
  * Référence : docs/specs/F3-51-daily-challenge-news-precalculated.md — Section 6
  */
 
@@ -64,6 +66,9 @@ function buildArticleSummary(lang: string = 'fr', titleSuffix: string = '') {
 // describe: POST /api/admin/daily-challenges/precompute
 // ---------------------------------------------------------------------------
 
+// Token injecté par jest.setup.ts
+const ADMIN_TOKEN = 'test-admin-token';
+
 describe('POST /api/admin/daily-challenges/precompute', () => {
   const app = buildApp();
 
@@ -85,6 +90,29 @@ describe('POST /api/admin/daily-challenges/precompute', () => {
   });
 
   // ─────────────────────────────────────────────
+  // Authentification (P-02 finding 3 / P-03)
+  // ─────────────────────────────────────────────
+
+  it("retourne 401 sans header Authorization", async () => {
+    const response = await supertest(app.server)
+      .post('/api/admin/daily-challenges/precompute')
+      .send();
+
+    expect(response.status).toBe(401);
+    expect(response.body).toMatchObject({ statusCode: 401, error: 'Unauthorized' });
+  });
+
+  it("retourne 401 avec un token invalide", async () => {
+    const response = await supertest(app.server)
+      .post('/api/admin/daily-challenges/precompute')
+      .set('Authorization', 'Bearer wrong-token')
+      .send();
+
+    expect(response.status).toBe(401);
+    expect(response.body).toMatchObject({ statusCode: 401, error: 'Unauthorized' });
+  });
+
+  // ─────────────────────────────────────────────
   // Cas nominal — pool suffisant pour toutes les langues
   // ─────────────────────────────────────────────
 
@@ -100,6 +128,7 @@ describe('POST /api/admin/daily-challenges/precompute', () => {
 
     const response = await supertest(app.server)
       .post('/api/admin/daily-challenges/precompute')
+      .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
       .send();
 
     expect(response.status).toBe(200);
@@ -126,6 +155,7 @@ describe('POST /api/admin/daily-challenges/precompute', () => {
 
     const response = await supertest(app.server)
       .post('/api/admin/daily-challenges/precompute')
+      .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
       .send();
 
     expect(response.status).toBe(200);
@@ -140,6 +170,7 @@ describe('POST /api/admin/daily-challenges/precompute', () => {
 
     const response = await supertest(app.server)
       .post('/api/admin/daily-challenges/precompute')
+      .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
       .send();
 
     expect(response.status).toBe(200);
@@ -161,6 +192,7 @@ describe('POST /api/admin/daily-challenges/precompute', () => {
 
     const response = await supertest(app.server)
       .post('/api/admin/daily-challenges/precompute')
+      .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
       .send();
 
     expect(response.status).toBe(200);
@@ -182,6 +214,7 @@ describe('POST /api/admin/daily-challenges/precompute', () => {
 
     const response = await supertest(app.server)
       .post('/api/admin/daily-challenges/precompute')
+      .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
       .send();
 
     expect(response.status).toBe(200);
@@ -200,6 +233,7 @@ describe('POST /api/admin/daily-challenges/precompute', () => {
 
     const response = await supertest(app.server)
       .post('/api/admin/daily-challenges/precompute')
+      .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
       .send();
 
     expect(response.status).toBe(200);
@@ -215,6 +249,7 @@ describe('POST /api/admin/daily-challenges/precompute', () => {
 
     const response = await supertest(app.server)
       .post('/api/admin/daily-challenges/precompute')
+      .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
       .send();
 
     expect(response.status).toBe(200);
@@ -240,6 +275,7 @@ describe('POST /api/admin/daily-challenges/precompute', () => {
 
     const response = await supertest(app.server)
       .post('/api/admin/daily-challenges/precompute')
+      .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
       .send();
 
     expect(response.status).toBe(200);
@@ -264,6 +300,7 @@ describe('POST /api/admin/daily-challenges/precompute', () => {
 
     await supertest(app.server)
       .post('/api/admin/daily-challenges/precompute')
+      .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
       .send();
 
     // Vérifie que query a été appelé avec ON CONFLICT DO UPDATE

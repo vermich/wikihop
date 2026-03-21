@@ -6,9 +6,9 @@
  *   Pré-calcule le défi du jour pour J+1, toutes langues supportées.
  *   Déclenché manuellement ou via cron externe (pas de cron intégré — ADR-009).
  *
- * IMPORTANT : Pas d'authentification sur ces routes en Phase 3.
- * Raison : route accessible en réseau interne uniquement (hors scope Phase 3).
- * À sécuriser en Phase 4 (Bearer token ou IP whitelist).
+ * Sécurité (Phase 4 — P-03) : authentification via Bearer token.
+ * La variable ADMIN_SECRET_TOKEN doit être définie en production.
+ * Si absente, la route répond 401 (fail-safe).
  *
  * Référence : docs/specs/F3-51-daily-challenge-news-precalculated.md — Section 6
  */
@@ -18,9 +18,9 @@ import type { FastifyInstance } from 'fastify';
 import type { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { z } from 'zod/v4';
 
-
 import { query } from '../db/index';
 import type { DailyChallengeRow } from '../db/schema';
+import { env } from '../env';
 import { computeDailyChallengeFromNews } from '../services/daily-news.service';
 import { djb2Hash } from '../utils/daily-challenge.utils';
 
@@ -45,6 +45,12 @@ const serviceErrorSchema = z.object({
     code: z.string(),
     message: z.string(),
   }),
+});
+
+const unauthorizedSchema = z.object({
+  statusCode: z.literal(401),
+  error: z.string(),
+  message: z.string(),
 });
 
 export type LangResult = z.infer<typeof langResultSchema>;
@@ -76,11 +82,33 @@ export async function adminRoutes(instance: FastifyInstance): Promise<void> {
         tags: ['admin'],
         response: {
           200: precomputeResponseSchema,
+          401: unauthorizedSchema,
           500: serviceErrorSchema,
         },
       },
     },
     async (request, reply) => {
+      // ── Authentification Bearer token ─────────────────────────────────────
+      // Si ADMIN_SECRET_TOKEN est absent de la config → route désactivée (fail-safe)
+      if (env.ADMIN_SECRET_TOKEN === undefined) {
+        return reply.code(401).send({
+          statusCode: 401,
+          error: 'Unauthorized',
+          message: 'Unauthorized',
+        });
+      }
+
+      const authHeader = request.headers['authorization'];
+      const expectedToken = `Bearer ${env.ADMIN_SECRET_TOKEN}`;
+
+      if (authHeader !== expectedToken) {
+        return reply.code(401).send({
+          statusCode: 401,
+          error: 'Unauthorized',
+          message: 'Unauthorized',
+        });
+      }
+
       // Calculer J+1 en UTC
       const targetDate = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
 
