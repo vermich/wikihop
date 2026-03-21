@@ -4,7 +4,7 @@ title: UX — Supprimer le bouton retour sur l'écran défi du jour
 phase: 4-Production
 priority: Should
 agents: [Frontend Dev]
-status: pending
+status: in-progress
 created: 2026-03-21
 completed:
 ---
@@ -32,4 +32,4 @@ Toute modification touchant la navigation dans ArticleScreen doit respecter la r
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending
+in-progress

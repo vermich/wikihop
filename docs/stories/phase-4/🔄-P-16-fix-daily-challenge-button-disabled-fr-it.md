@@ -4,7 +4,7 @@ title: Fix — Bouton défi du jour grisé en FR et IT
 phase: 4-Production
 priority: Must
 agents: [Frontend Dev, Backend Dev]
-status: pending
+status: in-progress
 created: 2026-03-21
 completed:
 ---
@@ -32,4 +32,4 @@ Ce bug est distinct de F3-46 (fix contraste et délai d'affichage) et de F3-37 (
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending
+in-progress
