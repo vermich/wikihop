@@ -230,6 +230,26 @@ describe('POST /api/admin/daily-challenges/precompute', () => {
   });
 
   // ─────────────────────────────────────────────
+  // Branche catch — erreur non-Error (String(error))
+  // ─────────────────────────────────────────────
+
+  it("retourne status 'error' quand computeDailyChallengeFromNews throw une valeur non-Error", async () => {
+    // Couvre la branche String(error) dans le catch (ligne 122 de admin.route.ts)
+    // quand error n'est pas une instance d'Error (ex: throw 'string error')
+    mockComputeDailyChallenge.mockRejectedValue('erreur string non-Error');
+
+    const response = await supertest(app.server)
+      .post('/api/admin/daily-challenges/precompute')
+      .send();
+
+    expect(response.status).toBe(200);
+
+    const body = response.body as { results: Array<{ status: string }> };
+    const errorResults = body.results.filter((r) => r.status === 'error');
+    expect(errorResults.length).toBeGreaterThan(0);
+  });
+
+  // ─────────────────────────────────────────────
   // Idempotence — rejeu safe (ON CONFLICT DO UPDATE)
   // ─────────────────────────────────────────────
 
