@@ -4,9 +4,9 @@ title: Fix — Bouton partage mal positionné sur VictoryScreen (chevauchement t
 phase: 3-Features
 priority: Must
 agents: [Frontend Dev]
-status: in-progress
+status: done
 created: 2026-03-21
-completed:
+completed: 2026-03-21
 ---
 
 # F3-47 — Fix — Bouton partage mal positionné sur VictoryScreen (chevauchement texte)
@@ -31,4 +31,4 @@ Symptôme observé : le bouton de partage est positionné sur le "s" de "seconde
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending → in-progress
+pending → in-progress → done

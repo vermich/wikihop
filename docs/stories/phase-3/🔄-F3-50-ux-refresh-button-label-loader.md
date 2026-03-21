@@ -4,9 +4,9 @@ title: UX — Renommer "Changer articles" + loader dynamique sur le bouton Recha
 phase: 3-Features
 priority: Should
 agents: [Frontend Dev]
-status: in-progress
+status: done
 created: 2026-03-21
-completed:
+completed: 2026-03-21
 ---
 
 # F3-50 — UX — Renommer "Changer articles" + loader dynamique sur le bouton Recharger
@@ -36,4 +36,4 @@ Modifications attendues :
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending → in-progress
+pending → in-progress → done

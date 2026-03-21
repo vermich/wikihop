@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-21 | **Version** : 5.6
+**PM** : Gauderic | **Mis à jour** : 2026-03-21 | **Version** : 5.7
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -122,12 +122,12 @@
 | [F3-43](stories/phase-3/🔄-F3-43-hard-mode-label-home-toggle.md) | UX — Ajouter le libellé "Difficile" à côté du toggle mode difficile sur HomeScreen | Should | Frontend Dev | ✅ done |
 | [F3-44](stories/phase-3/🔄-F3-44-history-link-to-button-home.md) | UX — Transformer le lien "Historique des parties" en bouton sur HomeScreen | Should | Frontend Dev, UX/UI | ✅ done |
 | [F3-45](stories/phase-3/✅-F3-45-home-bottom-action-row.md) | UX — Ligne de 3 boutons en bas de HomeScreen (Wikipedia / Recharger / À propos) | Should | Frontend Dev, UX/UI | ✅ done |
-| [F3-46](stories/phase-3/🔄-F3-46-fix-daily-challenge-button-display.md) | Fix — Affichage bouton défi du jour (FR/IT incorrect, délai autres langues) | Must | Frontend Dev | 🔄 in-progress |
-| [F3-47](stories/phase-3/🔄-F3-47-fix-share-button-position-victory-screen.md) | Fix — Bouton partage mal positionné sur VictoryScreen (chevauchement texte) | Must | Frontend Dev | 🔄 in-progress |
+| [F3-46](stories/phase-3/✅-F3-46-fix-daily-challenge-button-display.md) | Fix — Affichage bouton défi du jour (FR/IT incorrect, délai autres langues) | Must | Frontend Dev | ✅ done |
+| [F3-47](stories/phase-3/✅-F3-47-fix-share-button-position-victory-screen.md) | Fix — Bouton partage mal positionné sur VictoryScreen (chevauchement texte) | Must | Frontend Dev | ✅ done |
 | [F3-48](stories/phase-3/🔄-F3-48-fix-back-button-missing-first-jumps.md) | Fix — Bouton retour absent sur les premiers sauts dans ArticleScreen | Must | Frontend Dev | 🔄 in-progress |
 | [F3-49](stories/phase-3/🔄-F3-49-fix-multiplayer-forfeit-handling.md) | Fix — Multijoueur : abandon d'un joueur passe incorrectement au joueur suivant | Must | Frontend Dev, Backend Dev | 🔄 in-progress |
-| [F3-50](stories/phase-3/🔄-F3-50-ux-refresh-button-label-loader.md) | UX — Renommer "Changer articles" + loader dynamique sur le bouton Recharger | Should | Frontend Dev | 🔄 in-progress |
-| [F3-51](stories/phase-3/🔄-F3-51-daily-challenge-news-based-precalculated.md) | Défi du jour basé sur l'actualité Wikipedia (pré-calculé J-1) | Should | Backend Dev, Tech Lead | 🔄 in-progress |
+| [F3-50](stories/phase-3/✅-F3-50-ux-refresh-button-label-loader.md) | UX — Renommer "Changer articles" + loader dynamique sur le bouton Recharger | Should | Frontend Dev | ✅ done |
+| [F3-51](stories/phase-3/✅-F3-51-daily-challenge-news-based-precalculated.md) | Défi du jour basé sur l'actualité Wikipedia (pré-calculé J-1) | Should | Backend Dev, Tech Lead | ✅ done |
 
 ---
 
@@ -245,4 +245,5 @@
 *v5.3 : Phase 3B Recette — 9 stories créées (F3-37 à F3-45) suite aux tests d'acceptance Client (2 bugs Must + 7 UX Should) (2026-03-18)*
 *v5.4 : F3-37 à F3-45 passées in-progress — Phase 3B vague UX lancée (2026-03-20)*
 *v5.5 : Phase 3C — 5 stories créées (F3-46 à F3-50) suite aux retours de tests Phase 3B du Client (4 bugs Must + 1 UX Should) (2026-03-21)*
+*v5.7 : Phase 3C partielle — F3-46/47/50/51 passées en done (2026-03-21) — F3-48/F3-49 restent in-progress (gate device physique Client en attente)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*

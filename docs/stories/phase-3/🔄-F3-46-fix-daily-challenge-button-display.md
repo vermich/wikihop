@@ -4,9 +4,9 @@ title: Fix — Affichage bouton défi du jour (FR/IT incorrect, délai autres la
 phase: 3-Features
 priority: Must
 agents: [Frontend Dev]
-status: in-progress
+status: done
 created: 2026-03-21
-completed:
+completed: 2026-03-21
 ---
 
 # F3-46 — Fix — Affichage bouton défi du jour (FR/IT incorrect, délai autres langues)
@@ -32,4 +32,4 @@ Symptôme observé : en FR et IT, le bouton défi du jour présente un problème
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending → in-progress
+pending → in-progress → done

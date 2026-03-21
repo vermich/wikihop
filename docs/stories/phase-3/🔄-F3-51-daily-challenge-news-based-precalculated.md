@@ -4,9 +4,9 @@ title: Défi du jour basé sur l'actualité Wikipedia (pré-calculé J-1)
 phase: 3-Features
 priority: Should
 agents: [Backend Dev, Tech Lead]
-status: in-progress
+status: done
 created: 2026-03-21
-completed:
+completed: 2026-03-21
 ---
 
 # F3-51 — Défi du jour basé sur l'actualité Wikipedia (pré-calculé J-1)
@@ -39,4 +39,4 @@ Périmètre backend attendu :
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending → in-progress
+pending → in-progress → done
