@@ -137,6 +137,8 @@
     "sources_api_a11y": "Ver os termos de uso da API MediaWiki",
     "legal_privacy_label": "Política de privacidade",
     "legal_privacy_a11y": "Consultar a política de privacidade do WikiHop",
+    "legal_mentions_label": "Aviso legal",
+    "legal_mentions_a11y": "Consultar o aviso legal do WikiHop",
     "code_github_label": "Código-fonte no GitHub",
     "code_github_a11y": "Ver o código-fonte do WikiHop no GitHub"
   },
