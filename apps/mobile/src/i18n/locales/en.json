@@ -252,7 +252,11 @@
     "abandon_button": "Abandon",
     "error_title": "Unable to load this article.",
     "error_subtitle": "Check your internet connection.",
-    "retry_button": "Retry"
+    "retry_button": "Retry",
+    "daily_quit_title": "Quit the challenge?",
+    "daily_quit_message": "If you quit now, your daily attempt will be used up.",
+    "daily_quit_cancel": "Continue challenge",
+    "daily_quit_confirm": "Quit"
   },
   "language_selector": {
     "title": "Interface language"

@@ -252,7 +252,11 @@
     "abandon_button": "Abandonner",
     "error_title": "Impossible de charger cet article.",
     "error_subtitle": "Vérifiez votre connexion internet.",
-    "retry_button": "Réessayer"
+    "retry_button": "Réessayer",
+    "daily_quit_title": "Quitter le défi ?",
+    "daily_quit_message": "Si vous quittez maintenant, votre tentative quotidienne sera consommée.",
+    "daily_quit_cancel": "Continuer le défi",
+    "daily_quit_confirm": "Quitter"
   },
   "language_selector": {
     "title": "Langue de l'interface"

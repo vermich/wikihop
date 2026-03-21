@@ -112,7 +112,18 @@ const mockAddJump = jest.fn().mockResolvedValue(undefined);
 const mockCompleteSession = jest.fn().mockResolvedValue(undefined);
 const mockAbandonSession = jest.fn().mockResolvedValue(undefined);
 
-const mockCurrentSession = {
+// P-17 : session mutable — isDailyChallenge peut être activé/désactivé par test
+// L'objet est muté directement (pas de spread) pour que la closure dans jest.mock
+// lise toujours la valeur courante au moment de l'appel du sélecteur.
+const mockCurrentSession: {
+  status: string;
+  jumps: number;
+  path: Array<{ id: string; title: string; url: string; language: string }>;
+  startArticle: { id: string; title: string; url: string; language: string };
+  targetArticle: { id: string; title: string; url: string; language: string };
+  startedAt: Date;
+  isDailyChallenge?: boolean;
+} = {
   status: 'in_progress',
   jumps: 0,
   path: [{ id: '1', title: 'Tour Eiffel', url: 'https://fr.m.wikipedia.org/wiki/Tour_Eiffel', language: 'fr' }],
@@ -127,12 +138,16 @@ jest.mock('../src/store/game.store', () => ({
     addJump: jest.Mock;
     completeSession: jest.Mock;
     abandonSession: jest.Mock;
+    clearSession: jest.Mock;
+    startSession: jest.Mock;
   }) => unknown) =>
     selector({
       currentSession: mockCurrentSession,
       addJump: mockAddJump,
       completeSession: mockCompleteSession,
       abandonSession: mockAbandonSession,
+      clearSession: jest.fn().mockResolvedValue(undefined),
+      startSession: jest.fn().mockResolvedValue(undefined),
     }),
   ),
 }));
@@ -195,6 +210,8 @@ describe('ArticleScreen', () => {
     jest.clearAllMocks();
     capturedWebViewProps = {};
     mockIsFocused = true;
+    // P-17 : réinitialiser isDailyChallenge à false entre chaque test
+    delete mockCurrentSession.isDailyChallenge;
     mockWebViewGoBack.mockClear();
     mockWebViewInjectJavaScript.mockClear();
     mockAddJump.mockResolvedValue(undefined);
@@ -745,6 +762,149 @@ describe('ArticleScreen', () => {
 
       // addJump NE doit PAS être appelé (retour arrière — isBackNavigation flag)
       expect(mockAddJump).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── P-17 — Bouton retour header et BackHandler en mode défi quotidien ─────────
+
+  describe('P-17 — Bouton retour header et BackHandler en mode défi quotidien', () => {
+    it('Cas 1 — Mode solo, stackSize > 1 : bouton retour visible', async () => {
+      // isDailyChallenge = false (par défaut), stack = 2 après un saut forward
+      mockCurrentSession.isDailyChallenge = false;
+      const { queryByLabelText } = renderArticleScreen();
+      await act(async () => { await Promise.resolve(); });
+
+      // Simuler un saut forward pour stackSize > 1
+      await act(async () => {
+        capturedWebViewProps.onNavigationStateChange?.({
+          canGoBack: true,
+          url: 'https://fr.m.wikipedia.org/wiki/Paris',
+          loading: false,
+        });
+        await Promise.resolve();
+      });
+      await waitFor(() => { expect(mockAddJump).toHaveBeenCalledTimes(1); });
+
+      // Le bouton retour doit être visible (mode solo + stackSize > 1)
+      expect(queryByLabelText("Retour à l'article précédent")).toBeTruthy();
+    });
+
+    it('Cas 2 — Mode défi, stackSize > 1 : bouton retour masqué', async () => {
+      // isDailyChallenge = true → bouton retour masqué même si stackSize > 1
+      mockCurrentSession.isDailyChallenge = true;
+      const { queryByLabelText } = renderArticleScreen();
+      await act(async () => { await Promise.resolve(); });
+
+      // Simuler un saut forward pour stackSize > 1
+      await act(async () => {
+        capturedWebViewProps.onNavigationStateChange?.({
+          canGoBack: true,
+          url: 'https://fr.m.wikipedia.org/wiki/Paris',
+          loading: false,
+        });
+        await Promise.resolve();
+      });
+      await waitFor(() => { expect(mockAddJump).toHaveBeenCalledTimes(1); });
+
+      // Le bouton retour NE doit PAS être visible (mode défi)
+      expect(queryByLabelText("Retour à l'article précédent")).toBeNull();
+    });
+
+    it('Cas 3 — Mode solo, stackSize = 1 : placeholder (non régressé)', async () => {
+      // isDailyChallenge = false, stackSize = 1 (aucun saut forward)
+      mockCurrentSession.isDailyChallenge = false;
+      const { queryByLabelText } = renderArticleScreen();
+      await act(async () => { await Promise.resolve(); });
+
+      // Aucun saut forward → stackSize = 1 → bouton retour non visible
+      expect(queryByLabelText("Retour à l'article précédent")).toBeNull();
+    });
+
+    it('Cas 4 — BackHandler mode défi → alerte daily_quit_title', async () => {
+      // isDailyChallenge = true → BackHandler doit appeler Alert avec daily_quit_title
+      mockCurrentSession.isDailyChallenge = true;
+      mockIsFocused = true;
+
+      const alertSpy = jest.spyOn(Alert, 'alert');
+
+      const handlers: Array<() => boolean> = [];
+      jest.spyOn(BackHandler, 'addEventListener').mockImplementation(
+        (_event, handler) => {
+          handlers.push(handler as () => boolean);
+          return { remove: jest.fn() };
+        },
+      );
+
+      renderArticleScreen();
+      await act(async () => { await Promise.resolve(); });
+
+      const lastHandler = handlers[handlers.length - 1];
+      expect(lastHandler).toBeDefined();
+
+      let result: boolean | undefined;
+      await act(async () => {
+        result = lastHandler?.();
+        await Promise.resolve();
+      });
+
+      expect(result).toBe(true);
+      // Doit appeler Alert avec le titre daily_quit_title (résolu depuis fr.json)
+      expect(alertSpy).toHaveBeenCalledWith(
+        'Quitter le défi ?',
+        expect.any(String),
+        expect.any(Array),
+      );
+      // handleGoBack ne doit pas être appelé
+      expect(mockWebViewGoBack).not.toHaveBeenCalled();
+    });
+
+    it('Cas 5 — BackHandler mode solo, stackSize > 1 → handleGoBack (non régressé)', async () => {
+      // isDailyChallenge = false, stackSize > 1 → comportement inchangé (handleGoBack)
+      mockCurrentSession.isDailyChallenge = false;
+      mockIsFocused = true;
+
+      const alertSpy = jest.spyOn(Alert, 'alert');
+
+      const handlers: Array<() => boolean> = [];
+      jest.spyOn(BackHandler, 'addEventListener').mockImplementation(
+        (_event, handler) => {
+          handlers.push(handler as () => boolean);
+          return { remove: jest.fn() };
+        },
+      );
+
+      renderArticleScreen();
+      await act(async () => { await Promise.resolve(); });
+
+      // Saut forward pour stackSize > 1
+      await act(async () => {
+        capturedWebViewProps.onNavigationStateChange?.({
+          canGoBack: true,
+          url: 'https://fr.m.wikipedia.org/wiki/Paris',
+          loading: false,
+        });
+        await Promise.resolve();
+      });
+      await waitFor(() => { expect(mockAddJump).toHaveBeenCalledTimes(1); });
+
+      const lastHandler = handlers[handlers.length - 1];
+      expect(lastHandler).toBeDefined();
+
+      let result: boolean | undefined;
+      await act(async () => {
+        result = lastHandler?.();
+        await Promise.resolve();
+      });
+
+      expect(result).toBe(true);
+      // handleGoBack a été appelé (pop du stack) → webViewGoBack non appelé (architecture F3-34)
+      expect(mockWebViewGoBack).not.toHaveBeenCalled();
+      // Alert daily_quit ne doit pas être appelée
+      expect(alertSpy).not.toHaveBeenCalledWith(
+        'Quitter le défi ?',
+        expect.any(String),
+        expect.any(Array),
+      );
     });
   });
 });

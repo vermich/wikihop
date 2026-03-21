@@ -252,7 +252,11 @@
     "abandon_button": "Verlaten",
     "error_title": "Kan dit artikel niet laden.",
     "error_subtitle": "Controleer je internetverbinding.",
-    "retry_button": "Opnieuw proberen"
+    "retry_button": "Opnieuw proberen",
+    "daily_quit_title": "Uitdaging verlaten?",
+    "daily_quit_message": "Als je nu verlaat, wordt je dagelijkse poging verbruikt.",
+    "daily_quit_cancel": "Doorgaan met uitdaging",
+    "daily_quit_confirm": "Verlaten"
   },
   "language_selector": {
     "title": "Interfacetaal"

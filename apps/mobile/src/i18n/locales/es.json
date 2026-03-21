@@ -252,7 +252,11 @@
     "abandon_button": "Abandonar",
     "error_title": "Imposible cargar este artículo.",
     "error_subtitle": "Verifica tu conexión a internet.",
-    "retry_button": "Reintentar"
+    "retry_button": "Reintentar",
+    "daily_quit_title": "¿Salir del desafío?",
+    "daily_quit_message": "Si sales ahora, tu intento diario será consumido.",
+    "daily_quit_cancel": "Continuar el desafío",
+    "daily_quit_confirm": "Salir"
   },
   "language_selector": {
     "title": "Idioma de la interfaz"

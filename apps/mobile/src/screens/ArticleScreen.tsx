@@ -103,6 +103,11 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
   const clearSession = useGameStore((state) => state.clearSession);
   const startSession = useGameStore((state) => state.startSession);
 
+  // Sélecteur défi quotidien — P-17
+  const isDailyChallenge = useGameStore(
+    (state) => state.currentSession?.isDailyChallenge === true,
+  );
+
   // Sélecteurs multijoueur — F3-49
   const isMultiplayerActive = useMultiplayerStore((state) => state.isSessionActive);
   const currentPlayerIndex = useMultiplayerStore((state) => state.currentPlayerIndex);
@@ -304,6 +309,22 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
     roundCount,
   ]);
 
+  // ── handleDailyQuit — alerte de confirmation pour quitter le défi quotidien (P-17) ─
+  const handleDailyQuit = useCallback((): void => {
+    Alert.alert(
+      t('article_screen.daily_quit_title'),
+      t('article_screen.daily_quit_message'),
+      [
+        { text: t('article_screen.daily_quit_cancel'), style: 'cancel' },
+        {
+          text: t('article_screen.daily_quit_confirm'),
+          style: 'destructive',
+          onPress: () => { handleAbandon(); },
+        },
+      ],
+    );
+  }, [t, handleAbandon]);
+
   // ── handleGoBack — retour vers l'article précédent via le stack applicatif ────
   const handleGoBack = useCallback((): void => {
     if (articleStack.current.length <= 1) {
@@ -341,6 +362,11 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
     const subscription = BackHandler.addEventListener(
       'hardwareBackPress',
       () => {
+        // P-17 : en mode défi quotidien, le back Android affiche l'alerte daily_quit
+        if (isDailyChallenge) {
+          handleDailyQuit();
+          return true;
+        }
         if (stackSize > 1) {
           handleGoBack();
           return true;
@@ -354,7 +380,7 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
     return () => {
       subscription.remove();
     };
-  }, [isFocused, stackSize, handleGoBack, handleAbandon]);
+  }, [isFocused, stackSize, isDailyChallenge, handleGoBack, handleAbandon, handleDailyQuit]);
 
   // ── Rendu ────────────────────────────────────────────────────────────────────
 
@@ -363,8 +389,8 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
       {/* Header fixe avec SafeAreaView edges top */}
       <SafeAreaView edges={['top']} style={styles.headerSafeArea}>
         <View style={styles.header}>
-          {/* F3-34 : bouton retour conditionné sur stackSize > 1 */}
-          {stackSize > 1 ? (
+          {/* P-17 : bouton retour masqué si stackSize <= 1 ou mode défi quotidien */}
+          {stackSize > 1 && !isDailyChallenge ? (
             <TouchableOpacity
               style={styles.backButton}
               onPress={handleGoBack}

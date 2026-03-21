@@ -259,7 +259,11 @@
     "abandon_button": "Porzuć",
     "error_title": "Nie można załadować tego artykułu.",
     "error_subtitle": "Sprawdź połączenie z internetem.",
-    "retry_button": "Spróbuj ponownie"
+    "retry_button": "Spróbuj ponownie",
+    "daily_quit_title": "Wyjść z wyzwania?",
+    "daily_quit_message": "Jeśli wyjdziesz teraz, twoja dzienna próba zostanie zużyta.",
+    "daily_quit_cancel": "Kontynuuj wyzwanie",
+    "daily_quit_confirm": "Wyjdź"
   },
   "language_selector": {
     "title": "Język interfejsu"
