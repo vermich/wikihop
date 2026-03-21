@@ -305,28 +305,26 @@ export async function gameRoutes(instance: FastifyInstance): Promise<void> {
         });
       }
 
-      // Indices déterministes basés sur la date — idempotent
-      const [idxStart, idxTarget] = computeDailyIndices(hash, articles.length);
-      const titleStart = articles[idxStart];
-      const titleTarget = articles[idxTarget];
+      // Retry : tentative 0 = indices déterministes (même paire pour tous les joueurs),
+      // tentatives 1+ = indices aléatoires (fallback si les articles déterministes sont indisponibles)
+      for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+        const [idxStart, idxTarget] =
+          attempt === 0
+            ? computeDailyIndices(hash, articles.length)
+            : pickTwoDistinctIndices(articles.length);
 
-      // noUncheckedIndexedAccess : vérification explicite
-      if (titleStart === undefined || titleTarget === undefined) {
-        request.log.error(
-          { lang, date, idxStart, idxTarget, poolSize: articles.length },
-          'daily: indices hors limites — erreur algorithmique',
-        );
-        return reply.code(503).send({
-          success: false,
-          error: {
-            code: 'DAILY_UNAVAILABLE',
-            message: 'Erreur interne lors du calcul du défi quotidien',
-          },
-        });
-      }
+        const titleStart = articles[idxStart];
+        const titleTarget = articles[idxTarget];
 
-      // Retry : même paire cible à chaque tentative (déterminisme)
-      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        // noUncheckedIndexedAccess : vérification explicite à l'intérieur de la boucle
+        if (titleStart === undefined || titleTarget === undefined) {
+          request.log.warn(
+            { attempt, lang, date, idxStart, idxTarget, poolSize: articles.length },
+            'daily: indices hors limites — tentative ignorée',
+          );
+          continue;
+        }
+
         const [start, target] = await Promise.all([
           fetchArticleSummary(titleStart, lang),
           fetchArticleSummary(titleTarget, lang),
@@ -337,7 +335,7 @@ export async function gameRoutes(instance: FastifyInstance): Promise<void> {
         }
 
         request.log.warn(
-          { attempt, lang, date, reason: 'échec Wikipedia' },
+          { attempt, lang, date, reason: 'échec Wikipedia', titleStart, titleTarget },
           'daily: tentative de fetching échouée',
         );
       }
@@ -351,7 +349,7 @@ export async function gameRoutes(instance: FastifyInstance): Promise<void> {
       return reply.code(503).send({
         success: false,
         error: {
-          code: 'DAILY_UNAVAILABLE',
+          code: 'DAILY_POOL_EXHAUSTED',
           message: `Impossible de récupérer le défi quotidien après ${String(MAX_ATTEMPTS)} tentatives`,
         },
       });
