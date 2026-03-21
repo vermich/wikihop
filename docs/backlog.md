@@ -138,8 +138,8 @@
 | ID | Titre | Priorité | Agent(s) | Statut |
 |----|-------|----------|----------|--------|
 | [P-01](stories/phase-4/⬜-P-01-privacy-policy.md) | Politique de confidentialité (RGPD) | Must | DPO, Frontend Dev | ⬜ pending |
-| [P-02](stories/phase-4/🔄-P-02-owasp-audit.md) | Audit de sécurité — OWASP Mobile Top 10 | Must | Security | 🔄 in-progress |
-| [P-03](stories/phase-4/🔄-P-03-backend-security.md) | Sécurisation du backend — Headers, CORS, Rate limiting | Must | Security, Backend Dev | 🔄 in-progress |
+| [P-02](stories/phase-4/✅-P-02-owasp-audit.md) | Audit de sécurité — OWASP Mobile Top 10 | Must | Security | ✅ done |
+| [P-03](stories/phase-4/✅-P-03-backend-security.md) | Sécurisation du backend — Headers, CORS, Rate limiting | Must | Security, Backend Dev | ✅ done |
 | [P-04](stories/phase-4/🔄-P-04-secrets-management.md) | Secrets et variables d'environnement (production) | Must | Security, Tech Lead | 🔄 in-progress |
 | [P-05](stories/phase-4/⬜-P-05-performance-tests.md) | Tests de performance et de charge (backend) | Must | QA, Backend Dev | ⬜ pending |
 | [P-06](stories/phase-4/⬜-P-06-cicd-deployment.md) | Pipeline CI/CD — Build et déploiement automatisé | Must | Tech Lead | ⬜ pending |
@@ -249,4 +249,5 @@
 *v5.5 : Phase 3C — 5 stories créées (F3-46 à F3-50) suite aux retours de tests Phase 3B du Client (4 bugs Must + 1 UX Should) (2026-03-21)*
 *v5.7 : Phase 3C partielle — F3-46/47/50/51 passées en done (2026-03-21) — F3-48/F3-49 restent in-progress (gate device physique Client en attente)*
 *v5.8 : Phase 3 clôturée — F3-48/F3-49 passées en done (gate device physique confirmé par le Client — 2026-03-21) — P-16/P-17 créées en Phase 4 (2026-03-21)*
+*v5.9 : Phase 4 Lot 2 sécurité — P-02/P-03 passées en done (validées QA Halim — 24 tests OWASP + 13 tests security/admin passants — 2026-03-21)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
