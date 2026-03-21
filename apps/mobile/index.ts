@@ -7,8 +7,12 @@
  * Reactotron doit être importé EN PREMIER pour intercepter les logs dès le démarrage.
  */
 
-// Reactotron doit être importé avant tout autre module (actif uniquement en __DEV__)
-import './src/config/ReactotronConfig';
+// Reactotron uniquement en mode __DEV__ — ne pas bundler en production
+// require() conditionnel : Metro ne bundle pas ce module dans les builds de production
+if (__DEV__) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('./src/config/ReactotronConfig');
+}
 
 import { registerRootComponent } from 'expo';
 

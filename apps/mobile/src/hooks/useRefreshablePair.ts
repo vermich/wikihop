@@ -19,6 +19,7 @@
 import type { ArticleSummary } from '@wikihop/shared';
 import { useCallback, useEffect, useState } from 'react';
 
+import { BACKEND_BASE_URL } from '../config/backend.config';
 import { useLanguageStore } from '../store/language.store';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -78,7 +79,7 @@ export function useRefreshablePair(): UseRefreshablePairReturn {
 
     void (async () => {
       try {
-        const url = `http://192.168.1.30:3000/api/game/random-pair?lang=${language}&difficulty=normal`;
+        const url = `${BACKEND_BASE_URL}/api/game/random-pair?lang=${language}&difficulty=normal`;
         const response = await fetch(url, {
           signal: controller.signal,
         });
