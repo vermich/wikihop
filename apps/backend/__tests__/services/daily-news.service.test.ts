@@ -16,26 +16,64 @@ import {
   selectNewsPair,
 } from '../../src/services/daily-news.service';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- types utilisés dans les annotations
 import type { FeaturedFeedResponse, FeedArticle } from '../../src/services/daily-news.service';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Extract valide de 201+ caractères */
+/** Extract valide de 201+ caractères (comptés précisément) */
 const VALID_EXTRACT =
   "Cet article décrit en détail l'histoire de la science moderne depuis le XVIIe siècle jusqu'à nos jours, " +
-  'en couvrant les découvertes fondamentales de la physique, de la chimie et de la biologie.';
+  'en couvrant les découvertes fondamentales de la physique, de la chimie et de la biologie. ' +
+  "Il présente également l'évolution des méthodes scientifiques au cours des siècles.";
 
-function buildFeedArticle(overrides: Partial<FeedArticle> = {}): FeedArticle {
-  return {
-    title: overrides.title ?? 'Albert Einstein',
-    extract: overrides.extract ?? VALID_EXTRACT,
-    content_urls: overrides.content_urls ?? {
+/**
+ * Construit un FeedArticle valide avec possibilité de surcharger ou d'omettre des champs.
+ * Utiliser `null` comme sentinelle pour forcer l'absence d'un champ optional.
+ */
+function buildFeedArticle(
+  overrides: Partial<{
+    title: string | undefined;
+    extract: string | undefined;
+    content_urls: { desktop: { page: string } } | undefined;
+    pageid: number | undefined;
+  }> = {},
+): FeedArticle {
+  const article: FeedArticle = {};
+
+  // title
+  if ('title' in overrides) {
+    article.title = overrides.title;
+  } else {
+    article.title = 'Albert Einstein';
+  }
+
+  // extract
+  if ('extract' in overrides) {
+    article.extract = overrides.extract;
+  } else {
+    article.extract = VALID_EXTRACT;
+  }
+
+  // content_urls
+  if ('content_urls' in overrides) {
+    article.content_urls = overrides.content_urls;
+  } else {
+    article.content_urls = {
       desktop: { page: 'https://fr.wikipedia.org/wiki/Albert_Einstein' },
-    },
-    pageid: overrides.pageid ?? 1,
-  };
+    };
+  }
+
+  // pageid
+  if ('pageid' in overrides) {
+    article.pageid = overrides.pageid;
+  } else {
+    article.pageid = 1;
+  }
+
+  return article;
 }
 
 // ---------------------------------------------------------------------------
