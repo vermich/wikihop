@@ -50,3 +50,19 @@ export interface GameSessionRow {
   /** Timestamp de fin (null si en cours) */
   completed_at: Date | null;
 }
+
+/**
+ * Représente une ligne de la table `daily_challenges`.
+ * start_article et target_article sont des JSONB correspondant à ArticleSummaryResponse.
+ * La validation Zod est effectuée dans game.route.ts avant envoi au client.
+ *
+ * Référence : docs/specs/F3-51-daily-challenge-news-precalculated.md — Section 4
+ */
+export interface DailyChallengeRow {
+  date: Date;
+  lang: string;
+  start_article: unknown;
+  target_article: unknown;
+  source: string;
+  created_at: Date;
+}
