@@ -17,6 +17,15 @@
  *   - BackHandler Android : handleGoBack() si stackSize > 1, sinon handleAbandon.
  *   - Le bouton "← Retour" dans le header est conditionné sur stackSize > 1.
  *
+ * F3-48 — Fix bouton retour absent premiers sauts :
+ *   handlePageChangeSync est stabilisé via une ref (stableOnPageChange).
+ *   Ceci évite la stale closure si WikipediaWebView capture la référence de onPageChange
+ *   au premier rendu : la fonction stable délègue toujours à la dernière version du callback.
+ *
+ * F3-49 — Fix abandon multijoueur :
+ *   handleAbandon bifurque selon isMultiplayerActive : en mode multijoueur, appelle
+ *   recordForfeit + advanceToNextPlayer avant de passer au joueur suivant (ou aux résultats).
+ *
  * Pourquoi deux états ?
  *   Avant ce fix, un seul état `currentTitle` pilotait à la fois le header ET la source
  *   WebView. Lors d'un saut forward : setStackSize() (sync) + setCurrentTitle() (async
@@ -32,6 +41,8 @@
  *   Story : docs/stories/M-03-article-content-display.md
  *   Story : docs/stories/M-04-article-navigation.md
  *   Story : docs/stories/F3-34-fix-back-navigation-webview.md
+ *   Story : docs/stories/phase-3/F3-48-fix-back-button-missing-first-jumps.md
+ *   Story : docs/stories/phase-3/F3-49-fix-multiplayer-forfeit-handling.md
  *
  * Conventions :
  *   - Export nommé
@@ -67,6 +78,7 @@ import {
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useGameStore } from '../store/game.store';
 import { useLanguageStore } from '../store/language.store';
+import { useMultiplayerStore } from '../store/multiplayer.store';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -88,6 +100,17 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
   const addJump = useGameStore((state) => state.addJump);
   const completeSession = useGameStore((state) => state.completeSession);
   const abandonSession = useGameStore((state) => state.abandonSession);
+  const clearSession = useGameStore((state) => state.clearSession);
+  const startSession = useGameStore((state) => state.startSession);
+
+  // Sélecteurs multijoueur — F3-49
+  const isMultiplayerActive = useMultiplayerStore((state) => state.isSessionActive);
+  const currentPlayerIndex = useMultiplayerStore((state) => state.currentPlayerIndex);
+  const multiplayerPlayers = useMultiplayerStore((state) => state.players);
+  const recordForfeit = useMultiplayerStore((state) => state.recordForfeit);
+  const advanceToNextPlayer = useMultiplayerStore((state) => state.advanceToNextPlayer);
+  const roundCount = useMultiplayerStore((state) => state.roundCount);
+  const currentRound = useMultiplayerStore((state) => state.currentRound);
 
   const jumps = currentSession?.jumps ?? 0;
   const targetTitle = currentSession?.targetArticle.title ?? '';
@@ -181,7 +204,30 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
     [handlePageChange],
   );
 
-  // ── handleAbandon : confirmation abandon + navigate Home ─────────────────────
+  // ── F3-48 : Stabilisation du callback onPageChange via useRef ────────────────
+  //
+  // Problème : WikipediaWebView peut capturer la référence de onPageChange via
+  // handleNavigationStateChange (fermeture sur la prop). Si handlePageChangeSync
+  // est recréé (dépendances changées au montage), la WebView peut appeler
+  // l'ancienne version du callback → stale closure → stackSize non mis à jour.
+  //
+  // Solution : stocker handlePageChangeSync dans une ref et passer une fonction
+  // stable (stableOnPageChange) à WikipediaWebView. La fonction stable ne change
+  // jamais et délègue toujours à la dernière version via la ref.
+  const handlePageChangeSyncRef = useRef<(title: string) => void>(handlePageChangeSync);
+
+  useEffect(() => {
+    handlePageChangeSyncRef.current = handlePageChangeSync;
+  }, [handlePageChangeSync]);
+
+  // Fonction stable passée à WikipediaWebView — ne change jamais de référence.
+  // Les deps vides sont intentionnelles : on lit toujours depuis la ref.
+  // Note : react-hooks/exhaustive-deps non installé dans ce projet (voir MEMORY.md).
+  const stableOnPageChange = useCallback((title: string): void => {
+    handlePageChangeSyncRef.current(title);
+  }, []); // deps vides intentionnelles — F3-48 : lecture via ref pour éviter la stale closure
+
+  // ── handleAbandon : confirmation abandon (F3-49 : bifurcation solo/multijoueur) ─
   const handleAbandon = useCallback((): void => {
     Alert.alert(
       t('article_screen.abandon_title'),
@@ -192,12 +238,71 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
           text: t('article_screen.abandon_confirm'),
           style: 'destructive',
           onPress: () => {
-            void abandonSession().then(() => { navigation.navigate('Home'); });
+            void (async () => {
+              await abandonSession();
+
+              if (isMultiplayerActive) {
+                // Mode multijoueur : forfeit + passage au joueur suivant
+                // Ordre strict : recordForfeit + advanceToNextPlayer AVANT clearSession
+                // (identique au flux handleNextTurn de VictoryScreen, sauf recordForfeit)
+                recordForfeit(currentPlayerIndex);
+                advanceToNextPlayer();
+
+                const nextIndex = currentPlayerIndex + 1;
+                const allPlayersThisRoundDone = nextIndex >= multiplayerPlayers.length;
+
+                await clearSession();
+
+                if (allPlayersThisRoundDone) {
+                  if (currentRound < roundCount) {
+                    navigation.navigate('MultiplayerRoundTransition');
+                  } else {
+                    navigation.navigate('MultiplayerResult');
+                  }
+                  return;
+                }
+
+                const nextPlayer = multiplayerPlayers[nextIndex];
+                if (nextPlayer === undefined) {
+                  navigation.navigate('MultiplayerResult');
+                  return;
+                }
+
+                // Accès direct au store (hors re-render, dans le callback)
+                const storeStartArticle = useMultiplayerStore.getState().startArticle;
+                const storeTargetArticle = useMultiplayerStore.getState().targetArticle;
+
+                if (storeStartArticle === null || storeTargetArticle === null) {
+                  navigation.navigate('MultiplayerResult');
+                  return;
+                }
+
+                // F3-30 : isMultiplayer: true → session non enregistrée dans l'historique solo
+                await startSession(storeStartArticle, storeTargetArticle, { isMultiplayer: true });
+                navigation.navigate('PassPhone', { playerName: nextPlayer.name });
+              } else {
+                // Mode solo : comportement existant
+                navigation.navigate('Home');
+              }
+            })();
           },
         },
       ],
     );
-  }, [abandonSession, navigation, t]);
+  }, [
+    t,
+    abandonSession,
+    isMultiplayerActive,
+    currentPlayerIndex,
+    multiplayerPlayers,
+    recordForfeit,
+    advanceToNextPlayer,
+    clearSession,
+    startSession,
+    navigation,
+    currentRound,
+    roundCount,
+  ]);
 
   // ── handleGoBack — retour vers l'article précédent via le stack applicatif ────
   const handleGoBack = useCallback((): void => {
@@ -324,7 +429,7 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
           <WikipediaWebView
             currentTitle={webViewSource}
             lang={lang}
-            onPageChange={handlePageChangeSync}
+            onPageChange={stableOnPageChange}
             onError={(error) => { setWebViewError(error); }}
           />
         )}
