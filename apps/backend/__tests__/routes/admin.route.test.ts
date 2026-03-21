@@ -16,6 +16,8 @@
 
 import supertest from 'supertest';
 
+import type { Language } from '@wikihop/shared';
+
 import { buildApp } from '../../src/app';
 
 // ---------------------------------------------------------------------------
@@ -52,7 +54,7 @@ const VALID_EXTRACT =
   'dans le royaume de Wurtemberg, et mort le 18 avril 1955 à Princeton, dans le New Jersey, ' +
   'après avoir développé la théorie de la relativité générale et restreinte.';
 
-function buildArticleSummary(lang: string = 'fr', titleSuffix: string = '') {
+function buildArticleSummary(lang: Language = 'fr', titleSuffix: string = '') {
   return {
     id: `123${titleSuffix}`,
     title: `Albert Einstein${titleSuffix}`,
