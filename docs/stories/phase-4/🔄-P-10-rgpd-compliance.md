@@ -4,7 +4,7 @@ title: Conformité RGPD complète — Registre de traitement
 phase: 4-Production
 priority: Should
 agents: [DPO]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---

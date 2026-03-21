@@ -4,7 +4,7 @@ title: Textes légaux in-app (CGU simplifiées)
 phase: 4-Production
 priority: Should
 agents: [DPO, Frontend Dev]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---

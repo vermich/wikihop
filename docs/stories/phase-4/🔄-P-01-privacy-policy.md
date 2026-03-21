@@ -4,7 +4,7 @@ title: Politique de confidentialité (RGPD)
 phase: 4-Production
 priority: Must
 agents: [DPO, Frontend Dev]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---
