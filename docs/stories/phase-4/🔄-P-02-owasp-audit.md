@@ -4,7 +4,7 @@ title: Audit de sécurité — OWASP Mobile Top 10
 phase: 4-Production
 priority: Must
 agents: [Security]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---
@@ -34,4 +34,4 @@ En tant qu'éditeur de l'application, je veux que l'app soit auditée selon OWAS
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending → in-progress → done
+~~pending~~ → in-progress → done

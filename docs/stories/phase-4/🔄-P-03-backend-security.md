@@ -4,7 +4,7 @@ title: Sécurisation du backend — Headers, CORS, Rate limiting
 phase: 4-Production
 priority: Must
 agents: [Security, Backend Dev]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---
@@ -29,4 +29,4 @@ En tant qu'éditeur, je veux que le backend soit protégé contre les abus et le
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending → in-progress → done
+~~pending~~ → in-progress → done

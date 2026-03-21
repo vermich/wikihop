@@ -4,7 +4,7 @@ title: Tests de sécurité automatisés (SAST)
 phase: 4-Production
 priority: Could
 agents: [Security]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---
@@ -27,4 +27,4 @@ En tant qu'équipe, nous voulons une analyse de sécurité statique automatisée
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending → in-progress → done
+~~pending~~ → in-progress → done

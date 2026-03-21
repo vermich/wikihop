@@ -4,7 +4,7 @@ title: Secrets et variables d'environnement (production)
 phase: 4-Production
 priority: Must
 agents: [Security, Tech Lead]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---
@@ -28,4 +28,4 @@ En tant qu'équipe, nous voulons que les secrets de production soient gérés de
 <!-- Rempli par QA après les tests -->
 
 ## Statut
-pending → in-progress → done
+~~pending~~ → in-progress → done
