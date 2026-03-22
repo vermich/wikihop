@@ -1,7 +1,7 @@
 ---
 id: P-09
 title: Monitoring et alerting en production
-phase: 4-Production
+phase: 5-Services managés
 priority: Must
 agents: [Tech Lead, Backend Dev]
 status: in-progress
