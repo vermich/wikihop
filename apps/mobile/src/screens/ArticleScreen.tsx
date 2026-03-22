@@ -310,6 +310,8 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
   ]);
 
   // ── handleDailyQuit — alerte de confirmation pour quitter le défi quotidien (P-17) ─
+  // Note : n'appelle pas handleAbandon() pour éviter une deuxième alerte — exécute
+  // directement la logique d'abandon solo (abandonSession + navigate Home).
   const handleDailyQuit = useCallback((): void => {
     Alert.alert(
       t('article_screen.daily_quit_title'),
@@ -319,11 +321,16 @@ export function ArticleScreen({ route, navigation }: ArticleScreenProps): React.
         {
           text: t('article_screen.daily_quit_confirm'),
           style: 'destructive',
-          onPress: () => { handleAbandon(); },
+          onPress: () => {
+            void (async () => {
+              await abandonSession();
+              navigation.navigate('Home');
+            })();
+          },
         },
       ],
     );
-  }, [t, handleAbandon]);
+  }, [t, abandonSession, navigation]);
 
   // ── handleGoBack — retour vers l'article précédent via le stack applicatif ────
   const handleGoBack = useCallback((): void => {
