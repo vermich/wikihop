@@ -27,6 +27,7 @@
     "expo": "~54.0.0",
     "expo-image": "~3.0.11",
     "expo-status-bar": "~3.0.9",
+    "expo-updates": "~29.0.16",
     "i18next": "^25.8.18",
     "react": "19.1.0",
     "react-i18next": "^16.5.8",

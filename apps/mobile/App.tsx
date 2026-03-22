@@ -23,10 +23,14 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 
 import { RootNavigator } from './src/navigation/RootNavigator';
+import { useCriticalUpdateCheck } from './src/hooks/useCriticalUpdateCheck';
 import { useGameStore } from './src/store/game.store';
 import { useLanguageStore } from './src/store/language.store';
 
 export default function App(): React.JSX.Element {
+  // Vérification OTA critique au démarrage — no-op en simulateur/Expo Go
+  useCriticalUpdateCheck();
+
   // Les deux hydratations sont indépendantes — elles s'exécutent en parallèle.
   // void : useEffect ne peut pas être async, les erreurs sont gérées dans chaque action.
   useEffect(() => {

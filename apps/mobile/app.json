@@ -23,6 +23,15 @@
       },
       "package": "com.wikihop.app"
     },
-    "extra": {}
+    "extra": {},
+    "updates": {
+      "enabled": true,
+      "fallbackToCacheTimeout": 0,
+      "checkAutomatically": "ON_LOAD",
+      "url": "https://u.expo.dev/[PROJECT_ID]"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
   }
 }
