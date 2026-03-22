@@ -169,6 +169,14 @@ export function AboutScreen({ navigation }: AboutScreenProps): React.JSX.Element
 
         <View style={styles.separator} />
 
+        {/* Section Diagnostics — mention Sentry requise DPO (P-14) */}
+        <SectionHeader title={t('about.section_diagnostics')} />
+        <Text style={styles.sectionText}>
+          {t('about.diagnostics_text')}
+        </Text>
+
+        <View style={styles.separator} />
+
         {/* Section Code source */}
         <SectionHeader title={t('about.section_code')} />
         <LinkRow

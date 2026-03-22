@@ -143,7 +143,9 @@
     "legal_mentions_label": "Juridische informatie",
     "legal_mentions_a11y": "Juridische informatie van WikiHop bekijken",
     "code_github_label": "Broncode op GitHub",
-    "code_github_a11y": "Broncode van WikiHop op GitHub bekijken"
+    "code_github_a11y": "Broncode van WikiHop op GitHub bekijken",
+    "section_diagnostics": "Diagnostiek",
+    "diagnostics_text": "WikiHop gebruikt Sentry voor automatische crashdetectie. Als de app crasht, worden anonieme technische gegevens (app-versie, fouttype) naar onze Europese servers gestuurd om ons te helpen het probleem op te lossen. Er worden geen persoonsgegevens verzonden."
   },
   "multiplayer_setup": {
     "header_title": "Multiplayer",

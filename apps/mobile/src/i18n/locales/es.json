@@ -143,7 +143,9 @@
     "legal_mentions_label": "Aviso legal",
     "legal_mentions_a11y": "Consultar el aviso legal de WikiHop",
     "code_github_label": "Código fuente en GitHub",
-    "code_github_a11y": "Ver el código fuente de WikiHop en GitHub"
+    "code_github_a11y": "Ver el código fuente de WikiHop en GitHub",
+    "section_diagnostics": "Diagnósticos",
+    "diagnostics_text": "WikiHop utiliza Sentry para la detección automática de fallos. Si la app se bloquea, información técnica anónima (versión de la app, tipo de error) se envía a nuestros servidores europeos para ayudarnos a solucionar el problema. No se transmiten datos personales."
   },
   "multiplayer_setup": {
     "header_title": "Multijugador",

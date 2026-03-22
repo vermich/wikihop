@@ -144,7 +144,9 @@
     "legal_mentions_label": "Informacje prawne",
     "legal_mentions_a11y": "Zobacz informacje prawne WikiHop",
     "code_github_label": "Kod źródłowy na GitHub",
-    "code_github_a11y": "Zobacz kod źródłowy WikiHop na GitHub"
+    "code_github_a11y": "Zobacz kod źródłowy WikiHop na GitHub",
+    "section_diagnostics": "Diagnostyka",
+    "diagnostics_text": "WikiHop używa Sentry do automatycznego wykrywania awarii. Jeśli aplikacja ulegnie awarii, anonimowe informacje techniczne (wersja aplikacji, typ błędu) są wysyłane na nasze europejskie serwery, aby pomóc nam naprawić problem. Żadne dane osobowe nie są przesyłane."
   },
   "multiplayer_setup": {
     "header_title": "Wieloosobowy",
