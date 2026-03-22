@@ -858,6 +858,49 @@ describe('ArticleScreen', () => {
       expect(mockWebViewGoBack).not.toHaveBeenCalled();
     });
 
+    it('Cas 6 — confirmation daily_quit → navigate(Home) sans deuxième alerte (fix P-17-01)', async () => {
+      // Vérifie que handleDailyQuit n'affiche qu'UNE seule alerte, et que la confirmation
+      // navigue directement vers Home sans passer par handleAbandon (double alerte).
+      mockCurrentSession.isDailyChallenge = true;
+      mockIsFocused = true;
+
+      const alertSpy = jest.spyOn(Alert, 'alert');
+
+      const handlers: Array<() => boolean> = [];
+      jest.spyOn(BackHandler, 'addEventListener').mockImplementation(
+        (_event, handler) => {
+          handlers.push(handler as () => boolean);
+          return { remove: jest.fn() };
+        },
+      );
+
+      renderArticleScreen();
+      await act(async () => { await Promise.resolve(); });
+
+      // Déclenche le BackHandler → handleDailyQuit → Alert affiché
+      const lastHandler = handlers[handlers.length - 1];
+      await act(async () => { lastHandler?.(); await Promise.resolve(); });
+
+      expect(alertSpy).toHaveBeenCalledTimes(1);
+      expect(alertSpy).toHaveBeenCalledWith('Quitter le défi ?', expect.any(String), expect.any(Array));
+
+      // Récupère les boutons de l'alerte et appuie sur "Quitter" (index 1)
+      const alertButtons = alertSpy.mock.calls[0]?.[2] as Array<{ text: string; onPress?: () => void }>;
+      const confirmButton = alertButtons?.[1];
+      expect(confirmButton).toBeDefined();
+
+      await act(async () => {
+        confirmButton?.onPress?.();
+        await Promise.resolve();
+      });
+
+      // Une seule alerte au total — handleAbandon() ne doit pas en afficher une deuxième
+      expect(alertSpy).toHaveBeenCalledTimes(1);
+      // Navigation vers Home après confirmation
+      expect(mockNavigate).toHaveBeenCalledWith('Home');
+      expect(mockAbandonSession).toHaveBeenCalled();
+    });
+
     it('Cas 5 — BackHandler mode solo, stackSize > 1 → handleGoBack (non régressé)', async () => {
       // isDailyChallenge = false, stackSize > 1 → comportement inchangé (handleGoBack)
       mockCurrentSession.isDailyChallenge = false;
