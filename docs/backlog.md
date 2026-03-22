@@ -147,7 +147,7 @@
 | [M-13](stories/phase-4/✅-M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | ✅ done |
 | [P-12](stories/phase-4/✅-P-12-ota-updates.md) | Stratégie de mise à jour OTA (Over The Air) | Should | Tech Lead, Frontend Dev | ✅ done |
 | [P-13](stories/phase-4/✅-P-13-legal-texts.md) | Textes légaux in-app (CGU simplifiées) | Should | DPO, Frontend Dev | ✅ done |
-| [P-14](stories/phase-4/🔄-P-14-crash-reporting.md) | Traçabilité des erreurs côté mobile (crash reporting) | Could | Frontend Dev, DPO | 🔄 in-progress |
+| [P-14](stories/phase-4/✅-P-14-crash-reporting.md) | Traçabilité des erreurs côté mobile (crash reporting) | Could | Frontend Dev, DPO | ✅ done |
 | [P-15](stories/phase-4/✅-P-15-sast-security.md) | Tests de sécurité automatisés (SAST) | Could | Security | ✅ done |
 | [P-16](stories/phase-4/✅-P-16-fix-daily-challenge-button-disabled-fr-it.md) | Fix — Bouton défi du jour grisé en FR et IT | Must | Frontend Dev, Backend Dev | ✅ done |
 | [P-17](stories/phase-4/✅-P-17-remove-back-button-daily-challenge.md) | UX — Supprimer le bouton retour sur l'écran défi du jour | Should | Frontend Dev | ✅ done |
@@ -255,4 +255,5 @@
 *v6.2 : Phase 4 Lot final — P-05/M-13/P-14 → in-progress (2026-03-22)*
 *v6.3 : P-05 → done (2026-03-22)*
 *v6.4 : M-13 → done (2026-03-22)*
+*v6.5 : P-14 → done — correction bloquante PR #62 mergée, mention Sentry AboutScreen + 8 i18n validés (2026-03-22)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*

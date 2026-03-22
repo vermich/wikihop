@@ -73,3 +73,6 @@ packages/shared/node_modules/
 # Claude Code — config locale (agents, commandes, settings, worktrees)
 # CLAUDE.md reste tracké — c'est la doc du projet
 .claude/
+
+# k6 load test results
+load-tests/results-*.json
