@@ -143,7 +143,9 @@
     "legal_mentions_label": "Impressum",
     "legal_mentions_a11y": "Impressum von WikiHop anzeigen",
     "code_github_label": "Quellcode auf GitHub",
-    "code_github_a11y": "Quellcode von WikiHop auf GitHub anzeigen"
+    "code_github_a11y": "Quellcode von WikiHop auf GitHub anzeigen",
+    "section_diagnostics": "Diagnose",
+    "diagnostics_text": "WikiHop verwendet Sentry zur automatischen Absturzerkennung. Bei einem Absturz werden anonyme technische Daten (App-Version, Fehlertyp) an unsere europäischen Server gesendet, um uns bei der Problembehebung zu helfen. Es werden keine personenbezogenen Daten übertragen."
   },
   "multiplayer_setup": {
     "header_title": "Mehrspieler",

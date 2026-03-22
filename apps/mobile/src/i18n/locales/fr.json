@@ -143,7 +143,9 @@
     "legal_mentions_label": "Mentions légales",
     "legal_mentions_a11y": "Consulter les mentions légales de WikiHop",
     "code_github_label": "Code source sur GitHub",
-    "code_github_a11y": "Voir le code source de WikiHop sur GitHub"
+    "code_github_a11y": "Voir le code source de WikiHop sur GitHub",
+    "section_diagnostics": "Diagnostics",
+    "diagnostics_text": "WikiHop utilise Sentry pour la détection automatique de crashs. En cas de plantage, des informations techniques anonymes (version de l'app, type d'erreur) sont envoyées à nos serveurs européens pour nous aider à corriger le problème. Aucune donnée personnelle n'est transmise."
   },
   "multiplayer_setup": {
     "header_title": "Multijoueur",
