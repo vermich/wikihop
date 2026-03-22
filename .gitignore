@@ -69,3 +69,7 @@ postgres-data/
 apps/mobile/node_modules/
 apps/backend/node_modules/
 packages/shared/node_modules/
+
+# Claude Code — config locale (agents, commandes, settings, worktrees)
+# CLAUDE.md reste tracké — c'est la doc du projet
+.claude/
