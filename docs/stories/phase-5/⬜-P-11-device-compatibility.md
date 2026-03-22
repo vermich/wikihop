@@ -1,7 +1,7 @@
 ---
 id: P-11
 title: Tests de compatibilité appareils (iOS et Android)
-phase: 4-Production
+phase: 5-Services managés
 priority: Should
 agents: [QA]
 status: pending

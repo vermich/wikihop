@@ -144,8 +144,6 @@
 | [P-05](stories/phase-4/⬜-P-05-performance-tests.md) | Tests de performance et de charge (backend) | Must | QA, Backend Dev | ⬜ pending |
 | [P-06](stories/phase-4/✅-P-06-cicd-deployment.md) | Pipeline CI/CD — Build et déploiement automatisé | Must | Tech Lead | ✅ done |
 | [P-10](stories/phase-4/✅-P-10-rgpd-compliance.md) | Conformité RGPD complète — Registre de traitement | Should | DPO | ✅ done |
-| [P-11](stories/phase-4/⬜-P-11-device-compatibility.md) | Tests de compatibilité appareils (iOS et Android) | Should | QA | ⬜ pending |
-| [M-11](stories/phase-4/⬜-M-11-offline-mode.md) | Gestion du mode hors-ligne | Should | Frontend Dev | ⬜ pending |
 | [M-13](stories/phase-4/⬜-M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | ⬜ pending |
 | [P-12](stories/phase-4/✅-P-12-ota-updates.md) | Stratégie de mise à jour OTA (Over The Air) | Should | Tech Lead, Frontend Dev | ✅ done |
 | [P-13](stories/phase-4/✅-P-13-legal-texts.md) | Textes légaux in-app (CGU simplifiées) | Should | DPO, Frontend Dev | ✅ done |
@@ -162,9 +160,11 @@
 
 | ID | Titre | Priorité | Agent(s) | Statut |
 |----|-------|----------|----------|--------|
+| [M-11](stories/phase-5/⬜-M-11-offline-mode.md) | Gestion du mode hors-ligne | Should | Frontend Dev | ⬜ différé |
 | [P-07](stories/phase-5/⬜-P-07-appstore-ios.md) | Soumission App Store (iOS) | Must | Tech Lead, Frontend Dev, DPO | ⬜ différé |
 | [P-08](stories/phase-5/⬜-P-08-playstore-android.md) | Soumission Google Play Store (Android) | Must | Tech Lead, Frontend Dev, DPO | ⬜ différé |
 | [P-09](stories/phase-5/🔄-P-09-monitoring-alerting.md) | Monitoring et alerting en production | Must | Tech Lead, Backend Dev | 🔄 différé |
+| [P-11](stories/phase-5/⬜-P-11-device-compatibility.md) | Tests de compatibilité appareils (iOS et Android) | Should | QA | ⬜ différé |
 | [P5-01](stories/phase-5/⬜-P5-01-daily-challenge-leaderboard.md) | Tableau des scores du défi quotidien — classement multijoueur | Should | Backend Dev, Frontend Dev, UX/UI, Tech Lead | ⬜ pending |
 
 ---
@@ -251,5 +251,5 @@
 *v5.8 : Phase 3 clôturée — F3-48/F3-49 passées en done (gate device physique confirmé par le Client — 2026-03-21) — P-16/P-17 créées en Phase 4 (2026-03-21)*
 *v5.9 : Phase 4 Lot 2 sécurité — P-02/P-03 passées en done (validées QA Halim — 24 tests OWASP + 13 tests security/admin passants — 2026-03-21)*
 *v6.0 : Phase 4 Lot 3 RGPD — P-01/P-10/P-13 passées en done (validées QA Halim — politique de confidentialité, registre art. 30, mentions légales intégrées — 2026-03-21)*
-*v6.1 : Phase 4 Lot 4 Infrastructure — P-06/P-12/P-17 passées en done (2026-03-22) — P-09/P-07/P-08 déplacées en Phase 5 (stores + monitoring différés)*
+*v6.1 : Phase 4 Lot 4 — P-06/P-12/P-17 done — P-07/P-08/P-09/P-11/M-11 déplacées en Phase 5 (requièrent backend déployé)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
