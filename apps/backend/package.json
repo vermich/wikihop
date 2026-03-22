@@ -13,7 +13,10 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "db:migrate": "tsx src/db/migrate.ts",
-    "db:migrate:down": "tsx src/db/migrate.ts --direction down"
+    "db:migrate:down": "tsx src/db/migrate.ts --direction down",
+    "load-test": "k6 run load-tests/random-pair.k6.js",
+    "load-test:daily": "k6 run load-tests/daily.k6.js",
+    "load-test:all": "k6 run load-tests/random-pair.k6.js && k6 run load-tests/daily.k6.js"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.0",
