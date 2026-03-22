@@ -7,11 +7,16 @@
  *   Une ligne doit exister dans la table daily_challenges pour la date du jour (lang=fr).
  *   Sans ça, le test mesure le fallback Wikipedia, pas le cache DB.
  *
- *   Commande pour insérer la pré-condition (adapter les titres) :
+ *   Commande pour insérer la pré-condition :
  *     psql $DATABASE_URL -c "
- *       INSERT INTO daily_challenges (challenge_date, lang, start_title, target_title)
- *       VALUES (CURRENT_DATE, 'fr', 'Paris', 'Tour Eiffel')
- *       ON CONFLICT (challenge_date, lang) DO NOTHING;
+ *       INSERT INTO daily_challenges (date, lang, start_article, target_article, source)
+ *       VALUES (
+ *         CURRENT_DATE, 'fr',
+ *         '{\"id\": \"Paris\", \"title\": \"Paris\", \"url\": \"https://fr.wikipedia.org/wiki/Paris\", \"language\": \"fr\"}',
+ *         '{\"id\": \"Tour_Eiffel\", \"title\": \"Tour Eiffel\", \"url\": \"https://fr.wikipedia.org/wiki/Tour_Eiffel\", \"language\": \"fr\"}',
+ *         'manual'
+ *       )
+ *       ON CONFLICT (date, lang) DO NOTHING;
  *     "
  *   Voir README.md pour la commande complète.
  *

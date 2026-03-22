@@ -35,18 +35,22 @@ Insérer la pré-condition avant de lancer le test :
 
 ```bash
 psql $DATABASE_URL -c "
-  INSERT INTO daily_challenges (challenge_date, lang, start_title, target_title)
-  VALUES (CURRENT_DATE, 'fr', 'Paris', 'Tour Eiffel')
-  ON CONFLICT (challenge_date, lang) DO NOTHING;
+  INSERT INTO daily_challenges (date, lang, start_article, target_article, source)
+  VALUES (
+    CURRENT_DATE,
+    'fr',
+    '{\"id\": \"Paris\", \"title\": \"Paris\", \"url\": \"https://fr.wikipedia.org/wiki/Paris\", \"language\": \"fr\"}',
+    '{\"id\": \"Tour_Eiffel\", \"title\": \"Tour Eiffel\", \"url\": \"https://fr.wikipedia.org/wiki/Tour_Eiffel\", \"language\": \"fr\"}',
+    'manual'
+  )
+  ON CONFLICT (date, lang) DO NOTHING;
 "
 ```
-
-Remplace `'Paris'` et `'Tour Eiffel'` par deux titres d'articles Wikipedia français valides.
 
 Pour vérifier que la ligne existe :
 
 ```bash
-psql $DATABASE_URL -c "SELECT * FROM daily_challenges WHERE challenge_date = CURRENT_DATE AND lang = 'fr';"
+psql $DATABASE_URL -c "SELECT date, lang, start_article->>'title', target_article->>'title' FROM daily_challenges WHERE date = CURRENT_DATE AND lang = 'fr';"
 ```
 
 ---
