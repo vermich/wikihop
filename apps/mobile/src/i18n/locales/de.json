@@ -80,7 +80,8 @@
     "loading_a11y": "Verlauf wird geladen",
     "sort_a11y_inactive": "Nach {{criterion}} sortieren — tippe, um vom ältesten zum neuesten zu sortieren",
     "sort_a11y_asc": "Nach {{criterion}} aufsteigend sortieren — tippe, um vom neuesten zum ältesten zu sortieren",
-    "sort_a11y_desc": "Nach {{criterion}} absteigend sortieren — tippe, um die Sortierung zu deaktivieren"
+    "sort_a11y_desc": "Nach {{criterion}} absteigend sortieren — tippe, um die Sortierung zu deaktivieren",
+    "back_button_a11y": "Zurück zur Startseite"
   },
   "game_detail": {
     "header_title": "Spieldetails",
@@ -103,7 +104,9 @@
     "delete_confirm_title": "Dieses Spiel löschen",
     "delete_confirm_message": "Diese Aktion ist nicht rückgängig zu machen.",
     "delete_confirm_action": "Löschen",
-    "delete_cancel_action": "Abbrechen"
+    "delete_cancel_action": "Abbrechen",
+    "bloc_statut_won_a11y": "Spiel gewonnen: {{start}} → {{target}}",
+    "bloc_statut_abandoned_a11y": "Spiel abgebrochen: {{start}} → {{target}}"
   },
   "stats": {
     "header_title": "Meine Statistiken",

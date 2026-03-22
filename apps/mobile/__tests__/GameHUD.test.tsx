@@ -100,7 +100,7 @@ describe('GameHUD', () => {
       );
 
       // Récupérer le conteneur via ses props d'accessibilité
-      const hudElement = UNSAFE_getByProps({ accessibilityRole: 'text' });
+      const hudElement = UNSAFE_getByProps({ accessibilityRole: 'none' });
       const label = hudElement.props.accessibilityLabel as string;
 
       expect(label).toContain('3 sauts');
@@ -118,7 +118,7 @@ describe('GameHUD', () => {
         <GameHUD jumps={0} targetTitle="Louvre" />,
       );
 
-      const hudElement = UNSAFE_getByProps({ accessibilityRole: 'text' });
+      const hudElement = UNSAFE_getByProps({ accessibilityRole: 'none' });
       const label = hudElement.props.accessibilityLabel as string;
 
       expect(label).toContain('0 saut');

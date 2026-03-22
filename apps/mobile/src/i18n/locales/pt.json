@@ -80,7 +80,8 @@
     "loading_a11y": "Carregando histórico",
     "sort_a11y_inactive": "Ordenar por {{criterion}} — toque para ordenar do mais antigo ao mais recente",
     "sort_a11y_asc": "Ordenar por {{criterion}} crescente — toque para ordenar do mais recente ao mais antigo",
-    "sort_a11y_desc": "Ordenar por {{criterion}} decrescente — toque para desativar a ordenação"
+    "sort_a11y_desc": "Ordenar por {{criterion}} decrescente — toque para desativar a ordenação",
+    "back_button_a11y": "Voltar ao início"
   },
   "game_detail": {
     "header_title": "Detalhe da partida",
@@ -103,7 +104,9 @@
     "delete_confirm_title": "Excluir esta partida",
     "delete_confirm_message": "Esta ação é irreversível.",
     "delete_confirm_action": "Excluir",
-    "delete_cancel_action": "Cancelar"
+    "delete_cancel_action": "Cancelar",
+    "bloc_statut_won_a11y": "Partida ganha: {{start}} → {{target}}",
+    "bloc_statut_abandoned_a11y": "Partida abandonada: {{start}} → {{target}}"
   },
   "stats": {
     "header_title": "Minhas estatísticas",

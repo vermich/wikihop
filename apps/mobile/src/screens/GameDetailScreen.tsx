@@ -183,7 +183,14 @@ export function GameDetailScreen({ navigation, route }: GameDetailScreenProps): 
         showsVerticalScrollIndicator={false}
       >
         {/* BlocStatut */}
-        <View style={styles.blocStatut}>
+        <View
+          style={styles.blocStatut}
+          accessible={true}
+          accessibilityLabel={t(
+            isVictory ? 'game_detail.bloc_statut_won_a11y' : 'game_detail.bloc_statut_abandoned_a11y',
+            { start: record.startArticle.title, target: record.targetArticle.title },
+          )}
+        >
           <View
             style={[styles.badge, isVictory ? styles.badgeVictory : styles.badgeAbandoned]}
             accessible={false}
@@ -192,7 +199,7 @@ export function GameDetailScreen({ navigation, route }: GameDetailScreenProps): 
               {isVictory ? t('game_detail.badge_won') : t('game_detail.badge_abandoned')}
             </Text>
           </View>
-          <Text style={styles.trajetTitle} numberOfLines={2}>
+          <Text style={styles.trajetTitle} numberOfLines={2} accessible={false}>
             {`${record.startArticle.title} → ${record.targetArticle.title}`}
           </Text>
         </View>

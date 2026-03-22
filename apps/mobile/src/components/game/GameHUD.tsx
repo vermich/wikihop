@@ -84,7 +84,7 @@ export const GameHUD = React.memo(function GameHUD({
     <View
       style={styles.container}
       accessibilityLabel={containerAccessibilityLabel}
-      accessibilityRole="text"
+      accessibilityRole="none"
       testID="game-hud"
     >
       {/* Compteur sauts */}

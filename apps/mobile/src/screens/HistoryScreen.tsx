@@ -114,7 +114,7 @@ function Header({ onBack, onStats, t }: HeaderProps): React.JSX.Element {
       <TouchableOpacity
         style={styles.backButton}
         onPress={onBack}
-        accessibilityLabel={t('history.header_title')}
+        accessibilityLabel={t('history.back_button_a11y')}
         accessibilityRole="button"
       >
         <Text style={styles.backButtonText}>{'←'}</Text>
@@ -160,7 +160,7 @@ function SortBar({ activeCriterion, direction, isLoading, onSelect, t }: SortBar
               disabled={isLoading}
               accessibilityRole="button"
               accessibilityLabel={getSortButtonA11yLabel(criterion, direction, activeCriterion, t)}
-              accessibilityState={{ selected: isActive }}
+              accessibilityState={{ selected: isActive, disabled: isLoading }}
               hitSlop={{ top: 6, bottom: 6, left: 4, right: 4 }}
             >
               <Text style={[styles.sortChipText, isActive && styles.sortChipTextActive]}>
