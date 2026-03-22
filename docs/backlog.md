@@ -141,7 +141,7 @@
 | [P-02](stories/phase-4/✅-P-02-owasp-audit.md) | Audit de sécurité — OWASP Mobile Top 10 | Must | Security | ✅ done |
 | [P-03](stories/phase-4/✅-P-03-backend-security.md) | Sécurisation du backend — Headers, CORS, Rate limiting | Must | Security, Backend Dev | ✅ done |
 | [P-04](stories/phase-4/✅-P-04-secrets-management.md) | Secrets et variables d'environnement (production) | Must | Security, Tech Lead | ✅ done |
-| [P-05](stories/phase-4/🔄-P-05-performance-tests.md) | Tests de performance et de charge (backend) | Must | QA, Backend Dev | 🔄 in-progress |
+| [P-05](stories/phase-4/✅-P-05-performance-tests.md) | Tests de performance et de charge (backend) | Must | QA, Backend Dev | ✅ done |
 | [P-06](stories/phase-4/✅-P-06-cicd-deployment.md) | Pipeline CI/CD — Build et déploiement automatisé | Must | Tech Lead | ✅ done |
 | [P-10](stories/phase-4/✅-P-10-rgpd-compliance.md) | Conformité RGPD complète — Registre de traitement | Should | DPO | ✅ done |
 | [M-13](stories/phase-4/🔄-M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | 🔄 in-progress |
@@ -253,4 +253,5 @@
 *v6.0 : Phase 4 Lot 3 RGPD — P-01/P-10/P-13 passées en done (validées QA Halim — politique de confidentialité, registre art. 30, mentions légales intégrées — 2026-03-21)*
 *v6.1 : Phase 4 Lot 4 — P-06/P-12/P-17 done — P-07/P-08/P-09/P-11/M-11 déplacées en Phase 5 (requièrent backend déployé)*
 *v6.2 : Phase 4 Lot final — P-05/M-13/P-14 → in-progress (2026-03-22)*
+*v6.3 : P-05 → done (2026-03-22)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
