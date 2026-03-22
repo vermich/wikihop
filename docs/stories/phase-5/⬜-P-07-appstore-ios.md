@@ -1,7 +1,7 @@
 ---
 id: P-07
 title: Soumission App Store (iOS)
-phase: 4-Production
+phase: 5-Services managés
 priority: Must
 agents: [Tech Lead, Frontend Dev, DPO]
 status: pending

@@ -1,7 +1,7 @@
 ---
 id: P-08
 title: Soumission Google Play Store (Android)
-phase: 4-Production
+phase: 5-Services managés
 priority: Must
 agents: [Tech Lead, Frontend Dev, DPO]
 status: pending
