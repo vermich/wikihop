@@ -154,7 +154,7 @@
 | [P-14](stories/phase-4/⬜-P-14-crash-reporting.md) | Traçabilité des erreurs côté mobile (crash reporting) | Could | Frontend Dev, DPO | ⬜ pending |
 | [P-15](stories/phase-4/✅-P-15-sast-security.md) | Tests de sécurité automatisés (SAST) | Could | Security | ✅ done |
 | [P-16](stories/phase-4/✅-P-16-fix-daily-challenge-button-disabled-fr-it.md) | Fix — Bouton défi du jour grisé en FR et IT | Must | Frontend Dev, Backend Dev | ✅ done |
-| [P-17](stories/phase-4/🔄-P-17-remove-back-button-daily-challenge.md) | UX — Supprimer le bouton retour sur l'écran défi du jour | Should | Frontend Dev | 🔄 in-progress |
+| [P-17](stories/phase-4/✅-P-17-remove-back-button-daily-challenge.md) | UX — Supprimer le bouton retour sur l'écran défi du jour | Should | Frontend Dev | ✅ done |
 
 ---
 
@@ -251,5 +251,5 @@
 *v5.8 : Phase 3 clôturée — F3-48/F3-49 passées en done (gate device physique confirmé par le Client — 2026-03-21) — P-16/P-17 créées en Phase 4 (2026-03-21)*
 *v5.9 : Phase 4 Lot 2 sécurité — P-02/P-03 passées en done (validées QA Halim — 24 tests OWASP + 13 tests security/admin passants — 2026-03-21)*
 *v6.0 : Phase 4 Lot 3 RGPD — P-01/P-10/P-13 passées en done (validées QA Halim — politique de confidentialité, registre art. 30, mentions légales intégrées — 2026-03-21)*
-*v6.1 : Phase 4 Lot 4 Infrastructure — P-06/P-12 passées en done (validées QA Halim — 2026-03-22) — P-09 déplacée en Phase 5 (décision différée, dépend de l'URL de prod) — P-17 in-progress (7/7 critères code, gate device physique Client en attente)*
+*v6.1 : Phase 4 Lot 4 Infrastructure — P-06/P-12/P-17 passées en done (2026-03-22) — P-09 déplacée en Phase 5 (décision différée, dépend URL de prod)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*

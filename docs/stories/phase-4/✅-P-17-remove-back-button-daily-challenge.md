@@ -4,9 +4,9 @@ title: UX — Supprimer le bouton retour sur l'écran défi du jour
 phase: 4-Production
 priority: Should
 agents: [Frontend Dev]
-status: in-progress
+status: done
 created: 2026-03-21
-completed:
+completed: 2026-03-22
 ---
 
 # P-17 — UX — Supprimer le bouton retour sur l'écran défi du jour
