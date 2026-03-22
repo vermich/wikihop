@@ -4,7 +4,7 @@ title: Accessibilité de base (WCAG 2.1 AA)
 phase: 4-Production
 priority: Should
 agents: [Frontend Dev, UX/UI]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---

@@ -4,7 +4,7 @@ title: Traçabilité des erreurs côté mobile (crash reporting)
 phase: 4-Production
 priority: Could
 agents: [Frontend Dev, DPO]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---

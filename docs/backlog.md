@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-21 | **Version** : 5.9
+**PM** : Gauderic | **Mis à jour** : 2026-03-22 | **Version** : 6.2
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -63,7 +63,7 @@
 | [M-10](stories/phase-2/✅-M-10-abandon-game.md) | Abandon de partie | Should | Frontend Dev, UX/UI | ✅ done |
 | [M-11](stories/phase-4/⬜-M-11-offline-mode.md) | Gestion du mode hors-ligne | Should | Frontend Dev | ↪ Phase 4 |
 | [M-12](stories/phase-2/✅-M-12-language-support.md) | Support de la langue (français par défaut, configurable) | Should | Frontend Dev, Backend Dev | ✅ done |
-| [M-13](stories/phase-4/⬜-M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | ↪ Phase 4 |
+| [M-13](stories/phase-4/🔄-M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | ↪ Phase 4 |
 | [M-14](stories/wont/🚫-M-14-article-thumbnail.md) | Affichage de l'image de résumé de l'article | Could | Frontend Dev | 🚫 won't |
 | [M-15](stories/phase-2/✅-M-15-webview-css-injection.md) | WebView Wikipedia avec injection CSS mobile | Must | Frontend Dev | ✅ done |
 | [M-16](stories/phase-2/✅-M-16-popular-pages-strategy.md) | Pages populaires — stratégie hybride API + cache + fallback JSON | Must | Frontend Dev, Backend Dev | ✅ done |
@@ -141,13 +141,13 @@
 | [P-02](stories/phase-4/✅-P-02-owasp-audit.md) | Audit de sécurité — OWASP Mobile Top 10 | Must | Security | ✅ done |
 | [P-03](stories/phase-4/✅-P-03-backend-security.md) | Sécurisation du backend — Headers, CORS, Rate limiting | Must | Security, Backend Dev | ✅ done |
 | [P-04](stories/phase-4/✅-P-04-secrets-management.md) | Secrets et variables d'environnement (production) | Must | Security, Tech Lead | ✅ done |
-| [P-05](stories/phase-4/⬜-P-05-performance-tests.md) | Tests de performance et de charge (backend) | Must | QA, Backend Dev | ⬜ pending |
+| [P-05](stories/phase-4/🔄-P-05-performance-tests.md) | Tests de performance et de charge (backend) | Must | QA, Backend Dev | 🔄 in-progress |
 | [P-06](stories/phase-4/✅-P-06-cicd-deployment.md) | Pipeline CI/CD — Build et déploiement automatisé | Must | Tech Lead | ✅ done |
 | [P-10](stories/phase-4/✅-P-10-rgpd-compliance.md) | Conformité RGPD complète — Registre de traitement | Should | DPO | ✅ done |
-| [M-13](stories/phase-4/⬜-M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | ⬜ pending |
+| [M-13](stories/phase-4/🔄-M-13-accessibility.md) | Accessibilité de base (WCAG 2.1 AA) | Should | Frontend Dev, UX/UI | 🔄 in-progress |
 | [P-12](stories/phase-4/✅-P-12-ota-updates.md) | Stratégie de mise à jour OTA (Over The Air) | Should | Tech Lead, Frontend Dev | ✅ done |
 | [P-13](stories/phase-4/✅-P-13-legal-texts.md) | Textes légaux in-app (CGU simplifiées) | Should | DPO, Frontend Dev | ✅ done |
-| [P-14](stories/phase-4/⬜-P-14-crash-reporting.md) | Traçabilité des erreurs côté mobile (crash reporting) | Could | Frontend Dev, DPO | ⬜ pending |
+| [P-14](stories/phase-4/🔄-P-14-crash-reporting.md) | Traçabilité des erreurs côté mobile (crash reporting) | Could | Frontend Dev, DPO | 🔄 in-progress |
 | [P-15](stories/phase-4/✅-P-15-sast-security.md) | Tests de sécurité automatisés (SAST) | Could | Security | ✅ done |
 | [P-16](stories/phase-4/✅-P-16-fix-daily-challenge-button-disabled-fr-it.md) | Fix — Bouton défi du jour grisé en FR et IT | Must | Frontend Dev, Backend Dev | ✅ done |
 | [P-17](stories/phase-4/✅-P-17-remove-back-button-daily-challenge.md) | UX — Supprimer le bouton retour sur l'écran défi du jour | Should | Frontend Dev | ✅ done |
@@ -252,4 +252,5 @@
 *v5.9 : Phase 4 Lot 2 sécurité — P-02/P-03 passées en done (validées QA Halim — 24 tests OWASP + 13 tests security/admin passants — 2026-03-21)*
 *v6.0 : Phase 4 Lot 3 RGPD — P-01/P-10/P-13 passées en done (validées QA Halim — politique de confidentialité, registre art. 30, mentions légales intégrées — 2026-03-21)*
 *v6.1 : Phase 4 Lot 4 — P-06/P-12/P-17 done — P-07/P-08/P-09/P-11/M-11 déplacées en Phase 5 (requièrent backend déployé)*
+*v6.2 : Phase 4 Lot final — P-05/M-13/P-14 → in-progress (2026-03-22)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*

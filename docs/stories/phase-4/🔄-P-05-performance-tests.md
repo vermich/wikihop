@@ -4,7 +4,7 @@ title: Tests de performance et de charge (backend)
 phase: 4-Production
 priority: Must
 agents: [QA, Backend Dev]
-status: pending
+status: in-progress
 created: 2026-02-28
 completed:
 ---
