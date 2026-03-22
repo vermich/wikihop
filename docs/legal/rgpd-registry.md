@@ -4,7 +4,7 @@
 
 **Responsable de traitement :** WikiHop App
 **Contact DPO :** privacy@wikihop.app
-**Dernière mise à jour :** 21 mars 2026
+**Dernière mise à jour :** 22 mars 2026
 
 ---
 
@@ -70,6 +70,24 @@
 
 ---
 
+### Traitement 4 — Crash reporting mobile (Sentry)
+
+| Champ | Détail |
+|-------|--------|
+| Finalité | Détection et diagnostic des crashs de l'application mobile pour correction de bugs |
+| Base légale | Intérêt légitime (article 6.1.f RGPD) |
+| Catégories de personnes | Utilisateurs de l'application (anonymes, aucune identité connue) |
+| Catégories de données | Version de l'app, OS + version OS, stack trace JavaScript, type de crash, timestamp |
+| Localisation | Sentry — datacenter Union européenne |
+| Destinataires | Sentry / Functional Software Inc. (sous-traitant, DPA en vigueur) |
+| Transfert hors UE | Potentiel accès par Sentry Inc. (USA) — couvert par DPA Sentry + Data Privacy Framework |
+| Durée de conservation | 90 jours (plan gratuit Sentry), puis suppression automatique |
+| Mesures de sécurité | `sendDefaultPii: false` (IP non collectée), hook `beforeSend` filtrant user/cookies/headers/url/query_string, datacenter EU, HTTPS, `enabled: false` hors production |
+
+> **Note DPO :** Le traitement est conditionné au choix du datacenter EU lors de la configuration du DSN Sentry. Le Tech Lead doit confirmer cette configuration avant mise en production. Le DPA Sentry doit être accepté via le compte Sentry de l'organisation. Voir validation complète dans `docs/dpo/P-14-sentry-validation.md`.
+
+---
+
 ## 3. Analyse de risque — Appels API Wikipedia et logs IP
 
 **Question :** Les appels à l'API Wikipedia génèrent-ils des logs d'adresse IP ?
@@ -121,14 +139,15 @@ Justification :
 - Les données locales (AsyncStorage) sont strictement nécessaires au fonctionnement du service et ne constituent pas des cookies au sens de la directive ePrivacy
 - Aucun consentement préalable n'est requis pour le traitement basé sur l'intérêt légitime (logs pseudonymisés de sécurité)
 
-L'application est conforme sans bannière de consentement dans sa version MVP anonyme. Cette conclusion devra être **révisée si** :
+L'application est conforme sans bannière de consentement dans sa version actuelle. Cette conclusion devra être **révisée si** :
 - Des comptes utilisateurs sont introduits
 - Un outil d'analytics est intégré (Firebase, Mixpanel, etc.)
 - Un SDK publicitaire est ajouté
-- Un crash reporter tiers est intégré (Sentry, Crashlytics, etc.)
+
+**Note de mise à jour (22 mars 2026) :** L'intégration de Sentry (crash reporting, story P-14) a été analysée et validée sans obligation de consentement. La base légale d'intérêt légitime est suffisante car : (1) les données sont minimales et non identifiantes, (2) l'IP est désactivée, (3) l'utilisateur est informé dans la politique de confidentialité. La bannière de consentement reste non requise après cette intégration.
 
 ---
 
 *Document produit par le DPO WikiHop — Maïté*
 *Article 30 RGPD — Usage interne*
-*Dernière mise à jour : 21 mars 2026*
+*Dernière mise à jour : 22 mars 2026*

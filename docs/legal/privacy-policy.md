@@ -1,6 +1,6 @@
 # Politique de confidentialité — WikiHop
 
-**Dernière mise à jour : 21 mars 2026**
+**Dernière mise à jour : 22 mars 2026**
 
 ---
 
@@ -21,7 +21,7 @@ WikiHop est conçue pour respecter votre vie privée au maximum. Dans sa version
 - Aucun cookie de traçage ou pixel de suivi
 - Aucun outil d'analytics ou de mesure d'audience
 - Aucune donnée de localisation
-- Aucun partage de données avec des tiers
+- Aucune adresse IP transmise à des services tiers
 
 ---
 
@@ -51,13 +51,41 @@ WikiHop ne collecte ni ne stocke aucune information relative à ces appels.
 
 ---
 
-## 5. Pas de cookies, pas de bannière
+## 5. Détection automatique des crashs (Sentry)
+
+WikiHop utilise le service **Sentry** pour détecter et analyser les crashs de l'application, afin de corriger les bugs et améliorer la stabilité.
+
+En cas de plantage de l'application, les informations suivantes sont automatiquement transmises à Sentry :
+
+| Donnée | Finalité |
+|--------|----------|
+| Version de l'application | Identifier la version concernée par le bug |
+| Système d'exploitation et version (iOS / Android) | Reproduire le contexte technique |
+| Stack trace JavaScript (trace d'erreur) | Localiser et corriger le bug dans le code |
+| Type de crash et message d'erreur | Classifier et prioriser les corrections |
+| Horodatage | Corréler les crashs dans le temps |
+
+**Ce qui n'est PAS transmis à Sentry :**
+- Aucune adresse IP
+- Aucun identifiant de compte (WikiHop n'en crée pas)
+- Aucune donnée de navigation (URLs consultées)
+- Aucune donnée saisie par l'utilisateur
+
+Ces données sont stockées sur des **serveurs Sentry situés dans l'Union européenne** pendant une durée maximale de **90 jours**, puis supprimées automatiquement.
+
+**Base légale :** intérêt légitime (article 6.1.f RGPD) — la correction de bugs est nécessaire au bon fonctionnement du service.
+
+Sentry (Functional Software Inc.) agit en qualité de sous-traitant au sens du RGPD. Un contrat de traitement des données (DPA) est en vigueur. Pour plus d'informations : [https://sentry.io/privacy/](https://sentry.io/privacy/)
+
+---
+
+## 6. Pas de cookies, pas de bannière
 
 WikiHop n'utilise aucun cookie, ni côté application ni côté serveur. Aucun consentement aux cookies n'est requis.
 
 ---
 
-## 6. Infrastructure backend
+## 7. Infrastructure backend
 
 WikiHop dispose d'un serveur backend hébergé dans l'Union européenne, utilisé pour fournir les listes d'articles de jeu. Ce serveur conserve des **logs techniques d'accès** (adresses IP des requêtes entrantes) pendant une durée maximale de 30 jours, à des fins de sécurité et de maintenance. Ces logs sont pseudonymisés (le dernier octet de chaque adresse IP est tronqué).
 
@@ -65,7 +93,7 @@ Ces logs ne sont pas utilisés pour identifier des utilisateurs individuels et n
 
 ---
 
-## 7. Vos droits (RGPD)
+## 8. Vos droits (RGPD)
 
 Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez de droits sur vos données personnelles : droit d'accès, de rectification, d'effacement, de portabilité et d'opposition.
 
@@ -73,6 +101,7 @@ Dans le cas de WikiHop, ces droits s'appliquent dans un cadre très limité :
 
 - **Données locales (statistiques, langue, historique)** : ces données sont exclusivement sur votre appareil. Vous pouvez les supprimer à tout moment en désinstallant l'application ou via les paramètres de votre téléphone (effacement des données de l'app).
 - **Logs serveur** : pseudonymisés et purgés automatiquement sous 30 jours. Il n'est pas possible d'y rattacher votre identité.
+- **Rapports de crash (Sentry)** : les données transmises à Sentry ne permettent pas de vous identifier. Elles sont supprimées automatiquement après 90 jours. Pour exercer vos droits, contactez-nous à l'adresse ci-dessous et nous relayerons votre demande à Sentry si nécessaire.
 
 Pour toute demande ou question relative à vos données, vous pouvez nous contacter à :
 
@@ -80,19 +109,19 @@ Pour toute demande ou question relative à vos données, vous pouvez nous contac
 
 ---
 
-## 8. Sécurité
+## 9. Sécurité
 
-WikiHop prend les mesures techniques appropriées pour protéger les données traitées : chiffrement des échanges (HTTPS), pseudonymisation des logs, purge automatique.
+WikiHop prend les mesures techniques appropriées pour protéger les données traitées : chiffrement des échanges (HTTPS), pseudonymisation des logs serveur, purge automatique, désactivation de la collecte d'IP côté Sentry.
 
 ---
 
-## 9. Modifications de cette politique
+## 10. Modifications de cette politique
 
 En cas de modification de cette politique de confidentialité, la nouvelle version sera publiée avec une date de mise à jour actualisée. Les changements significatifs seront signalés dans les notes de mise à jour de l'application.
 
 ---
 
-## 10. Contact
+## 11. Contact
 
 Pour toute question relative à cette politique ou à vos données :
 
@@ -101,4 +130,4 @@ Pour toute question relative à cette politique ou à vos données :
 ---
 
 *Document produit par le DPO WikiHop — Maïté*
-*Dernière mise à jour : 21 mars 2026*
+*Dernière mise à jour : 22 mars 2026*
