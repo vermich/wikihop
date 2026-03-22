@@ -32,6 +32,16 @@
     },
     "runtimeVersion": {
       "policy": "appVersion"
-    }
+    },
+    "plugins": [
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "wikihop",
+          "organization": "[NOM_ORGANISATION_SENTRY]"
+        }
+      ]
+    ]
   }
 }
