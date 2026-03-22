@@ -11,6 +11,7 @@
  */
 
 import type { ErrorEvent } from '@sentry/react-native';
+
 import { filterSentryEvent } from '../sentry.utils';
 
 /** Helper pour construire un ErrorEvent minimal valide en production */

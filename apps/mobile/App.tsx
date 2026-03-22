@@ -11,23 +11,43 @@
  *   useLanguageStore(state => state.isLanguageHydrated) pour afficher un
  *   indicateur de chargement si nécessaire.
  *
+ * Sentry (P-14) :
+ *   Sentry.init() est appelé en premier, avant tout import applicatif.
+ *   Sentry.wrap() intercepte les crashs non catchés sur le thread JS.
+ *   enabled: false en développement pour ne pas polluer le projet Sentry.
+ *
  * Note : default export requis ici par Expo (registerRootComponent).
  * Tous les autres composants utilisent des exports nommés.
  */
 
-// i18n doit être importé en premier — initialise i18next de façon synchrone
-// avant que les composants ne rendent et n'appellent useTranslation()
-import './src/i18n/i18n';
-
+import * as Sentry from '@sentry/react-native';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 
-import { RootNavigator } from './src/navigation/RootNavigator';
+import './src/i18n/i18n';
 import { useCriticalUpdateCheck } from './src/hooks/useCriticalUpdateCheck';
+import { RootNavigator } from './src/navigation/RootNavigator';
 import { useGameStore } from './src/store/game.store';
 import { useLanguageStore } from './src/store/language.store';
+import { filterSentryEvent } from './src/utils/sentry.utils';
 
-export default function App(): React.JSX.Element {
+Sentry.init({
+  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+  // Désactiver en développement pour ne pas polluer le projet Sentry
+  enabled: process.env.NODE_ENV === 'production',
+  // Pas de sampling de sessions — on capture tous les crashs, pas de tracing de performance
+  tracesSampleRate: 0,
+  // Attacher la stack trace à tous les événements (pas uniquement les exceptions non catchées)
+  attachStacktrace: true,
+  // sendDefaultPii: false désactive la collecte automatique de l'IP — requis DPO
+  sendDefaultPii: false,
+  // Filtre obligatoire : supprime toute donnée potentiellement personnelle avant envoi
+  beforeSend(event) {
+    return filterSentryEvent(event);
+  },
+});
+
+function App(): React.JSX.Element {
   // Vérification OTA critique au démarrage — no-op en simulateur/Expo Go
   useCriticalUpdateCheck();
 
@@ -47,3 +67,8 @@ export default function App(): React.JSX.Element {
     </>
   );
 }
+
+// Sentry.wrap() intercepte les erreurs non catchées React Native (JS thread crash)
+// C'est le mécanisme principal de détection des crashs — exception documentée
+// au pattern "default export uniquement pour App.tsx" (requis Expo + Sentry.wrap)
+export default Sentry.wrap(App);

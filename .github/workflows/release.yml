@@ -31,6 +31,16 @@ jobs:
         working-directory: apps/mobile
         run: npm ci
 
+      - name: Configure Sentry environment for EAS
+        # Pousse SENTRY_AUTH_TOKEN comme secret EAS pour que le plugin @sentry/react-native/expo
+        # puisse uploader les source maps lors du build EAS (dé-obfuscation des stack traces).
+        # Secret GitHub requis : SENTRY_AUTH_TOKEN (Internal Integration token Sentry,
+        # scope project:releases + org:read)
+        run: |
+          eas secret:push --scope project --non-interactive \
+            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+        working-directory: apps/mobile
+
       - name: Build production (iOS + Android)
         working-directory: apps/mobile
         run: eas build --platform all --profile production --non-interactive
