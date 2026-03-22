@@ -81,7 +81,8 @@
     "loading_a11y": "Ładowanie historii",
     "sort_a11y_inactive": "Sortuj według {{criterion}} — dotknij, aby sortować od najstarszego do najnowszego",
     "sort_a11y_asc": "Sortuj według {{criterion}} rosnąco — dotknij, aby sortować od najnowszego do najstarszego",
-    "sort_a11y_desc": "Sortuj według {{criterion}} malejąco — dotknij, aby wyłączyć sortowanie"
+    "sort_a11y_desc": "Sortuj według {{criterion}} malejąco — dotknij, aby wyłączyć sortowanie",
+    "back_button_a11y": "Powrót do strony głównej"
   },
   "game_detail": {
     "header_title": "Szczegóły gry",
@@ -104,7 +105,9 @@
     "delete_confirm_title": "Usuń tę grę",
     "delete_confirm_message": "Ta akcja jest nieodwracalna.",
     "delete_confirm_action": "Usuń",
-    "delete_cancel_action": "Anuluj"
+    "delete_cancel_action": "Anuluj",
+    "bloc_statut_won_a11y": "Gra wygrana: {{start}} → {{target}}",
+    "bloc_statut_abandoned_a11y": "Gra porzucona: {{start}} → {{target}}"
   },
   "stats": {
     "header_title": "Moje statystyki",

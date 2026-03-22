@@ -80,7 +80,8 @@
     "loading_a11y": "Geschiedenis laden",
     "sort_a11y_inactive": "Sorteren op {{criterion}} — tik om van oudst naar nieuwst te sorteren",
     "sort_a11y_asc": "Sorteren op {{criterion}} oplopend — tik om van nieuwst naar oudst te sorteren",
-    "sort_a11y_desc": "Sorteren op {{criterion}} aflopend — tik om sortering uit te schakelen"
+    "sort_a11y_desc": "Sorteren op {{criterion}} aflopend — tik om sortering uit te schakelen",
+    "back_button_a11y": "Terug naar het beginscherm"
   },
   "game_detail": {
     "header_title": "Speldetail",
@@ -103,7 +104,9 @@
     "delete_confirm_title": "Dit spel verwijderen",
     "delete_confirm_message": "Deze actie is onomkeerbaar.",
     "delete_confirm_action": "Verwijderen",
-    "delete_cancel_action": "Annuleren"
+    "delete_cancel_action": "Annuleren",
+    "bloc_statut_won_a11y": "Spel gewonnen: {{start}} → {{target}}",
+    "bloc_statut_abandoned_a11y": "Spel verlaten: {{start}} → {{target}}"
   },
   "stats": {
     "header_title": "Mijn statistieken",

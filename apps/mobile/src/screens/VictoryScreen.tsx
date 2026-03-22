@@ -482,7 +482,7 @@ export function VictoryScreen({ navigation }: VictoryScreenProps): React.JSX.Ele
                   >
                     {article.title}
                   </Text>
-                  <Text style={styles.pathItemIcon}>{'↗'}</Text>
+                  <Text style={styles.pathItemIcon} accessible={false}>{'↗'}</Text>
                 </TouchableOpacity>
                 {!isLast && <View style={styles.pathItemSeparator} />}
               </View>

@@ -69,8 +69,8 @@ function BlocStat({
       accessible={true}
       accessibilityLabel={accessibilityLabel}
     >
-      <Text style={styles.blocStatLabel}>{label}</Text>
-      <Text style={[styles.blocStatValue, { fontSize: valueFontSize }]}>{value}</Text>
+      <Text style={styles.blocStatLabel} accessible={false}>{label}</Text>
+      <Text style={[styles.blocStatValue, { fontSize: valueFontSize }]} accessible={false}>{value}</Text>
     </View>
   );
 }
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
   },
   emptyChartMessage: {
     fontSize: 14,
-    color: '#94A3B8',
+    color: '#64748B',
     textAlign: 'center',
     lineHeight: 22,
     paddingVertical: 16,

@@ -80,7 +80,8 @@
     "loading_a11y": "Loading history",
     "sort_a11y_inactive": "Sort by {{criterion}} — tap to sort from oldest to newest",
     "sort_a11y_asc": "Sort by {{criterion}} ascending — tap to sort from newest to oldest",
-    "sort_a11y_desc": "Sort by {{criterion}} descending — tap to disable sorting"
+    "sort_a11y_desc": "Sort by {{criterion}} descending — tap to disable sorting",
+    "back_button_a11y": "Back to home"
   },
   "game_detail": {
     "header_title": "Game detail",
@@ -103,7 +104,9 @@
     "delete_confirm_title": "Delete this game",
     "delete_confirm_message": "This action is irreversible.",
     "delete_confirm_action": "Delete",
-    "delete_cancel_action": "Cancel"
+    "delete_cancel_action": "Cancel",
+    "bloc_statut_won_a11y": "Game won: {{start}} → {{target}}",
+    "bloc_statut_abandoned_a11y": "Game abandoned: {{start}} → {{target}}"
   },
   "stats": {
     "header_title": "My statistics",

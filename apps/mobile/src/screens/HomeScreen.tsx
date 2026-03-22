@@ -234,7 +234,13 @@ export function HomeScreen({ navigation }: HomeScreenProps): React.JSX.Element {
       ]),
     );
 
-    animation.start();
+    void AccessibilityInfo.isReduceMotionEnabled().then((reduceMotion) => {
+      if (reduceMotion) {
+        shimmerAnim.setValue(1.0);
+      } else {
+        animation.start();
+      }
+    });
 
     return () => {
       animation.stop();
