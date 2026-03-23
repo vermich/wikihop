@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-22 | **Version** : 6.2
+**PM** : Gauderic | **Mis à jour** : 2026-03-23 | **Version** : 6.6
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -166,6 +166,7 @@
 | [P-09](stories/phase-5/🔄-P-09-monitoring-alerting.md) | Monitoring et alerting en production | Must | Tech Lead, Backend Dev | 🔄 différé |
 | [P-11](stories/phase-5/⬜-P-11-device-compatibility.md) | Tests de compatibilité appareils (iOS et Android) | Should | QA | ⬜ différé |
 | [P5-01](stories/phase-5/⬜-P5-01-daily-challenge-leaderboard.md) | Tableau des scores du défi quotidien — classement multijoueur | Should | Backend Dev, Frontend Dev, UX/UI, Tech Lead | ⬜ pending |
+| [P-18](stories/phase-5/⬜-P-18-client-onboarding-phase5.md) | Prérequis Client — Configuration des services externes Phase 5 | Must | Client | ⬜ pending |
 
 ---
 
@@ -256,4 +257,5 @@
 *v6.3 : P-05 → done (2026-03-22)*
 *v6.4 : M-13 → done (2026-03-22)*
 *v6.5 : P-14 → done — correction bloquante PR #62 mergée, mention Sentry AboutScreen + 8 i18n validés (2026-03-22)*
+*v6.6 : P-18 créée — Prérequis Client pour le lancement Phase 5 (Sentry, Apple Developer, Google Play, backend déployé) (2026-03-23)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
