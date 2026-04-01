@@ -23,7 +23,11 @@
       },
       "package": "com.wikihop.app"
     },
-    "extra": {},
+    "extra": {
+      "eas": {
+        "projectId": "aea912e3-0f65-4fc4-a55f-c82545233670"
+      }
+    },
     "updates": {
       "enabled": true,
       "fallbackToCacheTimeout": 0,
@@ -39,7 +43,7 @@
         {
           "url": "https://sentry.io/",
           "project": "wikihop",
-          "organization": "[NOM_ORGANISATION_SENTRY]"
+          "organization": "the-regular-guy"
         }
       ]
     ]
