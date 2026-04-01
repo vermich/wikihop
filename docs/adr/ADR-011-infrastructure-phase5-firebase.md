@@ -1,7 +1,7 @@
-# ADR-011 : Infrastructure Phase 5 — Cloud Run / Cloud SQL + Migration Firebase Crashlytics
+# ADR-011 : Infrastructure Phase 5 — Cloud Run / Cloud SQL
 
 ## Statut
-Proposé
+Accepté (partiellement) — Décision 1 (Cloud Run / Cloud SQL) : **Acceptée**. Décision 2 (Firebase Crashlytics) : **Abandonnée** — Sentry maintenu suite à l'avis DPO du 2026-04-01 (voir `docs/dpo/firebase-crashlytics-validation.md`).
 
 ## Contexte
 
