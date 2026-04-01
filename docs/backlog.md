@@ -1,6 +1,6 @@
 # WikiHop — Tableau de bord du backlog
 
-**PM** : Gauderic | **Mis à jour** : 2026-03-23 | **Version** : 6.6
+**PM** : Gauderic | **Mis à jour** : 2026-04-01 | **Version** : 6.7
 
 > Index des user stories. Chaque story est détaillée dans son fichier individuel dans `docs/stories/`.
 
@@ -167,6 +167,7 @@
 | [P-11](stories/phase-5/⬜-P-11-device-compatibility.md) | Tests de compatibilité appareils (iOS et Android) | Should | QA | ⬜ différé |
 | [P5-01](stories/phase-5/⬜-P5-01-daily-challenge-leaderboard.md) | Tableau des scores du défi quotidien — classement multijoueur | Should | Backend Dev, Frontend Dev, UX/UI, Tech Lead | ⬜ pending |
 | [P-18](stories/phase-5/⬜-P-18-client-onboarding-phase5.md) | Prérequis Client — Configuration des services externes Phase 5 | Must | Client | ⬜ pending |
+| [P-19](stories/phase-5/🔄-P-19-backend-cloud-run-deployment.md) | Déploiement backend sur Google Cloud Run + Cloud SQL | Must | Tech Lead, Backend Dev | 🔄 in-progress |
 
 ---
 
@@ -190,7 +191,7 @@
 | 1-Fondations | 10 | 2 | 0 | 12 |
 | 2-MVP | 12 | 5 | 1 | 18 |
 | 3-Features | 16 | 21 | 7 | 44 |
-| 5-Services managés | 0 | 1 | 0 | 1 |
+| 5-Services managés | 1 | 1 | 0 | 2 |
 | 4-Production | 10 | 5 | 2 | 17 |
 | Won't | — | — | — | 4 |
 | **Total** | **48** | **34** | **10** | **96** |
@@ -203,9 +204,9 @@
 
 | Agent | Stories |
 |-------|---------|
-| Tech Lead | F-01, F-02, F-03, F-04, F-05, F-06, F-07, F-08, F-09, F-10, F-12, F3-51, P-06, P-12 |
+| Tech Lead | F-01, F-02, F-03, F-04, F-05, F-06, F-07, F-08, F-09, F-10, F-12, F3-51, P-06, P-12, P-19 |
 | Frontend Dev | F-04, M-01, M-03, M-04, M-05, M-06, M-07, M-08, M-10, M-11, M-12, M-13, M-14, M-15, M-16, M-17, F3-02, F3-03, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-13, F3-14, F3-15, F3-20, F3-21, F3-22, F3-23, F3-24, F3-25, F3-26, F3-27, F3-28, F3-29, F3-30, F3-31, F3-35, F3-46, F3-47, F3-48, F3-49, F3-50, P-07, P-08, P-12, P-13, P-14, P-16, P-17 |
-| Backend Dev | F-05, F-06, F-11, M-02, M-08, M-12, M-16, F3-01, F3-05, F3-14, F3-26, F3-49, F3-51, P-03, P-05, P-06, P-09, P-16 |
+| Backend Dev | F-05, F-06, F-11, M-02, M-08, M-12, M-16, F3-01, F3-05, F3-14, F3-26, F3-49, F3-51, P-03, P-05, P-06, P-09, P-16, P-19 |
 | UX/UI | M-01, M-06, M-13, M-14, M-17, F3-01, F3-02, F3-04, F3-05, F3-06, F3-08, F3-09, F3-10, F3-11, F3-12, F3-14, F3-16, F3-23, F3-25, F3-35 |
 | QA | F-08, M-09, M-18, F3-07, P-05, P-11 |
 | Security | P-02, P-03, P-04, P-15 |
@@ -258,4 +259,5 @@
 *v6.4 : M-13 → done (2026-03-22)*
 *v6.5 : P-14 → done — correction bloquante PR #62 mergée, mention Sentry AboutScreen + 8 i18n validés (2026-03-22)*
 *v6.6 : P-18 créée — Prérequis Client pour le lancement Phase 5 (Sentry, Apple Developer, Google Play, backend déployé) (2026-03-23)*
+*v6.7 : P-19 créée et passée in-progress — Déploiement backend Cloud Run + Cloud SQL (Tech Lead, Backend Dev) (2026-04-01)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
