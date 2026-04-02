@@ -46,43 +46,69 @@ jobs:
         run: eas build --platform all --profile production --non-interactive
 
   # ─────────────────────────────────────────────
-  # Deploy Backend (après build mobile réussi)
+  # Deploy Backend to Cloud Run (après build mobile réussi)
   # ─────────────────────────────────────────────
   deploy-backend:
-    name: Deploy Backend
+    name: Deploy Backend to Cloud Run
     needs: [build-mobile]
     runs-on: ubuntu-latest
     environment: production
     concurrency:
       group: production-deploy
       cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write  # Requis pour Workload Identity Federation (OIDC)
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          node-version: 24
+          workload_identity_provider: projects/518388457741/locations/global/workloadIdentityPools/github-actions/providers/github
+          service_account: wikihop-backend@wikihop-prod.iam.gserviceaccount.com
 
-      - name: Configure SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
 
-      - name: Deploy to production
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+
+      - name: Build Docker image
         run: |
-          ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST \
-            "cd /opt/wikihop && \
-             git fetch --tags && \
-             git checkout ${{ github.ref_name }} && \
-             cd apps/backend && \
-             npm ci --omit=dev && \
-             npm run db:migrate && \
-             pm2 reload wikihop-backend"
+          docker build \
+            -f apps/backend/Dockerfile \
+            -t europe-west1-docker.pkg.dev/wikihop-prod/wikihop/backend:${{ github.sha }} \
+            -t europe-west1-docker.pkg.dev/wikihop-prod/wikihop/backend:latest \
+            .
+
+      - name: Push to Artifact Registry
+        run: |
+          docker push europe-west1-docker.pkg.dev/wikihop-prod/wikihop/backend:${{ github.sha }}
+          docker push europe-west1-docker.pkg.dev/wikihop-prod/wikihop/backend:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy wikihop-backend \
+            --image europe-west1-docker.pkg.dev/wikihop-prod/wikihop/backend:${{ github.sha }} \
+            --region europe-west1 \
+            --platform managed \
+            --add-cloudsql-instances wikihop-prod:europe-west1:wikihop-prod \
+            --set-secrets DATABASE_URL=WIKIHOP_DATABASE_URL:latest,NODE_ENV=WIKIHOP_NODE_ENV:latest \
+            --allow-unauthenticated \
+            --port 3000 \
+            --project wikihop-prod
+
+      - name: Verify health check
+        run: |
+          SERVICE_URL=$(gcloud run services describe wikihop-backend \
+            --region europe-west1 \
+            --project wikihop-prod \
+            --format 'value(status.url)')
+          echo "Service URL: $SERVICE_URL"
+          curl --fail --silent --show-error "$SERVICE_URL/health"
+          echo "Health check passed"
 
   # ─────────────────────────────────────────────
   # Notification d'échec (GitHub Issue automatique)
