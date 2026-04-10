@@ -161,12 +161,12 @@
 | ID | Titre | Priorité | Agent(s) | Statut |
 |----|-------|----------|----------|--------|
 | [M-11](stories/phase-5/⬜-M-11-offline-mode.md) | Gestion du mode hors-ligne | Should | Frontend Dev | ⬜ différé |
-| [P-07](stories/phase-5/⬜-P-07-appstore-ios.md) | Soumission App Store (iOS) | Must | Tech Lead, Frontend Dev, DPO | ⬜ différé |
+| [P-07](stories/phase-5/⬜-P-07-appstore-ios.md) | Soumission App Store (iOS) | Must | Tech Lead, Frontend Dev, DPO | ⬜ Phase 6 |
 | [P-08](stories/phase-5/⬜-P-08-playstore-android.md) | Soumission Google Play Store (Android) | Must | Tech Lead, Frontend Dev, DPO | ⬜ différé |
 | [P-09](stories/phase-5/🔄-P-09-monitoring-alerting.md) | Monitoring et alerting en production | Must | Tech Lead, Backend Dev | 🔄 différé |
 | [P-11](stories/phase-5/⬜-P-11-device-compatibility.md) | Tests de compatibilité appareils (iOS et Android) | Should | QA | ⬜ différé |
 | [P5-01](stories/phase-5/⬜-P5-01-daily-challenge-leaderboard.md) | Tableau des scores du défi quotidien — classement multijoueur | Should | Backend Dev, Frontend Dev, UX/UI, Tech Lead | ⬜ pending |
-| [P-18](stories/phase-5/⬜-P-18-client-onboarding-phase5.md) | Prérequis Client — Configuration des services externes Phase 5 | Must | Client | ⬜ pending |
+| [P-18](stories/phase-5/🔄-P-18-client-onboarding-phase5.md) | Prérequis Client — Configuration des services externes Phase 5 | Must | Client | 🔄 in-progress |
 | [P-19](stories/phase-5/✅-P-19-backend-cloud-run-deployment.md) | Déploiement backend sur Google Cloud Run + Cloud SQL | Must | Tech Lead, Backend Dev | ✅ done |
 
 ---
@@ -261,4 +261,5 @@
 *v6.6 : P-18 créée — Prérequis Client pour le lancement Phase 5 (Sentry, Apple Developer, Google Play, backend déployé) (2026-03-23)*
 *v6.7 : P-19 créée et passée in-progress — Déploiement backend Cloud Run + Cloud SQL (Tech Lead, Backend Dev) (2026-04-01)*
 *v6.8 : P-19 → done — PR #63 mergée, Dockerfile + workflow Cloud Run validés, secrets GCP configurés (2026-04-10)*
+*v6.9 : P-18 → in-progress — Apple Developer Account différé Phase 6 (décision Client 2026-04-10, financement non disponible) — P-07 déplacée Phase 6 (2026-04-10)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
