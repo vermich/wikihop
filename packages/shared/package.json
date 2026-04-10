@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "description": "Types TypeScript partagés entre mobile et backend",
-  "main": "./src/types/index.ts",
-  "types": "./src/types/index.ts",
+  "main": "./dist/types/index.js",
+  "types": "./dist/types/index.d.ts",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build": "tsc --declaration --emitDeclarationOnly --outDir dist"
+    "build": "tsc --outDir dist --declaration --noEmit false"
   },
   "devDependencies": {
     "typescript": "^5.5.0"
