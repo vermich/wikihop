@@ -17,23 +17,21 @@ En tant que Client, je veux configurer les services externes requis, afin que l'
 
 ## Critères d'acceptance
 
-### 1. Sentry DSN
+### 1. Sentry DSN ✅ (fait en P-14)
 
-- [ ] Créer un projet "wikihop" dans l'interface Sentry (sentry.io)
-- [ ] Récupérer le DSN du projet (Settings > Client Keys)
-- [ ] Configurer le DSN dans les secrets EAS : `eas secret:set EXPO_PUBLIC_SENTRY_DSN --scope project`
-- [ ] Choisir la région EU pour le stockage des données (requis DPO — voir `docs/dpo/P-14-sentry-validation.md`)
+- [x] Projet "wikihop" créé dans Sentry (région EU — validé DPO)
+- [x] DSN configuré dans EAS : `EXPO_PUBLIC_SENTRY_DSN` présent sur le projet
+- [x] Organisation slug configuré : `the-regular-guy` dans `apps/mobile/app.json`
 
-### 2. Sentry Auth Token (pour l'upload des source maps CI)
+### 2. Sentry Auth Token ✅ (confirmé Client 2026-04-10)
 
-- [ ] Créer un Internal Integration dans Sentry (Settings > Developer Settings) avec les scopes `project:releases` et `org:read`
-- [ ] Ajouter le token comme secret GitHub : `SENTRY_AUTH_TOKEN` dans Settings > Secrets > Actions
-- [ ] Vérifier que `[NOM_ORGANISATION_SENTRY]` dans `apps/mobile/app.json` correspond bien au slug de l'organisation Sentry (déjà configuré comme `the-regular-guy`)
+- [x] Internal Integration créé dans Sentry avec les scopes `project:releases` et `org:read`
+- [x] Token ajouté comme secret GitHub : `SENTRY_AUTH_TOKEN`
 
-### 3. Sentry Alerting
+### 3. Sentry Alerting ✅ (confirmé Client 2026-04-10)
 
-- [ ] Configurer une règle d'alerte pour les nouveaux types de crash (Settings > Alerts > Create Alert Rule)
-- [ ] Configurer une notification email pour les crashes critiques
+- [x] Règle d'alerte configurée pour les nouveaux types de crash
+- [x] Notification email configurée pour les crashes critiques
 
 ### 4. Google Play Console (requis pour P-08 — Play Store Android)
 
