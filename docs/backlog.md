@@ -167,7 +167,7 @@
 | [P-11](stories/phase-5/⬜-P-11-device-compatibility.md) | Tests de compatibilité appareils (iOS et Android) | Should | QA | ⬜ différé |
 | [P5-01](stories/phase-5/⬜-P5-01-daily-challenge-leaderboard.md) | Tableau des scores du défi quotidien — classement multijoueur | Should | Backend Dev, Frontend Dev, UX/UI, Tech Lead | ⬜ pending |
 | [P-18](stories/phase-5/⬜-P-18-client-onboarding-phase5.md) | Prérequis Client — Configuration des services externes Phase 5 | Must | Client | ⬜ pending |
-| [P-19](stories/phase-5/🔄-P-19-backend-cloud-run-deployment.md) | Déploiement backend sur Google Cloud Run + Cloud SQL | Must | Tech Lead, Backend Dev | 🔄 in-progress |
+| [P-19](stories/phase-5/✅-P-19-backend-cloud-run-deployment.md) | Déploiement backend sur Google Cloud Run + Cloud SQL | Must | Tech Lead, Backend Dev | ✅ done |
 
 ---
 
@@ -260,4 +260,5 @@
 *v6.5 : P-14 → done — correction bloquante PR #62 mergée, mention Sentry AboutScreen + 8 i18n validés (2026-03-22)*
 *v6.6 : P-18 créée — Prérequis Client pour le lancement Phase 5 (Sentry, Apple Developer, Google Play, backend déployé) (2026-03-23)*
 *v6.7 : P-19 créée et passée in-progress — Déploiement backend Cloud Run + Cloud SQL (Tech Lead, Backend Dev) (2026-04-01)*
+*v6.8 : P-19 → done — PR #63 mergée, Dockerfile + workflow Cloud Run validés, secrets GCP configurés (2026-04-10)*
 *Pour créer les stories d'une nouvelle fonctionnalité : `/sprint [description]`*
