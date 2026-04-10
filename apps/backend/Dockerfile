@@ -52,4 +52,4 @@ COPY --from=build /app/packages/shared/dist ./packages/shared/dist
 EXPOSE 3000
 
 # Pas de --env-file : les variables sont injectées par Cloud Run depuis Secret Manager
-CMD ["node", "apps/backend/dist/apps/backend/src/server.js"]
+CMD ["node", "apps/backend/dist/server.js"]
